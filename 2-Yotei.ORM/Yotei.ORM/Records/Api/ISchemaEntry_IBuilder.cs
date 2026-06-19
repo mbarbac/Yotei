@@ -107,6 +107,14 @@ partial interface ISchemaEntry
         bool AddRange(IEnumerable<IMetadataEntry> range);
 
         /// <summary>
+        /// Updates in this instance the entries of the given range without throwing exceptions
+        /// if any is a duplicated one. Last one updated wins.
+        /// </summary>
+        /// <param name="range"></param>
+        /// <returns></returns>
+        bool UpdateRange(IEnumerable<IMetadataEntry> range);
+
+        /// <summary>
         /// Removes from this instance the entry associated with the given name, if any.
         /// </summary>
         /// <param name="name"></param>

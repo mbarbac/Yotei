@@ -14,27 +14,31 @@ public partial interface ISchemaEntry : IEnumerable<IMetadataEntry>, IEquatable<
 {
     /// <summary>
     /// The identifier by which the associated schema element (column) is knowm, or null if this
-    /// property has not been set explicitly or through associated well-known metadata.
+    /// property has not been either set yet explicitly or through its associated well-known
+    /// metadata tags, if any.
     /// </summary>
     [With] IIdentifier? Identifier { get; init; }
 
     /// <summary>
     /// Whether the associated schema element (column) is a primary key one, or part of a primary
-    /// key group, or null if this property has not been set explicitly or through associated
-    /// well-known metadata. Only one primary key group is supported per schema.
+    /// key group, or null if this property has not been either set yet explicitly or through its
+    /// associated well-known metadata tags, if any. Only one primary key group is supported per
+    /// schema.
     /// </summary>
     [With] bool? IsPrimaryKey { get; init; }
 
     /// <summary>
     /// Whether the associated schema element (column) is a unique valued one, or part of a unique
-    /// valued group, or null if this property has not been set explicitly or through associated
-    /// well-known metadata. Only one unique valued group is supported per schema.
+    /// valued group, or null if this property has not been either set yet explicitly or through
+    /// its associated well-known metadata tags, if any. Only one unique valued group is supported
+    /// per schema.
     /// </summary>
     [With] bool? IsUniqueValued { get; init; }
 
     /// <summary>
     /// Whether the associated schema element (column) is a read only one, or null if this property
-    /// has not been set explicitly or through associated well-known metadata.
+    /// has not been either set yet explicitly or through its associated well-known metadata tags,
+    /// if any.
     /// </summary>
     [With] bool? IsReadOnly { get; init; }
 

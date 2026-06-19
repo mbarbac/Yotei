@@ -6,14 +6,15 @@ partial class SchemaEntry
     /// <summary>
     /// <inheritdoc cref="ISchemaEntry.IBuilder"/>
     /// </summary>
-    [DebuggerDisplay("{ToString(3)}")]
+    /// Metadata entries may be set through the associated property, or throw an enumeration of
+    /// entries (constructor or addrange).
     [Cloneable]
     public partial class Builder : ISchemaEntry.IBuilder
     {
         readonly List<IMetadataEntry> Items = [];
 
         /// <summary>
-        /// Returns the index of the unique entry associated with the given name, or -1 if any.
+        /// Gets the index of the entry associated with the given name, or -1 if any.
         /// </summary>
         int IndexOf(string name)
         {
@@ -34,8 +35,8 @@ partial class SchemaEntry
         }
 
         /// <summary>
-        /// Returns the index of the unique entry associated with any of the given names, or -1
-        /// if any, or throws an exception if many.
+        /// Gets the index of the unique entry associated with any of the given names, or -1 if
+        /// any, or throws an exception if many.
         /// </summary>
         int IndexOf(IEnumerable<string> names)
         {
@@ -74,102 +75,7 @@ partial class SchemaEntry
         bool Compare(string source, string target)
             => string.Compare(source, target, Engine.IgnoreCase) == 0;
 
-        // ------------------------------------------------
-
-        /// <summary>
-        /// Gets the value of the given well-known propery.
-        /// </summary>
-        protected T? Getter<T>(IMetadataTag? tag, ref T? repo)
-        {
-            // Only if there is associated well-known metadata...
-            if (tag != null)
-            {
-                // No repo kept, try to obtain its value from metadata...
-                if (repo is null)
-                {
-                    var index = IndexOf(tag);
-                    if (index >= 0)
-                    {
-                        var item = Items[index];
-                        if (item.Value is null) Items.RemoveAt(index); // removing null values...
-                        else repo = (T)item.Value;
-                    }
-                }
-
-                // Having a repo'ed value, synchonize with metadata...
-                else
-                {
-                    var index = IndexOf(tag);
-                    if (index >= 0)
-                    {
-                        var item = Items[index];
-                        if (!repo.EqualsEx(item.Value))
-                            Items[index] = new MetadataEntry(item.Name, repo);
-                    }
-                    else Items.Add(new MetadataEntry(tag.Default, repo));
-                }
-            }
-
-            // Returning whatever the value the repo has...
-            return repo;
-        }
-
-        /// <summary>
-        /// Sets the value of the given well-known property.
-        /// </summary>
-        protected void Setter<T>(IMetadataTag? tag, ref T? repo, T? value)
-        {
-            // Only if there is associated well-known metadata...
-            if (tag != null)
-            {
-                // Updating existing entry if needed...
-                var index = IndexOf(tag);
-                if (index >= 0)
-                {
-                    if (value is null) Items.RemoveAt(index); // removing null values...
-                    else
-                    {
-                        var item = Items[index];
-                        if (!item.Value.EqualsEx(value))
-                            Items[index] = new MetadataEntry(item.Name, value);
-                    }
-                }
-
-                // Adding a metadata entry if needed...
-                else
-                {
-                    if (value is not null)
-                        Items.Add(new MetadataEntry(tag.Default, value));
-                }
-            }
-
-            // Setting whatever value we've got...
-            repo = value;
-        }
-
-        /// <summary>
-        /// Tries to obtain the default value associated with the well-known metadata name.
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        protected virtual bool GetDefaultValue(string name, out object? value)
-        {
-            name = Validate(name);
-
-            var tags = Engine.KnownTags.IdentifierTags;
-            if (tags != null)
-                foreach (var tag in tags) if (tag.Contains(name)) { value = null; return true; }
-
-            if (Engine.KnownTags.PrimaryKeyTag?.Contains(name) ?? false) { value = false; return true; }
-            if (Engine.KnownTags.UniqueValuedTag?.Contains(name) ?? false) { value = false; return true; }
-            if (Engine.KnownTags.ReadOnlyTag?.Contains(name) ?? false) { value = false; return true; }
-
-            value = null;
-            return false;
-        }
-
-        // ------------------------------------------------
+        // ----------------------------------------------------
 
         /// <summary>
         /// Initializes a new empty instance.
@@ -178,11 +84,13 @@ partial class SchemaEntry
         public Builder(IEngine engine) => Engine = engine.ThrowWhenNull();
 
         /// <summary>
-        /// Initializes a new instance with the given metadata entries.
+        /// Initializes a new instance with the metadata entries of the given range without
+        /// throwing an exception if any is duplicated.
         /// </summary>
         /// <param name="engine"></param>
+        /// <param name="range"></param>
         public Builder(
-            IEngine engine, IEnumerable<IMetadataEntry> range) : this(engine) => AddRange(range);
+            IEngine engine, IEnumerable<IMetadataEntry> range) : this(engine) => UpdateRange(range);
 
         /// <summary>
         /// Copy constructor.
@@ -194,42 +102,16 @@ partial class SchemaEntry
         /// <inheritdoc/>
         /// </summary>
         /// <returns></returns>
-        public override string ToString() => ToString(0);
+        public override string ToString() => throw null;
 
-        public string ToString(int count)
-        {
-            var sb = new StringBuilder();
-
-            sb.Append(_Identifier?.Value ?? "-");
-            if (IsPrimaryKey ?? false) sb.Append(", Primary");
-            if (IsUniqueValued ?? false) sb.Append(", Unique");
-            if (IsReadOnly ?? false) sb.Append(", ReadOnly");
-
-            foreach (var item in Items)
-            {
-                if (count <= 0) break;
-                if (Engine.KnownTags.Contains(item.Name)) continue;
-
-                sb.Append($"{item.Name}='{item.Value.Sketch()}'");
-                count--;
-            }
-
-            return sb.ToString();
-        }
+        protected virtual string CoreString() => throw null;
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         /// <returns></returns>
-        public IEnumerator<IMetadataEntry> GetEnumerator() => throw null;
+        public virtual IEnumerator<IMetadataEntry> GetEnumerator() => throw null;
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
-        // ----------------------------------------------------
-
-        IIdentifier? _Identifier = null;
-        bool? _IsPrimaryKey = null;
-        bool? _IsUniqueValued = null;
-        bool? _IsReadOnly = null;
 
         // ----------------------------------------------------
 
@@ -247,8 +129,8 @@ partial class SchemaEntry
         /// </summary>
         public bool? IsPrimaryKey
         {
-            get => Getter(Engine.KnownTags.PrimaryKeyTag, ref _IsPrimaryKey);
-            set => Setter(Engine.KnownTags.PrimaryKeyTag, ref _IsPrimaryKey, value);
+            get => throw null;
+            set => throw null;
         }
 
         /// <summary>
@@ -256,8 +138,8 @@ partial class SchemaEntry
         /// </summary>
         public bool? IsUniqueValued
         {
-            get => Getter(Engine.KnownTags.UniqueValuedTag, ref _IsUniqueValued);
-            set => Setter(Engine.KnownTags.UniqueValuedTag, ref _IsUniqueValued, value);
+            get => throw null;
+            set => throw null;
         }
 
         /// <summary>
@@ -265,8 +147,8 @@ partial class SchemaEntry
         /// </summary>
         public bool? IsReadOnly
         {
-            get => Getter(Engine.KnownTags.ReadOnlyTag, ref _IsReadOnly);
-            set => Setter(Engine.KnownTags.ReadOnlyTag, ref _IsReadOnly, value);
+            get => throw null;
+            set => throw null;
         }
 
         // ----------------------------------------------------
@@ -297,52 +179,21 @@ partial class SchemaEntry
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public bool Contains(string name)
-        {
-            name = Validate(name);
-
-            if (IndexOf(name) >= 0) return true;
-            return Engine.KnownTags.Contains(name); // Well-known ones behave as found!
-        }
+        public bool Contains(string name) => throw null;
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         /// <param name="names"></param>
         /// <returns></returns>
-        public bool Contains(IEnumerable<string> names)
-        {
-            ArgumentNullException.ThrowIfNull(names);
-
-            foreach (var name in names) if (Contains(name)) return true;
-            return false;
-        }
+        public bool Contains(IEnumerable<string> names) => throw null;
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public IMetadataEntry? Find(string name)
-        {
-            name = Validate(name);
-            
-            var index = IndexOf(name);
-            if (index >= 0) return Items[index];
-
-
-
-            var tag = Engine.KnownTags.PrimaryKeyTag;
-            if (tag != null && tag.Contains(name))
-            {
-                var value = IsPrimaryKey ?? false;
-                return 
-            }
-
-
-            // No entry found...
-            return null;
-        }
+        public IMetadataEntry? Find(string name) => throw null;
 
         /// <summary>
         /// <inheritdoc/>
@@ -379,6 +230,13 @@ partial class SchemaEntry
         /// <param name="entry"></param>
         /// <returns></returns>
         public virtual bool AddRange(IEnumerable<IMetadataEntry> range) => throw null;
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <param name="range"></param>
+        /// <returns></returns>
+        public virtual bool UpdateRange(IEnumerable<IMetadataEntry> range) => throw null;
 
         /// <summary>
         /// <inheritdoc/>
