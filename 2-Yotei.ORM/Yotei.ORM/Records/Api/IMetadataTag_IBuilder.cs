@@ -33,7 +33,7 @@ partial interface IMetadataTag
         bool Contains(string name);
 
         /// <summary>
-        /// <inheritdoc cref="IMetadataTag.ContainsAny(IEnumerable{string})"/>
+        /// <inheritdoc cref="IMetadataTag.Contains(IEnumerable{string})"/>
         /// </summary>
         /// <param name="range"></param>
         /// <returns></returns>

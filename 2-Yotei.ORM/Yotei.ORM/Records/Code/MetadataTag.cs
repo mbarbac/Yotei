@@ -134,7 +134,7 @@ public sealed partial class MetadataTag : IMetadataTag
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
-    public bool ContainsAny(IEnumerable<string> range) => Items.ContainsAny(range);
+    public bool Contains(IEnumerable<string> range) => Items.ContainsAny(range);
 
     /// <summary>
     /// <inheritdoc/>

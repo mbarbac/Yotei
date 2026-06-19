@@ -299,11 +299,8 @@ public partial class KnownTags : IKnownTags
     {
         name = name.NotNullNotEmpty(trim: true);
 
-        if (IdentifierTags != null)
-        {
-            var tag = IdentifierTags.Value.FirstOrDefault(x => x.Contains(name));
-            if (tag != null) return tag;
-        }
+        var tag = IdentifierFind(name);
+        if (tag != null) return tag;
 
         if (PrimaryKeyTag?.Contains(name) ?? false) return PrimaryKeyTag;
         if (UniqueValuedTag?.Contains(name) ?? false) return UniqueValuedTag;
@@ -344,5 +341,61 @@ public partial class KnownTags : IKnownTags
             if (UniqueValuedTag != null) foreach (var name in UniqueValuedTag) yield return name;
             if (ReadOnlyTag != null) foreach (var name in ReadOnlyTag) yield return name;
         }
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="name"></param>
+    /// <returns></returns>
+    public bool IdentifierContains(string name) => IdentifierFind(name) != null;
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="names"></param>
+    /// <returns></returns>
+    public bool IdentifierContains(IEnumerable<string> names)
+    {
+        ArgumentNullException.ThrowIfNull(names);
+
+        foreach (var name in names) if (IdentifierContains(name)) return true;
+        return false;
+    }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="name"></param>
+    /// <returns></returns>
+    public IMetadataTag? IdentifierFind(string name)
+    {
+        name = name.NotNullNotEmpty(trim: true);
+
+        if (IdentifierTags != null)
+        {
+            var tag = IdentifierTags.Value.FirstOrDefault(x => x.Contains(name));
+            if (tag != null) return tag;
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// Returns the tags among the identifier ones, if any, that contains any of the given names.
+    /// </summary>
+    /// <param name="name"></param>
+    /// <returns></returns>
+    public List<IMetadataTag> IdentifierFind(IEnumerable<string> names)
+    {
+        ArgumentNullException.ThrowIfNull(names);
+
+        List<IMetadataTag> items = []; foreach (var name in names)
+        {
+            var tag = IdentifierFind(name);
+            if (tag != null && !items.Contains(tag)) items.Add(tag);
+        }
+        return items;
     }
 }
