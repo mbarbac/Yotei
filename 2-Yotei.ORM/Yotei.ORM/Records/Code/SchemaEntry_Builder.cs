@@ -159,22 +159,48 @@ partial class SchemaEntry
         bool DirtyReadOnly = true;
 
         /// <summary>
-        /// Invoked to set as 'dirty' the property associated with the given metadata tag name
-        /// so that its value is considered as not-synchronized with the captured metadata, and
-        /// so that value must be recomputed.
+        /// Invoked to set the 'dirty' indicator of the property whose metadata name is given, if
+        /// such is possible. This way that property is considered not in sync with that metadata
+        /// so that,  the next time the value of the property is get, it is recomputed from the
+        /// metadata values.
+        /// <br/> If the name is null, then all dirty indicators are set.
         /// </summary>
         /// <param name="name"></param>
-        protected virtual void SetDirty(string name)
+        protected virtual void SetDirty(string? name = null)
         {
-            if (Engine.KnownTags.IdentifierContains(name)) DirtyIdentifier = true;
-            if (Engine.KnownTags.PrimaryKeyTag?.Contains(name) ?? false) DirtyPrimaryKey = true;
-            if (Engine.KnownTags.UniqueValuedTag?.Contains(name) ?? false) DirtyUniqueValued = true;
-            if (Engine.KnownTags.ReadOnlyTag?.Contains(name) ?? false) DirtyReadOnly = true;
+            if (name == null || Engine.KnownTags.IdentifierContains(name)) DirtyIdentifier = true;
+            if (name == null || (Engine.KnownTags.PrimaryKeyTag?.Contains(name) ?? false)) DirtyPrimaryKey = true;
+            if (name == null || (Engine.KnownTags.UniqueValuedTag?.Contains(name) ?? false)) DirtyUniqueValued = true;
+            if (name == null || (Engine.KnownTags.ReadOnlyTag?.Contains(name) ?? false)) DirtyReadOnly = true;
         }
+
+        /// <summary>
+        /// Invoked to clear the 'dirty' indicator of the property whose metadata name is given, if
+        /// such is possible (which is typically achieved by getting the value of that property and
+        /// discarding it right away.).
+        /// </summary>
+        /// <param name="name"></param>
+        protected virtual void ClearDirty(string? name = null)
+        {
+            volatilie object? para evitar optimizaciones.
+
+            if (name == null || Engine.KnownTags.IdentifierContains(name)) _ = Identifier;
+            if (name == null || (Engine.KnownTags.PrimaryKeyTag?.Contains(name) ?? false)) _ = IsPrimaryKey;
+            if (name == null || (Engine.KnownTags.UniqueValuedTag?.Contains(name) ?? false)) _ = IsUniqueValued;
+            if (name == null || (Engine.KnownTags.ReadOnlyTag?.Contains(name) ?? false)) _ = IsReadOnly;
+        }
+
+        // ----------------------------------------------------
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
+        /// <remarks>
+        /// The getter tries to obtain the value from metadata if this property is in dirty status
+        /// and if such is possible. If so, resets the dirty indicator.
+        /// <br/> The setter captures the value into the metadata, if such is possible, and always
+        /// reset the dirty indicator.
+        /// </remarks>
         public IIdentifier? Identifier
         {
             get // If dirty, we try to obtain its value from metadata...
@@ -243,6 +269,12 @@ partial class SchemaEntry
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
+        /// <remarks>
+        /// The getter tries to obtain the value from metadata if this property is in dirty status
+        /// and if such is possible. If so, resets the dirty indicator.
+        /// <br/> The setter captures the value into the metadata, if such is possible, and always
+        /// reset the dirty indicator.
+        /// </remarks>
         public bool? IsPrimaryKey
         {
             get // If dirty, we try to obtain its value from metadata...
@@ -297,6 +329,12 @@ partial class SchemaEntry
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
+        /// <remarks>
+        /// The getter tries to obtain the value from metadata if this property is in dirty status
+        /// and if such is possible. If so, resets the dirty indicator.
+        /// <br/> The setter captures the value into the metadata, if such is possible, and always
+        /// reset the dirty indicator.
+        /// </remarks>
         public bool? IsUniqueValued
         {
             get // If dirty, we try to obtain its value from metadata...
@@ -351,6 +389,12 @@ partial class SchemaEntry
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
+        /// <remarks>
+        /// The getter tries to obtain the value from metadata if this property is in dirty status
+        /// and if such is possible. If so, resets the dirty indicator.
+        /// <br/> The setter captures the value into the metadata, if such is possible, and always
+        /// reset the dirty indicator.
+        /// </remarks>
         public bool? IsReadOnly
         {
             get // If dirty, we try to obtain its value from metadata...
@@ -473,20 +517,24 @@ partial class SchemaEntry
                         SetDirty(name);
                     }
                 }
-            }
-        }
 
-        static object? GetValueOrNull(object value)
-        {
-            if (value is not null)
-            {
-                // If value is a 'Nullable<T>' one, and it is not null, then at this point the
-                // CLR should have unboxed it, so we can return its carried value...
-                var type = value.GetType();
-                if (Nullable.GetUnderlyingType(type) != null) return value;
+                /// <summary>
+                /// Invoked to get, in an unified manner, either the underlying value of nullable
+                /// value types, or the reference value itself, or null.
+                /// </summary>
+                static object? GetValueOrNull(object value)
+                {
+                    if (value is not null)
+                    {
+                        // If value is a 'Nullable<T>' one, and it is not null, then at this point the
+                        // CLR should have unboxed it, so we can return its carried value...
+                        var type = value.GetType();
+                        if (Nullable.GetUnderlyingType(type) != null) return value;
 
+                    }
+                    return value;
+                }
             }
-            return value;
         }
 
         /// <summary>
@@ -494,21 +542,24 @@ partial class SchemaEntry
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public bool Contains(string name) => throw null;
+        public bool Contains(string name) => Find(name) != null;
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         /// <param name="names"></param>
         /// <returns></returns>
-        public bool Contains(IEnumerable<string> names) => throw null;
+        public bool Contains(IEnumerable<string> names) => Find(names).Count > 0;
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public IMetadataEntry? Find(string name) => throw null;
+        public IMetadataEntry? Find(string name)
+        {
+            throw null;
+        }
 
         /// <summary>
         /// <inheritdoc/>
