@@ -42,47 +42,45 @@ partial interface ISchemaEntry
         int Count { get; }
 
         /// <summary>
-        /// <inheritdoc cref="ISchemaEntry.this[string]"/> The setter creates an ad-hoc entry
-        /// if such is needed.
+        /// <inheritdoc cref="ISchemaEntry.this[string, bool]"/> The setter creates an ad-hoc
+        /// entry if such is needed.
         /// </summary>
         /// <param name="name"></param>
+        /// <param name="strict"></param>
         /// <returns></returns>
-        object? this[string name] { get; set; }
+        object? this[string name, bool strict = false] { get; set; }
 
         /// <summary>
-        /// <inheritdoc cref="ISchemaEntry.Contains(string)"/>
+        /// <inheritdoc cref="ISchemaEntry.Contains(string, bool)"/>
         /// </summary>
         /// <param name="name"></param>
+        /// <param name="strict"></param>
         /// <returns></returns>
-        bool Contains(string name);
+        bool Contains(string name, bool strict = false);
 
         /// <summary>
-        /// <inheritdoc cref="ISchemaEntry.Contains(IEnumerable{string})"/>
+        /// <inheritdoc cref="ISchemaEntry.Contains(IEnumerable{string}, bool)"/>
         /// </summary>
         /// <param name="names"></param>
+        /// <param name="strict"></param>
         /// <returns></returns>
-        bool Contains(IEnumerable<string> names);
+        bool Contains(IEnumerable<string> names, bool strict = false);
 
         /// <summary>
-        /// <inheritdoc cref="ISchemaEntry.Find(string)"/>
+        /// <inheritdoc cref="ISchemaEntry.Find(string, bool)"/>
         /// </summary>
         /// <param name="name"></param>
+        /// <param name="strict"></param>
         /// <returns></returns>
-        IMetadataEntry? Find(string name);
+        IMetadataEntry? Find(string name, bool strict = false);
 
         /// <summary>
-        /// <inheritdoc cref="ISchemaEntry.Find(IEnumerable{string})"/>
+        /// <inheritdoc cref="ISchemaEntry.Find(IEnumerable{string}, bool)"/>
         /// </summary>
         /// <param name="names"></param>
+        /// <param name="strict"></param>
         /// <returns></returns>
-        List<IMetadataEntry> Find(IEnumerable<string> names);
-
-        /// <summary>
-        /// <inheritdoc cref="ISchemaEntry.Find(Predicate{IMetadataEntry})"/>
-        /// </summary>
-        /// <param name="predicate"></param>
-        /// <returns></returns>
-        List<IMetadataEntry> Find(Predicate<IMetadataEntry> predicate);
+        List<IMetadataEntry> Find(IEnumerable<string> names, bool strict = false);
 
         // ------------------------------------------------
 
@@ -105,6 +103,14 @@ partial interface ISchemaEntry
         /// <param name="entry"></param>
         /// <returns></returns>
         bool AddRange(IEnumerable<IMetadataEntry> range);
+
+        /// <summary>
+        /// Either adds or updates the existing metadata entry whose name is associated with
+        /// the name of the given one.
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        bool Update(IMetadataEntry item);
 
         /// <summary>
         /// Updates in this instance the entries of the given range without throwing exceptions

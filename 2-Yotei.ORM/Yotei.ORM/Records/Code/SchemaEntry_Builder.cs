@@ -1,4 +1,6 @@
-﻿namespace Yotei.ORM.Records.Code;
+﻿using System.Xml;
+
+namespace Yotei.ORM.Records.Code;
 
 partial class SchemaEntry
 {
@@ -7,6 +9,7 @@ partial class SchemaEntry
     /// <inheritdoc cref="ISchemaEntry.IBuilder"/>
     /// </summary>
     [Cloneable]
+    [DebuggerDisplay("{ToString(3)}")]
     public partial class Builder : ISchemaEntry.IBuilder
     {
         readonly List<IMetadataEntry> Items = [];
@@ -82,26 +85,118 @@ partial class SchemaEntry
         public Builder(IEngine engine) => Engine = engine.ThrowWhenNull();
 
         /// <summary>
-        /// Initializes a new instance with the metadata entries of the given range without
-        /// throwing an exception if any is duplicated.
+        /// Initializes a new instance with the metadata entries of the given range.
         /// </summary>
         /// <param name="engine"></param>
         /// <param name="range"></param>
         public Builder(
-            IEngine engine, IEnumerable<IMetadataEntry> range) : this(engine) => UpdateRange(range);
+            IEngine engine, IEnumerable<IMetadataEntry> range) : this(engine) => AddRange(range);
+
+        /// <summary>
+        /// Initializes a new instance.
+        /// </summary>
+        /// <param name="engine"></param>
+        /// <param name="identifier"></param>
+        /// <param name="isPrimaryKey"></param>
+        /// <param name="isUniqueValued"></param>
+        /// <param name="isReadOnly"></param>
+        /// <param name="range"></param>
+        public Builder(
+            IEngine engine,
+            IIdentifier identifier,
+            bool? isPrimaryKey = null,
+            bool? isUniqueValued = null,
+            bool? isReadOnly = null,
+            IEnumerable<IMetadataEntry>? range = null) : this(engine)
+        {
+            Identifier = identifier.ThrowWhenNull();
+            if (isPrimaryKey != null) IsPrimaryKey = isPrimaryKey.Value;
+            if (isUniqueValued != null) IsUniqueValued = isUniqueValued.Value;
+            if (isReadOnly != null) IsReadOnly = isReadOnly.Value;
+            if (range != null) UpdateRange(range);
+        }
+
+        /// <summary>
+        /// Initializes a new instance.
+        /// </summary>
+        /// <param name="engine"></param>
+        /// <param name="identifier"></param>
+        /// <param name="isPrimaryKey"></param>
+        /// <param name="isUniqueValued"></param>
+        /// <param name="isReadOnly"></param>
+        /// <param name="range"></param>
+        public Builder(
+            IEngine engine,
+            string identifier,
+            bool? isPrimaryKey = null,
+            bool? isUniqueValued = null,
+            bool? isReadOnly = null,
+            IEnumerable<IMetadataEntry>? range = null) : this(
+                engine,
+                new Identifier(engine, identifier),
+                isPrimaryKey,
+                isUniqueValued,
+                isReadOnly,
+                range)
+        { }
 
         /// <summary>
         /// Copy constructor.
         /// </summary>
         /// <param name="other"></param>
-        protected Builder(Builder other) => throw null;
+        protected Builder(Builder other)
+        {
+            ArgumentNullException.ThrowIfNull(other);
+
+            Engine = other.Engine;
+            Items.AddRange(other.Items);
+
+            if (other.Identifier != null) Identifier = other.Identifier;
+            if (other.IsPrimaryKey != null) IsPrimaryKey = other.IsPrimaryKey;
+            if (other.IsUniqueValued != null) IsUniqueValued = other.IsUniqueValued;
+            if (other.IsReadOnly != null) IsReadOnly = other.IsReadOnly;
+        }
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         /// <returns></returns>
-        public override string ToString() => throw null;
-        protected virtual string CoreString() => throw null;
+        public override string ToString() => ToString(0);
+
+        /// <summary>
+        /// Returns a string representation of this instance for debug purposes.
+        /// </summary>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        public string ToString(int count)
+        {
+            var sb = new StringBuilder();
+
+            ToCoreString(sb);
+            ToExtendedString(sb, count);
+
+            return sb.ToString();
+        }
+
+        protected virtual void ToCoreString(StringBuilder sb)
+        {
+            sb.Append(Identifier?.Value ?? "-");
+            if (IsPrimaryKey.HasValue && IsPrimaryKey.Value) sb.Append(", Primary");
+            if (IsUniqueValued.HasValue && IsUniqueValued.Value) sb.Append(", Unique");
+            if (IsReadOnly.HasValue && IsReadOnly.Value) sb.Append(", ReadOnly");
+        }
+
+        protected virtual void ToExtendedString(StringBuilder sb, int count)
+        {
+            foreach (var item in Items)
+            {
+                if (count <= 0) break;
+                if (Engine.KnownTags.Contains(item.Name)) continue;
+
+                sb.Append($"{item.Name}='{item.Value.Sketch()}'");
+                count--;
+            }
+        }
 
         /// <summary>
         /// <inheritdoc/>
@@ -109,47 +204,50 @@ partial class SchemaEntry
         /// <returns></returns>
         public virtual IEnumerator<IMetadataEntry> GetEnumerator()
         {
-            int index;
+            foreach (var item in EnumerateCore()) yield return item;
+            foreach (var item in EnumerateExtended()) yield return item;
+        }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        protected virtual IEnumerable<IMetadataEntry> EnumerateCore()
+        {
             IMetadataTag? tag;
+            int index;
 
-            var fakeIdentifier = Identifier ?? new Identifier(Engine);
-            var fakePrimaryKey = IsPrimaryKey ?? false;
-            var fakeUniqueValued = IsUniqueValued ?? false;
-            var fakeReadOnly = IsReadOnly ?? false;
-
-            var tags = Engine.KnownTags.IdentifierTags;
-            if (tags != null)
+            if (Engine.KnownTags.IdentifierTags != null)
             {
-                for (int i = 0; i < tags.Value.Length; i++)
+                _ = Identifier;
+                foreach (var idtag in Engine.KnownTags.IdentifierTags)
                 {
-                    tag = tags.Value[i];
-                    index = IndexOf(tag);
+                    index = IndexOf(idtag);
                     if (index >= 0) yield return Items[index];
                 }
             }
+            if ((tag = Engine.KnownTags.PrimaryKeyTag) != null)
+            {
+                _ = IsPrimaryKey;
+                index = IndexOf(tag);
+                if (index >= 0) yield return Items[index];
+            }
+            if ((tag = Engine.KnownTags.UniqueValuedTag) != null)
+            {
+                _ = IsUniqueValued;
+                index = IndexOf(tag);
+                if (index >= 0) yield return Items[index];
+            }
+            if ((tag = Engine.KnownTags.ReadOnlyTag) != null)
+            {
+                _ = IsReadOnly;
+                index = IndexOf(tag);
+                if (index >= 0) yield return Items[index];
+            }
+        }
 
-            tag = Engine.KnownTags.PrimaryKeyTag;
-            index = tag == null ? -1 : IndexOf(tag);
-            if (index >= 0) yield return Items[index];
-
-            tag = Engine.KnownTags.UniqueValuedTag;
-            index = tag == null ? -1 : IndexOf(tag);
-            if (index >= 0) yield return Items[index];
-
-            tag = Engine.KnownTags.ReadOnlyTag;
-            index = tag == null ? -1 : IndexOf(tag);
-            if (index >= 0) yield return Items[index];
-
+        protected virtual IEnumerable<IMetadataEntry> EnumerateExtended()
+        {
             foreach (var item in Items)
                 if (!Engine.KnownTags.Contains(item.Name)) yield return item;
-
-            // Preventing optimizations so that their values are always sync'ed with metadata...
-            GC.KeepAlive(fakeIdentifier);
-            GC.KeepAlive(fakePrimaryKey);
-            GC.KeepAlive(fakeUniqueValued);
-            GC.KeepAlive(fakeReadOnly);
         }
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         // ----------------------------------------------------
 
@@ -166,7 +264,7 @@ partial class SchemaEntry
         /// <br/> If the name is null, then all dirty indicators are set.
         /// </summary>
         /// <param name="name"></param>
-        protected virtual void SetDirty(string? name = null)
+        protected virtual void SetDirtyIndicator(string? name = null)
         {
             if (name == null || Engine.KnownTags.IdentifierContains(name)) DirtyIdentifier = true;
             if (name == null || (Engine.KnownTags.PrimaryKeyTag?.Contains(name) ?? false)) DirtyPrimaryKey = true;
@@ -176,13 +274,16 @@ partial class SchemaEntry
 
         /// <summary>
         /// Invoked to clear the 'dirty' indicator of the property whose metadata name is given, if
-        /// such is possible (which is typically achieved by getting the value of that property and
-        /// discarding it right away.).
+        /// such is possible, which is achieved by reading and discarding the value of the property
+        /// associated to that name.
+        /// <br/> If the name is null, then all dirty indicators are cleared.
         /// </summary>
         /// <param name="name"></param>
-        protected virtual void ClearDirty(string? name = null)
+        protected virtual void ClearDirtyIndicator(string? name = null)
         {
-            volatilie object? para evitar optimizaciones.
+            // We assume that by using the discard operator the value of the properties is always
+            // read, achieving the wanted side effects. If for whaterver reasons the compiler
+            // decides to optimize this away, then we'll need to use volatile or similar.
 
             if (name == null || Engine.KnownTags.IdentifierContains(name)) _ = Identifier;
             if (name == null || (Engine.KnownTags.PrimaryKeyTag?.Contains(name) ?? false)) _ = IsPrimaryKey;
@@ -190,17 +291,30 @@ partial class SchemaEntry
             if (name == null || (Engine.KnownTags.ReadOnlyTag?.Contains(name) ?? false)) _ = IsReadOnly;
         }
 
+        /// <summary>
+        /// Tries to obtain the default value associated to the given metadata name, if possible.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        protected virtual bool GetDefaultValue(string name, out object? value)
+        {
+            name = Validate(name);
+
+            if (Engine.KnownTags.IdentifierContains(name)) { value = null; return true; }
+            if (Engine.KnownTags.PrimaryKeyTag?.Contains(name) ?? false) { value = false; return true; }
+            if (Engine.KnownTags.UniqueValuedTag?.Contains(name) ?? false) { value = false; return true; }
+            if (Engine.KnownTags.ReadOnlyTag?.Contains(name) ?? false) { value = false; return true; }
+
+            value = null;
+            return false;
+        }
+
         // ----------------------------------------------------
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        /// <remarks>
-        /// The getter tries to obtain the value from metadata if this property is in dirty status
-        /// and if such is possible. If so, resets the dirty indicator.
-        /// <br/> The setter captures the value into the metadata, if such is possible, and always
-        /// reset the dirty indicator.
-        /// </remarks>
         public IIdentifier? Identifier
         {
             get // If dirty, we try to obtain its value from metadata...
@@ -227,7 +341,7 @@ partial class SchemaEntry
             }
             set // We need to capture the given value also in metadata, if possible...
             {
-                if (value != null && Engine != value.Engine) throw new ArgumentNullException(
+                if (value != null && Engine != value.Engine) throw new ArgumentException(
                     "Identifier's engine is not the same as the one of this instance.")
                     .WithData(value)
                     .WithData(this);
@@ -269,12 +383,6 @@ partial class SchemaEntry
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        /// <remarks>
-        /// The getter tries to obtain the value from metadata if this property is in dirty status
-        /// and if such is possible. If so, resets the dirty indicator.
-        /// <br/> The setter captures the value into the metadata, if such is possible, and always
-        /// reset the dirty indicator.
-        /// </remarks>
         public bool? IsPrimaryKey
         {
             get // If dirty, we try to obtain its value from metadata...
@@ -329,12 +437,6 @@ partial class SchemaEntry
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        /// <remarks>
-        /// The getter tries to obtain the value from metadata if this property is in dirty status
-        /// and if such is possible. If so, resets the dirty indicator.
-        /// <br/> The setter captures the value into the metadata, if such is possible, and always
-        /// reset the dirty indicator.
-        /// </remarks>
         public bool? IsUniqueValued
         {
             get // If dirty, we try to obtain its value from metadata...
@@ -389,12 +491,6 @@ partial class SchemaEntry
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        /// <remarks>
-        /// The getter tries to obtain the value from metadata if this property is in dirty status
-        /// and if such is possible. If so, resets the dirty indicator.
-        /// <br/> The setter captures the value into the metadata, if such is possible, and always
-        /// reset the dirty indicator.
-        /// </remarks>
         public bool? IsReadOnly
         {
             get // If dirty, we try to obtain its value from metadata...
@@ -470,58 +566,53 @@ partial class SchemaEntry
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public object? this[string name]
+        public object? this[string name, bool strict = false]
         {
-            get
+            get // We just return whatever value are we able to find for that metadata name...
             {
-                name = Validate(name);
-
-                var index = IndexOf(name);
-                if (index >= 0) return Items[index].Value;
-
-                if (Engine.KnownTags.IdentifierContains(name)) return Identifier;
-                if (Engine.KnownTags.PrimaryKeyTag?.Contains(name) ?? false) return IsPrimaryKey;
-                if (Engine.KnownTags.UniqueValuedTag?.Contains(name) ?? false) return IsUniqueValued;
-                if (Engine.KnownTags.ReadOnlyTag?.Contains(name) ?? false) return IsReadOnly;
-                if (Engine.KnownTags.Contains(name)) return null;
+                var item = Find(name, strict);
+                if (item != null) return item.Value;
 
                 throw new NotFoundException(
                     "Metadata entry associated with the given tag name not found.")
                     .WithData(name)
                     .WithData(this);
             }
-            set
+            set // We need to either update or create an appropriate entry...
             {
                 name = Validate(name);
                 value = GetValueOrNull(value!);
 
                 var index = IndexOf(name);
-                if (index >= 0)
+
+                if (index >= 0) // There is something to update...
                 {
-                    if (value == null) { Items.RemoveAt(index); SetDirty(name); }
-                    else
+                    if (value == null) // Null values are always removed...
+                    {
+                        Items.RemoveAt(index);
+                        SetDirtyIndicator(name);
+                    }
+                    else // Updating existing...
                     {
                         var item = Items[index];
                         if (!item.Value.EqualsEx(value))
                         {
                             Items[index] = new MetadataEntry(item.Name, value);
-                            SetDirty(name);
+                            SetDirtyIndicator(name);
                         }
                     }
                 }
-                else
+                else // There was nothing to update, we may need to create an entry...
                 {
-                    if (value != null)
+                    if (value != null) // But no need to create if value is null...
                     {
                         Items.Add(new MetadataEntry(name, value));
-                        SetDirty(name);
+                        SetDirtyIndicator(name);
                     }
                 }
 
-                /// <summary>
-                /// Invoked to get, in an unified manner, either the underlying value of nullable
-                /// value types, or the reference value itself, or null.
-                /// </summary>
+                // We get in an unified manner either the underlying value of a nullable value
+                // type, or the value of the reference type, or null.
                 static object? GetValueOrNull(object value)
                 {
                     if (value is not null)
@@ -541,39 +632,58 @@ partial class SchemaEntry
         /// <inheritdoc/>
         /// </summary>
         /// <param name="name"></param>
+        /// <param name="strict"></param>
         /// <returns></returns>
-        public bool Contains(string name) => Find(name) != null;
+        public bool Contains(
+            string name, bool strict = false) => Find(name, strict) != null;
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         /// <param name="names"></param>
+        /// <param name="strict"></param>
         /// <returns></returns>
-        public bool Contains(IEnumerable<string> names) => Find(names).Count > 0;
+        public bool Contains(
+            IEnumerable<string> names, bool strict = false) => Find(names, strict).Count > 0;
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         /// <param name="name"></param>
+        /// <param name="strict"></param>
         /// <returns></returns>
-        public IMetadataEntry? Find(string name)
+        public IMetadataEntry? Find(string name, bool strict = false)
         {
-            throw null;
+            name = Validate(name);
+
+            var index = IndexOf(name);
+            if (index >= 0) return Items[index];
+
+            if (!strict && GetDefaultValue(name, out var value))
+                return new MetadataEntry(name, value);
+
+            return null;
         }
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         /// <param name="names"></param>
+        /// <param name="strict"></param>
         /// <returns></returns>
-        public List<IMetadataEntry> Find(IEnumerable<string> names) => throw null;
+        public List<IMetadataEntry> Find(IEnumerable<string> names, bool strict = false)
+        {
+            ArgumentNullException.ThrowIfNull(names);
 
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
-        /// <param name="predicate"></param>
-        /// <returns></returns>
-        public List<IMetadataEntry> Find(Predicate<IMetadataEntry> predicate) => throw null;
+            List<IMetadataEntry> items = [];
+            foreach (var name in names)
+            {
+                var item = Find(name, strict);
+                if (item != null &&
+                    items.Find(x => Compare(x.Name, name)) != null) items.Add(item);
+            }
+            return items;
+        }
 
         // ------------------------------------------------
 
@@ -581,40 +691,101 @@ partial class SchemaEntry
         /// <inheritdoc/>
         /// </summary>
         /// <returns></returns>
-        public virtual ISchemaEntry ToInstance() => throw null;
+        public virtual ISchemaEntry ToInstance() => new SchemaEntry(Engine, this);
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public virtual bool Add(IMetadataEntry item) => throw null;
+        public virtual bool Add(IMetadataEntry item)
+        {
+            ArgumentNullException.ThrowIfNull(item);
+
+            var index = IndexOf(item.Name);
+            if (index >= 0) throw new DuplicateException(
+                "This instance already carries an entry associated with the given name.")
+                .WithData(item)
+                .WithData(this);
+
+            Items.Add(item);
+            SetDirtyIndicator(item.Name);
+            return true;
+        }
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         /// <param name="entry"></param>
         /// <returns></returns>
-        public virtual bool AddRange(IEnumerable<IMetadataEntry> range) => throw null;
+        public virtual bool AddRange(IEnumerable<IMetadataEntry> range)
+        {
+            ArgumentNullException.ThrowIfNull(range);
+
+            bool done = false;
+            foreach (var item in range) if (Add(item)) done = true;
+            return done;
+        }
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        public virtual bool Update(IMetadataEntry item)
+        {
+            ArgumentNullException.ThrowIfNull(item);
+
+            // The setter does not use any 'strict' mode specification...
+            this[item.Name] = item.Value;
+            return true;
+        }
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         /// <param name="range"></param>
         /// <returns></returns>
-        public virtual bool UpdateRange(IEnumerable<IMetadataEntry> range) => throw null;
+        public virtual bool UpdateRange(IEnumerable<IMetadataEntry> range)
+        {
+            ArgumentNullException.ThrowIfNull(range);
+
+            bool done = false;
+            foreach (var item in range) if (Update(item)) done = true;
+            return done;
+        }
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public virtual bool Remove(string name) => throw null;
+        public virtual bool Remove(string name)
+        {
+            name = Validate(name);
+
+            var index = IndexOf(name);
+            if (index >= 0)
+            {
+                Items.RemoveAt(index);
+                SetDirtyIndicator(name);
+            }
+
+            return false;
+        }
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         /// <returns></returns>
-        public virtual bool Clear() => throw null;
+        public virtual bool Clear()
+        {
+            if (Items.Count > 0)
+            {
+                Items.Clear();
+                SetDirtyIndicator();
+            }
+            return false;
+        }
     }
 }

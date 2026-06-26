@@ -13,7 +13,7 @@
 public partial interface ISchemaEntry : IEnumerable<IMetadataEntry>, IEquatable<ISchemaEntry>
 {
     /// <summary>
-    /// The identifier by which the associated schema element (column) is knowm, or null if this
+    /// The identifier by which the associated schema element (column) is known, or null if this
     /// property has not been either set yet explicitly or through its associated well-known
     /// metadata tags, if any.
     /// </summary>
@@ -56,47 +56,56 @@ public partial interface ISchemaEntry : IEnumerable<IMetadataEntry>, IEquatable<
 
     /// <summary>
     /// Gets the value kept by the metadata entry associated with the given name, or throws an
-    /// exception if that entry is not found.
+    /// exception if that entry is not found. In strict mode only those entries actually present
+    /// are taken into consideration. In non-strict mode, the standard ones are also considered
+    /// even if not already present.
     /// </summary>
     /// <param name="name"></param>
+    /// <param name="strict"></param>
     /// <returns></returns>
-    object? this[string name] { get; }
+    object? this[string name, bool strict = false] { get; }
 
     /// <summary>
     /// Determines if this instance contains a metadata entry associated with the given name.
+    /// In strict mode only those entries actually present are taken into consideration. In
+    /// non-strict mode, the standard ones are also considered even if not already present.
     /// </summary>
     /// <param name="name"></param>
+    /// <param name="strict"></param>
     /// <returns></returns>
-    bool Contains(string name);
+    bool Contains(string name, bool strict = false);
 
     /// <summary>
     /// Determines if this instance contains a metadata entry associated with any of the given
-    /// names.
+    /// names. In strict mode only those entries actually present are taken into consideration.
+    /// In non-strict mode, the standard ones are also considered even if not already present.
     /// </summary>
     /// <param name="names"></param>
+    /// <param name="strict"></param>
     /// <returns></returns>
-    bool Contains(IEnumerable<string> names);
+    bool Contains(IEnumerable<string> names, bool strict = false);
 
     /// <summary>
     /// Returns the unique metadata entry associated with the given name, or null if not found.
+    /// In strict mode only those entries actually present are taken into consideration. In
+    /// non-strict mode, the standard ones are also considered even if not already present,
+    /// and renders a default valued one.
     /// </summary>
     /// <param name="name"></param>
+    /// <param name="strict"></param>
     /// <returns></returns>
-    IMetadataEntry? Find(string name);
+    IMetadataEntry? Find(string name, bool strict = false);
 
     /// <summary>
-    /// Returns the collection of metadata entries associated with the given names.
+    /// Returns the collection of metadata entries associated with the given names. In strict
+    /// mode only those entries actually present are taken into consideration. In non-strict
+    /// mode, the standard ones are also considered even if not already present, and renders
+    /// a default valued one.
     /// </summary>
     /// <param name="names"></param>
+    /// <param name="strict"></param>
     /// <returns></returns>
-    List<IMetadataEntry> Find(IEnumerable<string> names);
-
-    /// <summary>
-    /// Returns the collection of metadata entries that match the given predicate.
-    /// </summary>
-    /// <param name="predicate"></param>
-    /// <returns></returns>
-    List<IMetadataEntry> Find(Predicate<IMetadataEntry> predicate);
+    List<IMetadataEntry> Find(IEnumerable<string> names, bool strict = false);
     
     // ------------------------------------------------
 
@@ -119,6 +128,22 @@ public partial interface ISchemaEntry : IEnumerable<IMetadataEntry>, IEquatable<
     /// <param name="entry"></param>
     /// <returns></returns>
     ISchemaEntry AddRange(IEnumerable<IMetadataEntry> range);
+
+    /// <summary>
+    /// Returns a copy of this instance where the existing metadata entry whose name is
+    /// associated with the name of the given one is either updated or added.
+    /// </summary>
+    /// <param name="item"></param>
+    /// <returns></returns>
+    ISchemaEntry Update(IMetadataEntry item);
+
+    /// <summary>
+    /// Returns a copy of this instance with the entries of the given range updated or added
+    /// to it.
+    /// </summary>
+    /// <param name="range"></param>
+    /// <returns></returns>
+    ISchemaEntry UpdateRange(IEnumerable<IMetadataEntry> range);
 
     /// <summary>
     /// Returns a copy of this instance where the entry associated with the given name removed,
