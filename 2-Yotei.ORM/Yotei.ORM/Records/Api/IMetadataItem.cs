@@ -6,7 +6,7 @@
 /// <br/> Instances of this type are intended to be immutable ones.
 /// </summary>
 [Cloneable]
-public partial interface IMetadataEntry : IEquatable<IMetadataEntry>
+public partial interface IMetadataItem : IEquatable<IMetadataItem>
 {
     /// <summary>
     /// Determines if this instance shall be considered equal to the other given one, using
@@ -15,7 +15,7 @@ public partial interface IMetadataEntry : IEquatable<IMetadataEntry>
     /// <param name="other"></param>
     /// <param name="ignoreNameCase"></param>
     /// <returns></returns>
-    bool Equals(IMetadataEntry? other, bool ignoreNameCase);
+    bool Equals(IMetadataItem? other, bool ignoreNameCase);
 
     /// <summary>
     /// The name by which this entry is known.

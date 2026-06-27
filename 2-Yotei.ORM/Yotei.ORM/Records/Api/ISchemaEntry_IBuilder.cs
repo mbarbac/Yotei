@@ -7,50 +7,43 @@ partial interface ISchemaEntry
     /// Represents a builder of <see cref="ISchemaEntry"/> instances.
     /// </summary>
     [Cloneable]
-    public partial interface IBuilder : IEnumerable<IMetadataEntry>
+    public partial interface IBuilder : IEnumerable<IMetadataItem>
     {
         /// <summary>
-        /// The identifier by which the associated schema element is known, or null if it this
-        /// information is not available. Entries with no identifier, or with an empty one, are
-        /// not considered valid schema elements.
+        /// <inheritdoc cref="ISchemaEntry.Identifier"/>
         /// </summary>
         IIdentifier? Identifier { get; set; }
 
         /// <summary>
-        /// Whether the associated schema element is a primary key one, or part of a primary key
-        /// group, or null if this information is not available. Only one group is supported per
-        /// schema.
+        /// <inheritdoc cref="ISchemaEntry.IsPrimaryKey"/>
         /// </summary>
         bool? IsPrimaryKey { get; set; }
 
         /// <summary>
-        /// Whether the associated schema element is a unique valued one, or part of an unique
-        /// valued group, or null if this information is not available. Only one group is supported
-        /// per schema.
+        /// <inheritdoc cref="ISchemaEntry.IsUniqueValued"/>
         /// </summary>
         bool? IsUniqueValued { get; set; }
 
         /// <summary>
-        /// Whether the associated schema element is a read-only one, or null if this information
-        /// is not available.
+        /// <inheritdoc cref="ISchemaEntry.IsReadOnly"/>
         /// </summary>
         bool? IsReadOnly { get; set; }
 
         // ------------------------------------------------
 
         /// <summary>
-        /// The engine this instance is associated with.
+        /// <inheritdoc cref="ISchemaEntry.Engine"/>
         /// </summary>
         IEngine Engine { get; }
 
         /// <summary>
-        /// Gets the number of metadata entries in this instance,.
+        /// 
+        /// <inheritdoc cref="ISchemaEntry.Count"/>
         /// </summary>
         int Count { get; }
 
         /// <summary>
-        /// Gets or sets the metadata value carried by the entry whose metadata name is given.
-        /// <br/> The getter throws an exception if such entry does not exist yet.
+        /// <inheritdoc cref="ISchemaEntry.this[string]"/>
         /// <br/> The setter either updates an existing entry, or creates an ad-hoc one.
         /// </summary>
         /// <param name="name"></param>
@@ -58,35 +51,45 @@ partial interface ISchemaEntry
         object? this[string name] { get; set; }
 
         /// <summary>
-        /// Determines if this instance carries a metadata entry with the given metadata name.
+        /// 
+        /// <inheritdoc cref="ISchemaEntry.Contains(string)"/>
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
         bool Contains(string name);
 
         /// <summary>
-        /// Determines if this instance carries any metadata entry with any of the given metadata
-        /// names.
+        /// <inheritdoc cref="ISchemaEntry.Contains(IEnumerable{string})"/>
         /// </summary>
         /// <param name="names"></param>
         /// <returns></returns>
         bool Contains(IEnumerable<string> names);
 
         /// <summary>
-        /// Returns the unique metadata entry in this collection with the given metadata name,
-        /// or null if such cannot be found.
+        /// <inheritdoc cref="ISchemaEntry.Find(string)"/>
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        IMetadataEntry? Find(string name);
+        IMetadataItem? Find(string name);
 
         /// <summary>
-        /// Returns the collection of metadata entries whose metadata names are given. This method
-        /// guarantees that in the returned collection there will be no duplicated elements.
+        /// <inheritdoc cref="ISchemaEntry.Find(IEnumerable{string})"/>
         /// </summary>
         /// <param name="names"></param>
         /// <returns></returns>
-        List<IMetadataEntry> Find(IEnumerable<string> names);
+        List<IMetadataItem> Find(IEnumerable<string> names);
+
+        /// <summary>
+        /// <inheritdoc cref="ISchemaEntry.ToArray"/>
+        /// </summary>
+        /// <returns></returns>
+        IMetadataItem[] ToArray();
+
+        /// <summary>
+        /// <inheritdoc cref="ISchemaEntry.ToList"/>
+        /// </summary>
+        /// <returns></returns>
+        List<IMetadataItem> ToList();
 
         // ------------------------------------------------
 
@@ -101,28 +104,36 @@ partial interface ISchemaEntry
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        bool Add(IMetadataEntry item);
+        bool Add(IMetadataItem item);
+
+        /// <summary>
+        /// Adds to this instance where a metadata entry built from the given name and value.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        bool Add(string name, object? value);
 
         /// <summary>
         /// Adds to this instance the entries of the given range.
         /// </summary>
         /// <param name="entry"></param>
         /// <returns></returns>
-        bool AddRange(IEnumerable<IMetadataEntry> range);
+        bool AddRange(IEnumerable<IMetadataItem> range);
 
         /// <summary>
         /// Either adds or updates the existing metadata entry that correspond with the given one.
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        bool Update(IMetadataEntry item);
+        bool Update(IMetadataItem item);
 
         /// <summary>
         /// Either adds or updates the existing metadata entries that correspond to the given ones.
         /// </summary>
         /// <param name="range"></param>
         /// <returns></returns>
-        bool UpdateRange(IEnumerable<IMetadataEntry> range);
+        bool UpdateRange(IEnumerable<IMetadataItem> range);
 
         /// <summary>
         /// Removes from this instance the entry associated with the given name, if any.

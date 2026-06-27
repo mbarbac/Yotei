@@ -17,10 +17,81 @@ partial class SchemaEntry
         public Builder(IEngine engine) => Engine = engine.ThrowWhenNull();
 
         /// <summary>
+        /// Initializes a new entry with the given metadata.
+        /// </summary>
+        /// <param name="engine"></param>
+        /// <param name="range"></param>
+        public Builder(
+            IEngine engine, IEnumerable<IMetadataItem> range) : this(engine) => AddRange(range);
+
+        /// <summary>
+        /// Initializes a new entry with the given values for its well-known properties, and
+        /// metadata. This constructor does not throw an exception if any metadata entry in the
+        /// given range is a duplicated one: the last one wins.
+        /// </summary>
+        /// <param name="engine"></param>
+        /// <param name="identifier"></param>
+        /// <param name="isPrimaryKey"></param>
+        /// <param name="isUniqueValued"></param>
+        /// <param name="isReadOnly"></param>
+        /// <param name="range"></param>
+        public Builder(
+            IEngine engine,
+            IIdentifier identifier,
+            bool? isPrimaryKey = null,
+            bool? isUniqueValued = null,
+            bool? isReadOnly = null,
+            IEnumerable<IMetadataItem>? range = null) : this(engine)
+        {
+            Identifier = identifier.ThrowWhenNull();
+            if (isPrimaryKey != null) IsPrimaryKey = isPrimaryKey.Value;
+            if (isUniqueValued != null) IsUniqueValued = isUniqueValued.Value;
+            if (isReadOnly != null) IsReadOnly = isReadOnly.Value;
+            if (range != null) UpdateRange(range);
+        }
+
+        /// <summary>
+        /// Initializes a new entry with the given values for its well-known properties, and
+        /// metadata. This constructor does not throw an exception if any metadata entry in the
+        /// given range is a duplicated one: the last one wins.
+        /// </summary>
+        /// <param name="engine"></param>
+        /// <param name="identifier"></param>
+        /// <param name="isPrimaryKey"></param>
+        /// <param name="isUniqueValued"></param>
+        /// <param name="isReadOnly"></param>
+        /// <param name="range"></param>
+        public Builder(
+            IEngine engine,
+            string identifier,
+            bool? isPrimaryKey = null,
+            bool? isUniqueValued = null,
+            bool? isReadOnly = null,
+            IEnumerable<IMetadataItem>? range = null) : this(
+                engine,
+                new Identifier(engine, identifier),
+                isPrimaryKey,
+                isUniqueValued,
+                isReadOnly,
+                range)
+        { }
+
+        /// <summary>
         /// Copy constructor.
         /// </summary>
         /// <param name="other"></param>
-        protected Builder(Builder other) => throw null;
+        protected Builder(Builder other)
+        {
+            ArgumentNullException.ThrowIfNull(other);
+
+            Engine = other.Engine;
+            Items.AddRange(other.Items);
+
+            if (other.Identifier != null) Identifier = other.Identifier;
+            if (other.IsPrimaryKey != null) IsPrimaryKey = other.IsPrimaryKey;
+            if (other.IsUniqueValued != null) IsUniqueValued = other.IsUniqueValued;
+            if (other.IsReadOnly != null) IsReadOnly = other.IsReadOnly;
+        }
 
         /// <summary>
         /// <inheritdoc/>
@@ -47,7 +118,7 @@ partial class SchemaEntry
                 if (count <= 0) break;
                 if (Engine.KnownTags.Contains(item.Name)) continue;
 
-                sb.Append($"{item.Name}='{item.Value.Sketch()}'");
+                sb.Append($", {item.Name}='{item.Value.Sketch()}'");
                 count--;
             }
 
@@ -58,20 +129,18 @@ partial class SchemaEntry
         /// <inheritdoc/>
         /// </summary>
         /// <returns></returns>
-        public virtual IEnumerator<IMetadataEntry> GetEnumerator() => Items.GetEnumerator();
+        public virtual IEnumerator<IMetadataItem> GetEnumerator() => Items.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         // ------------------------------------------------
-
-        readonly List<IMetadataEntry> Items = [];
-
         static string Validate(string name) => name.NotNullNotEmpty(trim: true);
-
         bool Compare(string x, string y) => string.Compare(x, y, Engine.IgnoreCase) == 0;
 
+        readonly List<IMetadataItem> Items = [];
+        
         /// <summary>
         /// Gets the internal index at which the entry associated with the given name is stored,
-        /// or -1 if any.
+        /// or -1 if any. This index is only valid at the very moment this method was called.
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
@@ -196,14 +265,16 @@ partial class SchemaEntry
                             var index = IndexOf(tag);
                             if (index >= 0)
                             {
-                                var str = (string?)Items[i].Value;
+                                var str = (string?)Items[index].Value;
                                 if (str != null) str = str.NullWhenEmpty(trim: true);
                                 values[i] = str;
                             }
                         }
 
                         // Capturing the value as needed...
-                        field = values.All(x => x is null) ? null : new Identifier(Engine, values);
+                        field = values.All(x => x is null)
+                            ? null
+                            : new Identifier(Engine, values);
                     }
 
                     // Any case, we've obtained the value, so no dirty any more...
@@ -247,7 +318,7 @@ partial class SchemaEntry
                     {
                         var str = values[i];
                         var tag = tags.Value[i];
-                        Items.Add(new MetadataEntry(tag.Default, str));
+                        Items.Add(new MetadataItem(tag.Default, str));
 
                     }
                 }
@@ -299,13 +370,13 @@ partial class SchemaEntry
                     {
                         var item = Items[index];
                         if (!item.Value.EqualsEx(value))
-                            Items[index] = new MetadataEntry(item.Name, value);
+                            Items[index] = new MetadataItem(item.Name, value);
                     }
 
                     // Or creating and ad-hoc one (if value is not null)...
                     else
                     {
-                        Items.Add(new MetadataEntry(tag.Default, value));
+                        Items.Add(new MetadataItem(tag.Default, value));
                     }
                 }
 
@@ -357,13 +428,13 @@ partial class SchemaEntry
                     {
                         var item = Items[index];
                         if (!item.Value.EqualsEx(value))
-                            Items[index] = new MetadataEntry(item.Name, value);
+                            Items[index] = new MetadataItem(item.Name, value);
                     }
 
                     // Or creating and ad-hoc one (if value is not null)...
                     else
                     {
-                        Items.Add(new MetadataEntry(tag.Default, value));
+                        Items.Add(new MetadataItem(tag.Default, value));
                     }
                 }
 
@@ -415,13 +486,13 @@ partial class SchemaEntry
                     {
                         var item = Items[index];
                         if (!item.Value.EqualsEx(value))
-                            Items[index] = new MetadataEntry(item.Name, value);
+                            Items[index] = new MetadataItem(item.Name, value);
                     }
 
                     // Or creating and ad-hoc one (if value is not null)...
                     else
                     {
-                        Items.Add(new MetadataEntry(tag.Default, value));
+                        Items.Add(new MetadataItem(tag.Default, value));
                     }
                 }
 
@@ -468,13 +539,13 @@ partial class SchemaEntry
                 {
                     var item = Items[index];
                     if (!item.Value.EqualsEx(value))
-                        Items[index] = new MetadataEntry(item.Name, value);
+                        Items[index] = new MetadataItem(item.Name, value);
                 }
 
                 // Need to create an ad-hoc one...
                 else
                 {
-                    Items.Add(new MetadataEntry(name, value));
+                    Items.Add(new MetadataItem(name, value));
                 }
 
                 // Any case, set the dirty indicator...
@@ -501,7 +572,7 @@ partial class SchemaEntry
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public IMetadataEntry? Find(string name)
+        public IMetadataItem? Find(string name)
         {
             name = Validate(name);
 
@@ -514,11 +585,11 @@ partial class SchemaEntry
         /// </summary>
         /// <param name="names"></param>
         /// <returns></returns>
-        public List<IMetadataEntry> Find(IEnumerable<string> names)
+        public List<IMetadataItem> Find(IEnumerable<string> names)
         {
             ArgumentNullException.ThrowIfNull(names);
 
-            List<IMetadataEntry> items = [];
+            List<IMetadataItem> items = [];
             foreach (var name in names)
             {
                 var item = Find(name);
@@ -527,53 +598,141 @@ partial class SchemaEntry
             return items;
         }
 
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <returns></returns>
+        public IMetadataItem[] ToArray() => [.. Items];
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <returns></returns>
+        public List<IMetadataItem> ToList() => [.. Items];
+
         // ------------------------------------------------
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         /// <returns></returns>
-        public virtual ISchemaEntry ToInstance() => throw null;
+        public virtual ISchemaEntry ToInstance() => new SchemaEntry(Engine, this);
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public virtual bool Add(IMetadataEntry item) => throw null;
+        public virtual bool Add(IMetadataItem item)
+        {
+            ArgumentNullException.ThrowIfNull(item);
+
+            // No duplicates for well-known tags...
+            if (Engine.KnownTags.Contains(item.Name)) return Update(item);
+
+            // Otherwise...
+            var index = IndexOf(item.Name);
+            if (index >= 0) throw new DuplicateException(
+                "This instance already carries an entry associated with the given name.")
+                .WithData(item)
+                .WithData(this);
+
+            Items.Add(item);
+            SetDirtyIndicator(item.Name);
+            return true;
+        }
+
+        /// <summary>
+        /// Adds to this instance where a metadata entry built from the given name and value.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public virtual bool Add(string name, object? value)
+        {
+            var item = new MetadataItem(name, value);
+            return Add(item);
+        }
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         /// <param name="entry"></param>
         /// <returns></returns>
-        public virtual bool AddRange(IEnumerable<IMetadataEntry> range) => throw null;
+        public virtual bool AddRange(IEnumerable<IMetadataItem> range)
+        {
+            ArgumentNullException.ThrowIfNull(range);
+
+            bool done = false;
+            foreach (var item in range) if (Add(item)) done = true;
+            return done;
+        }
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         /// <param name="item"></param>
         /// <returns></returns>
-        public virtual bool Update(IMetadataEntry item) => throw null;
+        public virtual bool Update(IMetadataItem item)
+        {
+            ArgumentNullException.ThrowIfNull(item);
+
+            this[item.Name] = item.Value;
+            return true;
+        }
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         /// <param name="range"></param>
         /// <returns></returns>
-        public virtual bool UpdateRange(IEnumerable<IMetadataEntry> range) => throw null;
+        public virtual bool UpdateRange(IEnumerable<IMetadataItem> range)
+        {
+            ArgumentNullException.ThrowIfNull(range);
+
+            bool done = false;
+            foreach (var item in range) if (Update(item)) done = true;
+            return done;
+        }
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public virtual bool Remove(string name) => throw null;
+        public virtual bool Remove(string name)
+        {
+            name = Validate(name);
+
+            var index = IndexOf(name);
+            if (index < 0) return false;
+
+            Items.RemoveAt(index);
+            SetDirtyIndicator(name);
+            return true;
+        }
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         /// <returns></returns>
-        public virtual bool Clear() => throw null;
+        public virtual bool Clear()
+        {
+            var done =
+                Items.Count != 0 ||
+                Identifier != null ||
+                IsPrimaryKey != null ||
+                IsUniqueValued != null ||
+                IsReadOnly != null;
+
+            Items.Clear();
+            Identifier = null;
+            IsPrimaryKey = null;
+            IsUniqueValued = null;
+            IsReadOnly = null;
+
+            SetDirtyIndicator();
+            return done;
+        }
     }
 }

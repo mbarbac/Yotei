@@ -2,18 +2,18 @@
 
 // ========================================================
 /// <summary>
-/// <inheritdoc cref="IMetadataEntry"/>
+/// <inheritdoc cref="IMetadataItem"/>
 /// </summary>
-[Cloneable(ReturnType = typeof(IMetadataEntry), UseVirtual = false)]
-[InheritsWith(ReturnType = typeof(IMetadataEntry), UseVirtual = false)]
-public sealed partial class MetadataEntry : IMetadataEntry
+[Cloneable(ReturnType = typeof(IMetadataItem), UseVirtual = false)]
+[InheritsWith(ReturnType = typeof(IMetadataItem), UseVirtual = false)]
+public sealed partial class MetadataItem : IMetadataItem
 {
     /// <summary>
     /// Initializes a new instance.
     /// </summary>
     /// <param name="name"></param>
     /// <param name="value"></param>
-    public MetadataEntry(string name, object? value)
+    public MetadataItem(string name, object? value)
     {
         Name = name;
         Value = value;
@@ -23,7 +23,7 @@ public sealed partial class MetadataEntry : IMetadataEntry
     /// Copy constructor.
     /// </summary>
     /// <param name="other"></param>
-    MetadataEntry(MetadataEntry other)
+    MetadataItem(MetadataItem other)
     {
         ArgumentNullException.ThrowIfNull(other);
 
@@ -43,7 +43,7 @@ public sealed partial class MetadataEntry : IMetadataEntry
     /// <param name="other"></param>
     /// <param name="ignoreNameCase"></param>
     /// <returns></returns>
-    public bool Equals(IMetadataEntry? other, bool ignoreNameCase)
+    public bool Equals(IMetadataItem? other, bool ignoreNameCase)
     {
         if (ReferenceEquals(this, other)) return true;
         if (other is null) return false;
@@ -58,16 +58,16 @@ public sealed partial class MetadataEntry : IMetadataEntry
     /// </summary>
     /// <param name="other"></param>
     /// <returns></returns>
-    public bool Equals(IMetadataEntry? other) => Equals(other, false);
+    public bool Equals(IMetadataItem? other) => Equals(other, false);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="obj"></param>
     /// <returns></returns>
-    public override bool Equals(object? obj) => Equals(obj as IMetadataEntry);
+    public override bool Equals(object? obj) => Equals(obj as IMetadataItem);
 
-    public static bool operator ==(MetadataEntry? host, IMetadataEntry? item)
+    public static bool operator ==(MetadataItem? host, IMetadataItem? item)
     {
         if (host is null && item is null) return true;
         if (host is null || item is null) return false;
@@ -75,7 +75,7 @@ public sealed partial class MetadataEntry : IMetadataEntry
         return host.Equals(item);
     }
 
-    public static bool operator !=(MetadataEntry? host, IMetadataEntry? item) => !(host == item);
+    public static bool operator !=(MetadataItem? host, IMetadataItem? item) => !(host == item);
 
     /// <summary>
     /// <inheritdoc/>
