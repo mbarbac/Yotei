@@ -76,7 +76,7 @@ public partial class ElementBag_T : IHost
 
         foreach (var item in this)
         {
-            var same = valid.Find(temp =>
+            var same = valid.TryFind(temp =>
                 item is NamedElement xitem && temp is NamedElement xtemp
                 ? xitem.Equals(xtemp, Engine.IgnoreCase)
                 : item.EqualsEx(temp),

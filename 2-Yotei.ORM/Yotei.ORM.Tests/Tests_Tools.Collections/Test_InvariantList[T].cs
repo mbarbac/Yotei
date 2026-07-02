@@ -331,18 +331,18 @@ public static partial class Test_InvariantList_T
         var source = new Chain() { AcceptDuplicates = true, IgnoreCase = true };
         source = (Chain)source.AddRange([xone, xtwo, xone, xthree]);
 
-        Assert.False(source.Find(x => x is null, out item));
+        Assert.False(source.TryFind(x => x is null, out item));
         Assert.Null(item);
 
-        Assert.True(source.Find(x => x is Named named && named.Name.Contains('e'), out item));
+        Assert.True(source.TryFind(x => x is Named named && named.Name.Contains('e'), out item));
         Assert.NotNull(item);
         Assert.Same(xone, item);
 
-        Assert.True(source.FindLast(x => x is Named named && named.Name.Contains('e'), out item));
+        Assert.True(source.TryFindLast(x => x is Named named && named.Name.Contains('e'), out item));
         Assert.NotNull(item);
         Assert.Same(xthree, item);
 
-        Assert.True(source.FindAll(x => x is Named named && named.Name.Contains('e'), out range));
+        Assert.True(source.TryFindAll(x => x is Named named && named.Name.Contains('e'), out range));
         Assert.Equal(3, range.Count);
         Assert.Same(xone, range[0]);
         Assert.Same(xone, range[1]);

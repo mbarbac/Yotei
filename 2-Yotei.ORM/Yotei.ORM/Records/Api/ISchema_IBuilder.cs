@@ -41,6 +41,27 @@ partial interface ISchema
         int IndexOf(string identifier);
 
         /// <summary>
+        /// <inheritdoc cref="IHost.LastIndexOf(string)"/>
+        /// </summary>
+        /// <param name="identifier"></param>
+        /// <returns></returns>
+        int LastIndexOf(string identifier);
+
+        /// <summary>
+        /// <inheritdoc cref="IHost.IndexesOf(string)"/>
+        /// </summary>
+        /// <param name="identifier"></param>
+        /// <returns></returns>
+        List<int> IndexesOf(string identifier);
+
+        /// <summary>
+        /// <inheritdoc cref="IHost.Match(string?)"/>
+        /// </summary>
+        /// <param name="specs"></param>
+        /// <returns></returns>
+        List<int> Match(string? specs);
+
+        /// <summary>
         /// <inheritdoc cref="IHost.Match(string?, out IItem?)"/>
         /// </summary>
         /// <param name="specs"></param>
@@ -49,10 +70,24 @@ partial interface ISchema
         List<int> Match(string? specs, out IItem? unique);
 
         /// <summary>
-        /// Removes from this instance the entry with the given identifier, if any.
+        /// Removes from this instance the first entry with the given identifier, if any.
         /// </summary>
         /// <param name="identifier"></param>
         /// <returns></returns>
         bool Remove(string identifier);
+
+        /// <summary>
+        /// Removes from this instance the last entry with the given identifier, if any.
+        /// </summary>
+        /// <param name="identifier"></param>
+        /// <returns></returns>
+        bool RemoveLast(string identifier);
+
+        /// <summary>
+        /// Removes from this instance all the entries with the given identifier.
+        /// </summary>
+        /// <param name="identifier"></param>
+        /// <returns></returns>
+        bool RemoveAll(string identifier);
     }
 }

@@ -88,7 +88,7 @@ public partial class CoreList<T> : ICoreList<T>
     /// <param name="key"></param>
     /// <returns></returns>
     public virtual IEnumerable<T> FindDuplicates(T value)
-        => FindAll(x => CompareElements(x, value), out var items) ? items : [];
+        => TryFindAll(x => CompareElements(x, value), out var items) ? items : [];
 
     /// <summary>
     /// Determines if the given value, which has been identified as a duplicate of existing ones,
@@ -225,7 +225,7 @@ public partial class CoreList<T> : ICoreList<T>
     /// <param name="predicate"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    public bool Find(Predicate<T> predicate, out T value)
+    public bool TryFind(Predicate<T> predicate, out T value)
     {
         var index = IndexOf(predicate);
         value = index >= 0 ? Items[index] : default!;
@@ -238,7 +238,7 @@ public partial class CoreList<T> : ICoreList<T>
     /// <param name="predicate"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    public bool FindLast(Predicate<T> predicate, out T value)
+    public bool TryFindLast(Predicate<T> predicate, out T value)
     {
         var index = LastIndexOf(predicate);
         value = index >= 0 ? Items[index] : default!;
@@ -251,7 +251,7 @@ public partial class CoreList<T> : ICoreList<T>
     /// <param name="predicate"></param>
     /// <param name="range"></param>
     /// <returns></returns>
-    public bool FindAll(Predicate<T> predicate, out List<T> range)
+    public bool TryFindAll(Predicate<T> predicate, out List<T> range)
     {
         var indexes = IndexesOf(predicate);
         range = [.. indexes.Select(x => Items[x])];

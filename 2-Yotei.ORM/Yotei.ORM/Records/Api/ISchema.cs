@@ -34,11 +34,35 @@ public partial interface ISchema : IEquatable<ISchema>
     bool Contains(string identifier);
 
     /// <summary>
-    /// Gets the entry in this instance with the given identifier, or -1 if any.
+    /// Gets the index of first entry in this instance with the given identifier, or -1 if any.
     /// </summary>
     /// <param name="identifier"></param>
     /// <returns></returns>
     int IndexOf(string identifier);
+
+    /// <summary>
+    /// Gets the index of last entry in this instance with the given identifier, or -1 if any.
+    /// </summary>
+    /// <param name="identifier"></param>
+    /// <returns></returns>
+    int LastIndexOf(string identifier);
+
+    /// <summary>
+    /// Gets the indexes of the entries in this instance with the given identifier.
+    /// </summary>
+    /// <param name="identifier"></param>
+    /// <returns></returns>
+    List<int> IndexesOf(string identifier);
+
+    /// <summary>
+    /// Returns the indexes of the entries in this instance whose identifiers match the given
+    /// specifications, in the form of a string with dot-separated parts where any empty or null
+    /// one is considered an implicit match. Comparison is performed per each part from right to
+    /// left.
+    /// </summary>
+    /// <param name="specs"></param>
+    /// <returns></returns>
+    List<int> Match(string? specs);
 
     /// <summary>
     /// Returns the indexes of the entries in this instance whose identifiers match the given
@@ -54,10 +78,26 @@ public partial interface ISchema : IEquatable<ISchema>
     List<int> Match(string? specs, out IItem? unique);
 
     /// <summary>
-    /// Returns a copy of this instance where the entry with the given identifier has been
+    /// Returns a copy of this instance where the first entry with the given identifier has been
     /// removed.
     /// </summary>
     /// <param name="identifier"></param>
     /// <returns></returns>
     IHost Remove(string identifier);
+
+    /// <summary>
+    /// Returns a copy of this instance where the last entry with the given identifier has been
+    /// removed.
+    /// </summary>
+    /// <param name="identifier"></param>
+    /// <returns></returns>
+    IHost RemoveLast(string identifier);
+
+    /// <summary>
+    /// Returns a copy of this instance where all the entries with the given identifier has been
+    /// removed.
+    /// </summary>
+    /// <param name="identifier"></param>
+    /// <returns></returns>
+    IHost RemoveAll(string identifier);
 }

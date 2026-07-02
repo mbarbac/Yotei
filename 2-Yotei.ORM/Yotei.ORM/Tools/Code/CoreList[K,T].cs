@@ -103,7 +103,7 @@ public abstract partial class CoreList<K, T> : ICoreList<K, T>
     /// <param name="key"></param>
     /// <returns></returns>
     public virtual IEnumerable<T> FindDuplicates(K key)
-        => FindAll(x => CompareKeys(GetKey(x), key), out var items) ? items : [];
+        => TryFindAll(x => CompareKeys(GetKey(x), key), out var items) ? items : [];
 
     /// <summary>
     /// Determines if the given value, which has been identified as a duplicate of existing ones,
@@ -247,7 +247,7 @@ public abstract partial class CoreList<K, T> : ICoreList<K, T>
     /// <param name="predicate"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    public bool Find(Predicate<T> predicate, out T value)
+    public bool TryFind(Predicate<T> predicate, out T value)
     {
         ArgumentNullException.ThrowIfNull(predicate);
 
@@ -262,7 +262,7 @@ public abstract partial class CoreList<K, T> : ICoreList<K, T>
     /// <param name="predicate"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    public bool FindLast(Predicate<T> predicate, out T value)
+    public bool TryFindLast(Predicate<T> predicate, out T value)
     {
         ArgumentNullException.ThrowIfNull(predicate);
 
@@ -277,7 +277,7 @@ public abstract partial class CoreList<K, T> : ICoreList<K, T>
     /// <param name="predicate"></param>
     /// <param name="range"></param>
     /// <returns></returns>
-    public bool FindAll(Predicate<T> predicate, out List<T> range)
+    public bool TryFindAll(Predicate<T> predicate, out List<T> range)
     {
         ArgumentNullException.ThrowIfNull(predicate);
 

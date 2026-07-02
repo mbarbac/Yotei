@@ -1,4 +1,5 @@
-﻿using Entry = Yotei.ORM.Records.Code.SchemaEntry;
+﻿using System.Xml.Schema;
+using Entry = Yotei.ORM.Records.Code.SchemaEntry;
 
 namespace Yotei.ORM.Tests;
 
@@ -105,91 +106,160 @@ public static partial class Test_Schema
         Assert.Same(xlast, target[2]);
         Assert.Same(xctry, target[3]);
     }
-}
-/*
 
     // ----------------------------------------------------
 
     //[Enforced]
     [Fact]
-    public static void Test_IndexOf_Value()
+    public static void Test_IndexOf_Identifier()
     {
         var engine = new FakeEngine() { IgnoreCase = true };
-        var source = new Schema(engine) { AcceptDuplicates = true };
-        source = (Chain)source.AddRange([xone, xtwo, xthree, xone]);
+        var xid = new Entry(engine, "Emp.Id", isPrimaryKey: true);
+        var xfirst = new Entry(engine, "Emp.FirstName");
+        var xlast = new Entry(engine, "LastName");
+        var xctry = new Entry(engine, "Ctry.Id");
 
-        var index = source.IndexOf("FOUR"); Assert.Equal(-1, index);
+        List<int> indexes;
+        IIdentifier id;
+        var schema = new Schema(engine, [xid, xfirst, xlast, xctry, xid]);
 
-        index = source.IndexOf("one"); Assert.Equal(0, index);
-        index = source.IndexOf("ONE"); Assert.Equal(0, index);
+        id = new Identifier(engine, "any"); Assert.Equal(-1, schema.IndexOf(id));
+        try { schema.IndexOf(new Identifier(new FakeEngine(), "any")); Assert.Fail(); }
+        catch (ArgumentException) { }
 
-        index = source.LastIndexOf("one"); Assert.Equal(3, index);
-        index = source.LastIndexOf("ONE"); Assert.Equal(3, index);
+        id = new Identifier(engine, "Emp.Id");
+        Assert.Equal(0, schema.IndexOf(id));
+        Assert.Equal(4, schema.LastIndexOf(id));
+        indexes = schema.IndexesOf(id);
+        Assert.Equal(2, indexes.Count);
+        Assert.Equal(0, indexes[0]);
+        Assert.Equal(4, indexes[1]);
 
-        var nums = source.IndexesOf("one");
-        Assert.Equal(2, nums.Count);
-        Assert.Equal(0, nums[0]);
-        Assert.Equal(3, nums[1]);
-
-        nums = source.IndexesOf("ONE");
-        Assert.Equal(2, nums.Count);
-        Assert.Equal(0, nums[0]);
-        Assert.Equal(3, nums[1]);
+        id = new Identifier(engine, "EMP.ID");
+        Assert.Equal(0, schema.IndexOf(id));
+        Assert.Equal(4, schema.LastIndexOf(id));
+        indexes = schema.IndexesOf(id);
+        Assert.Equal(2, indexes.Count);
+        Assert.Equal(0, indexes[0]);
+        Assert.Equal(4, indexes[1]);
     }
 
-    // ----------------------------------------------------
+    //[Enforced]
+    [Fact]
+    public static void Test_IndexOf_String()
+    {
+        var engine = new FakeEngine() { IgnoreCase = true };
+        var xid = new Entry(engine, "Emp.Id", isPrimaryKey: true);
+        var xfirst = new Entry(engine, "Emp.FirstName");
+        var xlast = new Entry(engine, "LastName");
+        var xctry = new Entry(engine, "Ctry.Id");
+        var schema = new Schema(engine, [xid, xfirst, xlast, xctry, xid]);
+        string id;
+        List<int> indexes;
+
+        Assert.Equal(-1, schema.IndexOf("any"));
+
+        id = "Emp.Id";
+        Assert.Equal(0, schema.IndexOf(id));
+        Assert.Equal(4, schema.LastIndexOf(id));
+        indexes = schema.IndexesOf(id);
+        Assert.Equal(2, indexes.Count);
+        Assert.Equal(0, indexes[0]);
+        Assert.Equal(4, indexes[1]);
+
+        id = "EMP.ID";
+        Assert.Equal(0, schema.IndexOf(id));
+        Assert.Equal(4, schema.LastIndexOf(id));
+        indexes = schema.IndexesOf(id);
+        Assert.Equal(2, indexes.Count);
+        Assert.Equal(0, indexes[0]);
+        Assert.Equal(4, indexes[1]);
+    }
 
     //[Enforced]
     [Fact]
     public static void Test_IndexOf_Predicate()
     {
         var engine = new FakeEngine() { IgnoreCase = true };
-        var source = new Schema(engine) { AcceptDuplicates = true };
-        source = (Chain)source.AddRange([xone, xtwo, xone, xthree]);
+        var xid = new Entry(engine, "Emp.Id", isPrimaryKey: true);
+        var xfirst = new Entry(engine, "Emp.FirstName");
+        var xlast = new Entry(engine, "LastName");
+        var xctry = new Entry(engine, "Ctry.Id");
+        var schema = new Schema(engine, [xid, xfirst, xlast, xctry, xid]);
+        int index;
+        List<int> indexes;
 
-        var index = source.IndexOf(x => x is null); Assert.Equal(-1, index);
+        index = schema.IndexOf(x => x.Identifier is null); Assert.Equal(-1, index);
 
-        index = source.IndexOf(x => x is Named named && named.Name.Contains('n'));
-        Assert.Equal(0, index);
-
-        index = source.LastIndexOf(x => x is Named named && named.Name.Contains('n'));
-        Assert.Equal(2, index);
-
-        var nums = source.IndexesOf(x => x is Named named && named.Name.Contains('e'));
-        Assert.Equal(3, nums.Count);
-        Assert.Equal(0, nums[0]);
-        Assert.Equal(2, nums[1]);
-        Assert.Equal(3, nums[2]);
+        index = schema.IndexOf(x => x.Identifier!.Contains("Id")); Assert.Equal(0, index);
+        index = schema.LastIndexOf(x => x.Identifier!.Contains("Id")); Assert.Equal(4, index);
+        indexes = schema.IndexesOf(x => x.Identifier!.Contains("Id"));
+        Assert.Equal(3, indexes.Count);
+        Assert.Equal(0, indexes[0]);
+        Assert.Equal(3, indexes[1]);
+        Assert.Equal(4, indexes[2]);
     }
 
-    // ----------------------------------------------------
+    //[Enforced]
+    [Fact]
+    public static void Test_Match()
+    {
+        var engine = new FakeEngine() { IgnoreCase = true };
+        var xid = new Entry(engine, "Emp.Id", isPrimaryKey: true);
+        var xfirst = new Entry(engine, "Emp.FirstName");
+        var xlast = new Entry(engine, "LastName");
+        var xctry = new Entry(engine, "Ctry.Id");
+        var schema = new Schema(engine, [xid, xfirst, xlast, xctry, xid]);
+
+        var indexes = schema.Match("any", out var unique);
+        Assert.Empty(indexes);
+        Assert.Null(unique);
+
+        indexes = schema.Match("Id", out unique);
+        Assert.Equal(3, indexes.Count);
+        Assert.Equal(0, indexes[0]);
+        Assert.Equal(3, indexes[1]);
+        Assert.Equal(4, indexes[2]);
+        Assert.Null(unique);
+
+        indexes = schema.Match("EMP.", out unique);
+        Assert.Equal(3, indexes.Count);
+        Assert.Equal(0, indexes[0]);
+        Assert.Equal(1, indexes[1]);
+        Assert.Equal(4, indexes[2]);
+        Assert.Null(unique);
+
+        indexes = schema.Match("FIRSTNAME", out unique);
+        Assert.Single(indexes);
+        Assert.Equal(1, indexes[0]);
+        Assert.NotNull(unique); Assert.Same(xfirst, unique);
+    }
 
     //[Enforced]
     [Fact]
     public static void Test_Find()
     {
         var engine = new FakeEngine() { IgnoreCase = true };
-        IElement item;
-        List<IElement> range;
-        var source = new Schema(engine) { AcceptDuplicates = true };
-        source = (Chain)source.AddRange([xone, xtwo, xone, xthree]);
+        var xid = new Entry(engine, "Emp.Id", isPrimaryKey: true);
+        var xfirst = new Entry(engine, "Emp.FirstName");
+        var xlast = new Entry(engine, "LastName");
+        var xctry = new Entry(engine, "Ctry.Id");
+        var schema = new Schema(engine, [xid, xfirst, xlast, xctry, xid]);
 
-        Assert.False(source.Find(x => x is null, out item));
-        Assert.Null(item);
+        Assert.False(schema.TryFind(x => x.Identifier is null, out var entry));
+        Assert.Null(entry);
 
-        Assert.True(source.Find(x => x is Named named && named.Name.Contains('e'), out item));
-        Assert.NotNull(item);
-        Assert.Same(xone, item);
+        Assert.True(schema.TryFind(x => x.Identifier!.Contains("Id"), out entry));
+        Assert.Same(xid, entry);
 
-        Assert.True(source.FindLast(x => x is Named named && named.Name.Contains('e'), out item));
-        Assert.NotNull(item);
-        Assert.Same(xthree, item);
+        Assert.True(schema.TryFindLast(x => x.Identifier!.Contains("Id"), out entry));
+        Assert.Same(xid, entry);
 
-        Assert.True(source.FindAll(x => x is Named named && named.Name.Contains('e'), out range));
+        Assert.True(schema.TryFindAll(x => x.Identifier!.Contains("Id"), out var range));
         Assert.Equal(3, range.Count);
-        Assert.Same(xone, range[0]);
-        Assert.Same(xone, range[1]);
-        Assert.Same(xthree, range[2]);
+        Assert.Same(xid, range[0]);
+        Assert.Same(xctry, range[1]);
+        Assert.Same(xid, range[2]);
     }
 
     // ----------------------------------------------------
@@ -198,25 +268,24 @@ public static partial class Test_Schema
     [Fact]
     public static void Test_GetRange()
     {
-        var engine = new FakeEngine();
-        var source = new Schema(engine);
-        var target = source.GetRange(0, 0);
-        Assert.Same(source, target);
+        var engine = new FakeEngine() { IgnoreCase = true };
+        var xid = new Entry(engine, "Emp.Id", isPrimaryKey: true);
+        var xfirst = new Entry(engine, "Emp.FirstName");
+        var xlast = new Entry(engine, "LastName");
+        var xctry = new Entry(engine, "Ctry.Id");
 
-        source = new Schema(engine, [xone, xtwo, xthree]);
-        target = source.GetRange(0, 3);
-        Assert.Same(source, target);
-
-        target = source.GetRange(1, 2);
+        var source = new Schema(engine, [xid, xfirst, xlast, xctry, xid]);
+        var target = source.GetRange(1, 3);
         Assert.NotSame(source, target);
-        Assert.Equal(2, target.Count);
-        Assert.Same(xtwo, target[0]);
-        Assert.Same(xthree, target[1]);
+        Assert.Equal(3, target.Count);
+        Assert.Same(xfirst, target[0]);
+        Assert.Same(xlast, target[1]);
+        Assert.Same(xctry, target[2]);
 
         try { source.GetRange(-1, 0); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
         try { source.GetRange(0, -1); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
-        try { source.GetRange(4, 0); Assert.Fail(); } catch (ArgumentException) { }
-        try { source.GetRange(0, 4); Assert.Fail(); } catch (ArgumentException) { }
+        try { source.GetRange(6, 0); Assert.Fail(); } catch (ArgumentException) { }
+        try { source.GetRange(0, 6); Assert.Fail(); } catch (ArgumentException) { }
     }
 
     // ----------------------------------------------------
@@ -225,85 +294,30 @@ public static partial class Test_Schema
     [Fact]
     public static void Test_Replace()
     {
-        var engine = new FakeEngine();
-        var source = new Schema(engine, [xone, xtwo, xthree]);
-        var target = source.Replace(0, xone);
-        Assert.Same(source, target);
-
-        target = source.Replace(0, new Named("ONE"));
-        Assert.NotSame(source, target);
-        Assert.Equal(3, target.Count);
-        Assert.Equal("ONE", ((Named)target[0]).Name);
-        Assert.Same(xtwo, target[1]);
-        Assert.Same(xthree, target[2]);
-
-        var xother = new Named("other");
-        try { source.Replace(-1, xother); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
-        try { source.Replace(3, xother); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
-    }
-
-    //[Enforced]
-    [Fact]
-    public static void Test_Replace_Same()
-    {
         var engine = new FakeEngine() { IgnoreCase = true };
-        var source = new Schema(engine, [xone, xtwo, xthree]);
-        var target = source.Replace(0, xone);
+        var xid = new Entry(engine, "Emp.Id", isPrimaryKey: true);
+        var xfirst = new Entry(engine, "Emp.FirstName");
+        var xlast = new Entry(engine, "LastName");
+        var xctry = new Entry(engine, "Ctry.Id");
+
+        var source = new Schema(engine, [xid, xfirst, xlast, xctry, xid]);
+        var target = source.Replace(0, xid);
         Assert.Same(source, target);
 
-        try { source.Replace(1, xone); Assert.Fail(); } catch (DuplicateException) { }
+        try { _ = source.Replace(0, new Entry(engine, "Emp.Id")); Assert.Fail(); }
+        catch (DuplicateException) { }
 
-        source = new Schema(engine) { AcceptDuplicates = true };
-        source = (Chain)source.AddRange([xone, xtwo, xthree]);
-        target = source.Replace(1, xtwo);
-        Assert.Same(source, target);
+        try { _ = source.Replace(0, new Entry(engine, "Id")); Assert.Fail(); }
+        catch (DuplicateException) { }
 
-        target = source.Replace(1, new Named("TWO"));
-        Assert.Same(source, target);
-    }
-
-    //[Enforced]
-    [Fact]
-    public static void Test_Replace_Empty_Nested()
-    {
-        var engine = new FakeEngine();
-        var source = new Schema(engine, [xone, xtwo, xthree]);
-        var target = source.Replace(0, new Schema(engine));
-        Assert.Same(source, target);
-    }
-
-    //[Enforced]
-    [Fact]
-    public static void Test_Replace_Range_Nested()
-    {
-        var engine = new FakeEngine();
-        var xalpha = new Named("alpha");
-        var xbeta = new Named("beta");
-        var source = new Schema(engine, [xone, xtwo, xthree]);
-
-        var target = source.Replace(0, new Schema(engine, [xalpha, xbeta]));
+        target = source.Replace(0, new Entry(engine, "ANY"));
         Assert.NotSame(source, target);
-        Assert.Equal(4, target.Count);
-        Assert.Same(xalpha, target[0]);
-        Assert.Same(xbeta, target[1]);
-        Assert.Same(xtwo, target[2]);
-        Assert.Same(xthree, target[3]);
-
-        target = source.Replace(1, new Schema(engine, [xalpha, xbeta]));
-        Assert.NotSame(source, target);
-        Assert.Equal(4, target.Count);
-        Assert.Same(xone, target[0]);
-        Assert.Same(xalpha, target[1]);
-        Assert.Same(xbeta, target[2]);
-        Assert.Same(xthree, target[3]);
-
-        target = source.Replace(2, new Schema(engine, [xalpha, xbeta]));
-        Assert.NotSame(source, target);
-        Assert.Equal(4, target.Count);
-        Assert.Same(xone, target[0]);
-        Assert.Same(xtwo, target[1]);
-        Assert.Same(xalpha, target[2]);
-        Assert.Same(xbeta, target[3]);
+        Assert.Equal(5, target.Count);
+        Assert.Equal("[ANY]", target[0].Identifier!.Value);
+        Assert.Same(xfirst, target[1]);
+        Assert.Same(xlast, target[2]);
+        Assert.Same(xctry, target[3]);
+        Assert.Same(xid, target[4]);
     }
 
     // ----------------------------------------------------
@@ -312,94 +326,54 @@ public static partial class Test_Schema
     [Fact]
     public static void Test_Add()
     {
-        var engine = new FakeEngine();
+        var engine = new FakeEngine() { IgnoreCase = true };
+        var xid = new Entry(engine, "Emp.Id", isPrimaryKey: true);
+        var xfirst = new Entry(engine, "Emp.FirstName");
+
         var source = new Schema(engine);
-        var target = source.Add(xone);
+        var target = source.Add(xid);
         Assert.NotSame(source, target);
         Assert.Single(target);
-        Assert.Same(xone, target[0]);
+        Assert.Same(xid, target[0]);
 
-        source = new Schema(engine, [xone]);
-        target = source.Add(xtwo);
+        source = new Schema(engine, [xid, xfirst]);
+        target = source.Add(new Entry(engine, "Emp.Age"));
         Assert.NotSame(source, target);
-        Assert.Equal(2, target.Count);
-        Assert.Same(xone, target[0]);
-        Assert.Same(xtwo, target[1]);
+        Assert.Equal(3, target.Count);
+        Assert.Same(xid, target[0]);
+        Assert.Same(xfirst, target[1]);
+        Assert.Equal("[Emp].[Age]", target[2].Identifier!.Value);
 
         try { source.Add(null!); Assert.Fail(); } catch (ArgumentNullException) { }
-        try { source.Add(xone); Assert.Fail(); } catch (DuplicateException) { }
-
-        engine = new FakeEngine() { IgnoreCase = true };
-        source = new Schema(engine, [xone, xtwo]);
-        try { source.Add(new Named("ONE")); Assert.Fail(); } catch (DuplicateException) { }
-
-        source.AcceptDuplicates = true;
-        target = source.Add(xone);
-        Assert.NotSame(source, target);
-        Assert.Equal(3, target.Count);
-        Assert.Same(xone, target[0]);
-        Assert.Same(xtwo, target[1]);
-        Assert.Same(xone, target[2]);
-
-        target = source.Add(new Named("ONE"));
-        Assert.NotSame(source, target);
-        Assert.Equal(3, target.Count);
-        Assert.Same(xone, target[0]);
-        Assert.Same(xtwo, target[1]);
-        Assert.Equal("ONE", ((Named)target[2]).Name);
+        try { source.Add(new Entry(engine, "ID")); Assert.Fail(); } catch (DuplicateException) { }
     }
-
-    //[Enforced]
-    [Fact]
-    public static void Test_Add_Nested()
-    {
-        var engine = new FakeEngine();
-        var source = new Schema(engine, [xone, xtwo]);
-        var target = source.Add(new Schema(engine, [xthree, xfour]));
-
-        Assert.NotSame(source, target);
-        Assert.Equal(4, target.Count);
-        Assert.Same(xone, target[0]);
-        Assert.Same(xtwo, target[1]);
-        Assert.Same(xthree, target[2]);
-        Assert.Same(xfour, target[3]);
-    }
-
-    // ----------------------------------------------------
 
     //[Enforced]
     [Fact]
     public static void Test_AddRange()
     {
-        var engine = new FakeEngine();
-        var source = new Schema(engine, [xone, xtwo]);
+        var engine = new FakeEngine() { IgnoreCase = true };
+        var xid = new Entry(engine, "Emp.Id", isPrimaryKey: true);
+        var xfirst = new Entry(engine, "Emp.FirstName");
+        var xlast = new Entry(engine, "LastName");
+        var xctry = new Entry(engine, "Ctry.Id");
+
+        var source = new Schema(engine);
         var target = source.AddRange([]);
         Assert.Same(source, target);
 
-        target = source.AddRange([xthree, xfour]);
-        Assert.NotSame(source, target);
-        Assert.Equal(4, target.Count);
-        Assert.Same(xone, target[0]);
-        Assert.Same(xtwo, target[1]);
-        Assert.Same(xthree, target[2]);
-        Assert.Same(xfour, target[3]);
-    }
-
-    //[Enforced]
-    [Fact]
-    public static void Test_AddRange_Nested()
-    {
-        var engine = new FakeEngine();
-        var source = new Schema(engine, [xone, xtwo]);
-        var target = source.AddRange([xthree, new Schema(engine, [xfour, xfive])]);
-
+        source = new Schema(engine, [xid, xfirst]);
+        target = source.AddRange([xlast, xctry, xid]);
         Assert.NotSame(source, target);
         Assert.Equal(5, target.Count);
-        Assert.Same(xone, target[0]);
-        Assert.Same(xtwo, target[1]);
-        Assert.Same(xthree, target[2]);
-        Assert.Same(xfour, target[3]);
-        Assert.Same(xfive, target[4]);
+        Assert.Same(xid, target[0]);
+        Assert.Same(xfirst, target[1]);
+        Assert.Same(xlast, target[2]);
+        Assert.Same(xctry, target[3]);
+        Assert.Same(xid, target[4]);
+
+        try { source.AddRange(null!); Assert.Fail(); } catch (ArgumentNullException) { }
+        try { source.AddRange([null!]); Assert.Fail(); } catch (ArgumentException) { }
     }
 
     // ----------------------------------------------------
@@ -408,109 +382,67 @@ public static partial class Test_Schema
     [Fact]
     public static void Test_Insert()
     {
-        var engine = new FakeEngine();
+        var engine = new FakeEngine() { IgnoreCase = true };
+        var xid = new Entry(engine, "Emp.Id", isPrimaryKey: true);
+        var xfirst = new Entry(engine, "Emp.FirstName");
+        var xlast = new Entry(engine, "LastName");
+
         var source = new Schema(engine);
-        var target = source.Insert(0, xone);
+        var target = source.Insert(0, xid);
         Assert.NotSame(source, target);
         Assert.Single(target);
-        Assert.Same(xone, target[0]);
+        Assert.Same(xid, target[0]);
 
-        source = (Chain)target;
-        target = source.Insert(1, xtwo);
+        source = (Schema)target;
+        target = source.Insert(1, xfirst);
         Assert.NotSame(source, target);
         Assert.Equal(2, target.Count);
-        Assert.Same(xone, target[0]);
-        Assert.Same(xtwo, target[1]);
+        Assert.Same(xid, target[0]);
+        Assert.Same(xfirst, target[1]);
 
-        source = (Chain)target;
-        target = source.Insert(0, xthree);
+        source = (Schema)target;
+        target = source.Insert(0, xlast);
         Assert.NotSame(source, target);
         Assert.Equal(3, target.Count);
-        Assert.Same(xthree, target[0]);
-        Assert.Same(xone, target[1]);
-        Assert.Same(xtwo, target[2]);
+        Assert.Same(xlast, target[0]);
+        Assert.Same(xid, target[1]);
+        Assert.Same(xfirst, target[2]);
 
         try { source.Insert(0, null!); Assert.Fail(); } catch (ArgumentNullException) { }
-        try { source.Insert(0, xone); Assert.Fail(); } catch (DuplicateException) { }
-        try { source.Insert(-1, xfive); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
-        try { source.Insert(4, xfive); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
-
-        engine = new FakeEngine() { IgnoreCase = true };
-        source = new Schema(engine, [xthree, xone, xtwo]);
-        try { source.Insert(0, new Named("ONE")); Assert.Fail(); } catch (DuplicateException) { }
-
-        source = (Chain)target;
-        source.AcceptDuplicates = true;
-        target = source.Insert(3, xone);
-        Assert.NotSame(source, target);
-        Assert.Equal(4, target.Count);
-        Assert.Same(xthree, target[0]);
-        Assert.Same(xone, target[1]);
-        Assert.Same(xtwo, target[2]);
-        Assert.Same(xone, target[3]);
-
-        source = (Chain)target;
-        target = source.Insert(0, new Named("ONE"));
-        Assert.NotSame(source, target);
-        Assert.Equal(5, target.Count);
-        Assert.Equal("ONE", ((Named)target[0]).Name);
-        Assert.Same(xthree, target[1]);
-        Assert.Same(xone, target[2]);
-        Assert.Same(xtwo, target[3]);
-        Assert.Same(xone, target[4]);
+        try { source.Insert(0, new Entry(engine, "ID")); Assert.Fail(); } catch (DuplicateException) { }
     }
-
-    //[Enforced]
-    [Fact]
-    public static void Test_Insert_Nested()
-    {
-        var engine = new FakeEngine();
-        var source = new Schema(engine, [xone, xtwo]);
-        var target = source.Insert(2, new Schema(engine, [xthree, xfour]));
-
-        Assert.NotSame(source, target);
-        Assert.Equal(4, target.Count);
-        Assert.Same(xone, target[0]);
-        Assert.Same(xtwo, target[1]);
-        Assert.Same(xthree, target[2]);
-        Assert.Same(xfour, target[3]);
-    }
-
-    // ----------------------------------------------------
 
     //[Enforced]
     [Fact]
     public static void Test_InsertRange()
     {
-        var engine = new FakeEngine();
-        var source = new Schema(engine, [xone, xtwo]);
+        var engine = new FakeEngine() { IgnoreCase = true };
+        var xid = new Entry(engine, "Emp.Id", isPrimaryKey: true);
+        var xfirst = new Entry(engine, "Emp.FirstName");
+        var xlast = new Entry(engine, "LastName");
+        var xctry = new Entry(engine, "Ctry.Id");
+
+        var source = new Schema(engine);
         var target = source.InsertRange(0, []);
         Assert.Same(source, target);
 
-        target = source.InsertRange(2, [xthree, xfour]);
+        target = source.InsertRange(0, [xid, xfirst]);
+        Assert.NotSame(source, target);
+        Assert.Equal(2, target.Count);
+        Assert.Same(xid, target[0]);
+        Assert.Same(xfirst, target[1]);
+
+        source = (Schema)target;
+        target = source.InsertRange(2, [xlast, xctry]);
         Assert.NotSame(source, target);
         Assert.Equal(4, target.Count);
-        Assert.Same(xone, target[0]);
-        Assert.Same(xtwo, target[1]);
-        Assert.Same(xthree, target[2]);
-        Assert.Same(xfour, target[3]);
-    }
+        Assert.Same(xid, target[0]);
+        Assert.Same(xfirst, target[1]);
+        Assert.Same(xlast, target[2]);
+        Assert.Same(xctry, target[3]);
 
-    //[Enforced]
-    [Fact]
-    public static void Test_InsertRange_Nested()
-    {
-        var engine = new FakeEngine();
-        var source = new Schema(engine, [xone, xtwo]);
-        var target = source.InsertRange(1, [xthree, new Schema(engine, [xfour, xfive])]);
-
-        Assert.NotSame(source, target);
-        Assert.Equal(5, target.Count);
-        Assert.Same(xone, target[0]);
-        Assert.Same(xthree, target[1]);
-        Assert.Same(xfour, target[2]);
-        Assert.Same(xfive, target[3]);
-        Assert.Same(xtwo, target[4]);
+        try { source.InsertRange(0, null!); Assert.Fail(); } catch (ArgumentNullException) { }
+        try { source.InsertRange(0, [null!]); Assert.Fail(); } catch (ArgumentException) { }
     }
 
     // ----------------------------------------------------
@@ -519,142 +451,166 @@ public static partial class Test_Schema
     [Fact]
     public static void Test_RemoveAt()
     {
-        var engine = new FakeEngine();
-        var source = new Schema(engine, [xone, xtwo, xthree]);
-        var target = source.RemoveAt(0);
+        var engine = new FakeEngine() { IgnoreCase = true };
+        var xid = new Entry(engine, "Emp.Id", isPrimaryKey: true);
+        var xfirst = new Entry(engine, "Emp.FirstName");
+        var xlast = new Entry(engine, "LastName");
 
+        var source = new Schema(engine, [xid, xfirst, xlast]);
+        var target = source.RemoveAt(0);
         Assert.NotSame(source, target);
         Assert.Equal(2, target.Count);
-        Assert.Same(xtwo, target[0]);
-        Assert.Same(xthree, target[1]);
-
-        try { source.RemoveAt(-1); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
-        try { source.RemoveAt(3); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
-    }
-
-    // ----------------------------------------------------
-
-    //[Enforced]
-    [Fact]
-    public static void Test_RemoveRange_Empty()
-    {
-        var engine = new FakeEngine();
-        var source = new Schema(engine, [xone, xtwo, xthree]);
-        var target = source.RemoveRange(0, 0);
-        Assert.Same(source, target);
+        Assert.Same(xfirst, target[0]);
+        Assert.Same(xlast, target[1]);
     }
 
     //[Enforced]
     [Fact]
     public static void Test_RemoveRange()
     {
-        var engine = new FakeEngine();
-        var source = new Schema(engine, [xone, xtwo, xthree]);
-        var target = source.RemoveRange(0, 1);
+        var engine = new FakeEngine() { IgnoreCase = true };
+        var source = new Schema(engine);
+        var target = source.RemoveRange(0, 0);
+        Assert.Same(source, target);
+
+        var xid = new Entry(engine, "Emp.Id", isPrimaryKey: true);
+        var xfirst = new Entry(engine, "Emp.FirstName");
+        var xlast = new Entry(engine, "LastName");
+        var xctry = new Entry(engine, "Ctry.Id");
+        source = new Schema(engine, [xid, xfirst, xlast, xctry]);
+        target = source.RemoveRange(0, 1);
         Assert.NotSame(source, target);
-        Assert.Equal(2, target.Count);
-        Assert.Same(xtwo, target[0]);
-        Assert.Same(xthree, target[1]);
+        Assert.Equal(3, target.Count);
+        Assert.Same(xfirst, target[0]);
+        Assert.Same(xlast, target[1]);
+        Assert.Same(xctry, target[2]);
 
         target = source.RemoveRange(1, 2);
         Assert.NotSame(source, target);
-        Assert.Single(target);
-        Assert.Same(xone, target[0]);
+        Assert.Equal(2, target.Count);
+        Assert.Same(xid, target[0]);
+        Assert.Same(xctry, target[1]);
 
         try { source.RemoveRange(-1, 0); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
-        try { source.RemoveRange(3, 1); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
-        try { source.RemoveRange(0, 4); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
-        try { source.RemoveRange(1, 3); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
-        try { source.RemoveRange(2, 2); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
+        try { source.RemoveRange(4, 1); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
+        try { source.RemoveRange(0, 5); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
+        try { source.RemoveRange(1, 4); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
+        try { source.RemoveRange(2, 3); Assert.Fail(); } catch (ArgumentOutOfRangeException) { }
     }
 
     // ----------------------------------------------------
 
     //[Enforced]
     [Fact]
-    public static void Test_Remove_Key()
+    public static void Test_Remove_Identifier()
     {
         var engine = new FakeEngine() { IgnoreCase = true };
-        var source = new Schema(engine) { AcceptDuplicates = true };
-        source = (Chain)source.AddRange([xone, xtwo, xone, xthree]);
+        var xid = new Entry(engine, "Emp.Id", isPrimaryKey: true);
+        var xfirst = new Entry(engine, "Emp.FirstName");
+        var xlast = new Entry(engine, "LastName");
+        var xctry = new Entry(engine, "Ctry.Id");
 
-        var target = source.Remove("four");
+        var source = new Schema(engine, [xid, xfirst, xlast, xctry, xid]);
+        var target = source.Remove(new Identifier(engine, "Any"));
         Assert.Same(source, target);
 
-        target = source.Remove("one");
+        target = source.Remove(xid.Identifier!);
+        Assert.NotSame(source, target);
+        Assert.Equal(4, target.Count);
+        Assert.Same(xfirst, target[0]);
+        Assert.Same(xlast, target[1]);
+        Assert.Same(xctry, target[2]);
+        Assert.Same(xid, target[3]);
+
+        target = source.RemoveLast(xid.Identifier!);
+        Assert.NotSame(source, target);
+        Assert.Equal(4, target.Count);
+        Assert.Same(xid, target[0]);
+        Assert.Same(xfirst, target[1]);
+        Assert.Same(xlast, target[2]);
+        Assert.Same(xctry, target[3]);
+
+        target = source.RemoveAll(xid.Identifier!);
         Assert.NotSame(source, target);
         Assert.Equal(3, target.Count);
-        Assert.Same(xtwo, target[0]);
-        Assert.Same(xone, target[1]);
-        Assert.Same(xthree, target[2]);
-
-        target = source.RemoveLast("ONE");
-        Assert.NotSame(source, target);
-        Assert.Equal(3, target.Count);
-        Assert.Same(xone, target[0]);
-        Assert.Same(xtwo, target[1]);
-        Assert.Same(xthree, target[2]);
-
-        target = source.RemoveAll("ONE");
-        Assert.NotSame(source, target);
-        Assert.Equal(2, target.Count);
-        Assert.Same(xtwo, target[0]);
-        Assert.Same(xthree, target[1]);
+        Assert.Same(xfirst, target[0]);
+        Assert.Same(xlast, target[1]);
+        Assert.Same(xctry, target[2]);
     }
 
     //[Enforced]
     [Fact]
-    public static void Test_Remove_Value_IgnoreCase()
+    public static void Test_Remove_String()
     {
         var engine = new FakeEngine() { IgnoreCase = true };
-        var source = new Schema(engine) { AcceptDuplicates = true };
-        source = (Chain)source.AddRange([xone, xtwo, xone, xthree]);
+        var xid = new Entry(engine, "Emp.Id", isPrimaryKey: true);
+        var xfirst = new Entry(engine, "Emp.FirstName");
+        var xlast = new Entry(engine, "LastName");
+        var xctry = new Entry(engine, "Ctry.Id");
 
-        var target = source.RemoveAll("ONE");
+        var source = new Schema(engine, [xid, xfirst, xlast, xctry, xid]);
+        var target = source.Remove("Any");
+        Assert.Same(source, target);
+
+        target = source.Remove("Emp.Id");
         Assert.NotSame(source, target);
-        Assert.Equal(2, target.Count);
-        Assert.Same(xtwo, target[0]);
-        Assert.Same(xthree, target[1]);
+        Assert.Equal(4, target.Count);
+        Assert.Same(xfirst, target[0]);
+        Assert.Same(xlast, target[1]);
+        Assert.Same(xctry, target[2]);
+        Assert.Same(xid, target[3]);
+
+        target = source.RemoveLast("Emp.Id");
+        Assert.NotSame(source, target);
+        Assert.Equal(4, target.Count);
+        Assert.Same(xid, target[0]);
+        Assert.Same(xfirst, target[1]);
+        Assert.Same(xlast, target[2]);
+        Assert.Same(xctry, target[3]);
+
+        target = source.RemoveAll("EMP.ID");
+        Assert.NotSame(source, target);
+        Assert.Equal(3, target.Count);
+        Assert.Same(xfirst, target[0]);
+        Assert.Same(xlast, target[1]);
+        Assert.Same(xctry, target[2]);
     }
-
-    //[Enforced]
-    //[Fact]
-    //public static void Test_Remove_Value_Nested()
-    // By default this capability is not supported: the remvoe methods take a 'key' argument, so
-    // there is no default way of specifying a collection of elements to remove.
-
-    // ----------------------------------------------------
 
     //[Enforced]
     [Fact]
     public static void Test_Remove_Predicate()
     {
         var engine = new FakeEngine() { IgnoreCase = true };
-        var source = new Schema(engine) { AcceptDuplicates = true };
-        source = (Chain)source.AddRange([xone, xtwo, xone, xthree]);
+        var xid = new Entry(engine, "Emp.Id", isPrimaryKey: true);
+        var xfirst = new Entry(engine, "Emp.FirstName");
+        var xlast = new Entry(engine, "LastName");
+        var xctry = new Entry(engine, "Ctry.Id");
 
-        var target = source.Remove(x => x is Named named && named.Name is null);
+        var source = new Schema(engine, [xid, xfirst, xlast, xctry, xid]);
+        var target = source.Remove(x => x.Identifier is null);
         Assert.Same(source, target);
 
-        target = source.Remove(x => x is Named named && named.Name.Contains('n'));
+        target = source.Remove(x => x.Identifier!.Contains("Id"));
         Assert.NotSame(source, target);
-        Assert.Equal(3, target.Count);
-        Assert.Same(xtwo, target[0]);
-        Assert.Same(xone, target[1]);
-        Assert.Same(xthree, target[2]);
+        Assert.Equal(4, target.Count);
+        Assert.Same(xfirst, target[0]);
+        Assert.Same(xlast, target[1]);
+        Assert.Same(xctry, target[2]);
+        Assert.Same(xid, target[3]);
 
-        target = source.RemoveLast(x => x is Named named && named.Name.Contains('n'));
+        target = source.RemoveLast(x => x.Identifier!.Contains("Id"));
         Assert.NotSame(source, target);
-        Assert.Equal(3, target.Count);
-        Assert.Same(xone, target[0]);
-        Assert.Same(xtwo, target[1]);
-        Assert.Same(xthree, target[2]);
+        Assert.Equal(4, target.Count);
+        Assert.Same(xid, target[0]);
+        Assert.Same(xfirst, target[1]);
+        Assert.Same(xlast, target[2]);
+        Assert.Same(xctry, target[3]);
 
-        target = source.RemoveAll(x => x is Named named && named.Name.Contains('n'));
+        target = source.RemoveAll(x => x.Identifier!.Contains("Id"));
         Assert.NotSame(source, target);
         Assert.Equal(2, target.Count);
-        Assert.Same(xtwo, target[0]);
-        Assert.Same(xthree, target[1]);
+        Assert.Same(xfirst, target[0]);
+        Assert.Same(xlast, target[1]);
     }
 
     // ----------------------------------------------------
@@ -663,14 +619,17 @@ public static partial class Test_Schema
     [Fact]
     public static void Test_Clear()
     {
-        var engine = new FakeEngine();
+        var engine = new FakeEngine() { IgnoreCase = true };
         var source = new Schema(engine);
         var target = source.Clear();
         Assert.Same(source, target);
 
-        source = new Schema(engine, [xone, xtwo, xthree]);
+        var xid = new Entry(engine, "Emp.Id", isPrimaryKey: true);
+        var xfirst = new Entry(engine, "Emp.FirstName");
+        var xlast = new Entry(engine, "LastName");
+        source = new Schema(engine, [xid, xfirst, xlast]);
         target = source.Clear();
         Assert.NotSame(source, target);
         Assert.Empty(target);
     }
- */
+}

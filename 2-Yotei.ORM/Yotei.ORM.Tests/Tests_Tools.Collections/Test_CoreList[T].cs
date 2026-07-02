@@ -321,18 +321,18 @@ public static partial class Test_CoreList_T
         var chain = new Chain() { AcceptDuplicates = true, IgnoreCase = true };
         chain.AddRange([xone, xtwo, xone, xthree]);
 
-        Assert.False(chain.Find(x => x is null, out item));
+        Assert.False(chain.TryFind(x => x is null, out item));
         Assert.Null(item);
 
-        Assert.True(chain.Find(x => x is Named named && named.Name.Contains('e'), out item));
+        Assert.True(chain.TryFind(x => x is Named named && named.Name.Contains('e'), out item));
         Assert.NotNull(item);
         Assert.Same(xone, item);
 
-        Assert.True(chain.FindLast(x => x is Named named && named.Name.Contains('e'), out item));
+        Assert.True(chain.TryFindLast(x => x is Named named && named.Name.Contains('e'), out item));
         Assert.NotNull(item);
         Assert.Same(xthree, item);
 
-        Assert.True(chain.FindAll(x => x is Named named && named.Name.Contains('e'), out range));
+        Assert.True(chain.TryFindAll(x => x is Named named && named.Name.Contains('e'), out range));
         Assert.Equal(3, range.Count);
         Assert.Same(xone, range[0]);
         Assert.Same(xone, range[1]);

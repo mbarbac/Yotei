@@ -87,7 +87,7 @@ public partial class CoreBag<T> : ICoreBag<T>
     /// <param name="key"></param>
     /// <returns></returns>
     public virtual IEnumerable<T> FindDuplicates(T value)
-        => FindAll(x => CompareElements(x, value), out var items) ? items : [];
+        => TryFindAll(x => CompareElements(x, value), out var items) ? items : [];
 
     /// <summary>
     /// Determines if the given value, which has been identified as a duplicate of existing ones,
@@ -128,7 +128,7 @@ public partial class CoreBag<T> : ICoreBag<T>
     /// <param name="predicate"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    public bool Find(Predicate<T> predicate, out T value) => Items.Find(predicate, out value);
+    public bool TryFind(Predicate<T> predicate, out T value) => Items.TryFind(predicate, out value);
 
     /// <summary>
     /// <inheritdoc/>
@@ -136,8 +136,8 @@ public partial class CoreBag<T> : ICoreBag<T>
     /// <param name="predicate"></param>
     /// <param name="range"></param>
     /// <returns></returns>
-    public bool FindAll(
-        Predicate<T> predicate, out List<T> range) => Items.FindAll(predicate, out range);
+    public bool TryFindAll(
+        Predicate<T> predicate, out List<T> range) => Items.TryFindAll(predicate, out range);
 
     /// <summary>
     /// <inheritdoc/>

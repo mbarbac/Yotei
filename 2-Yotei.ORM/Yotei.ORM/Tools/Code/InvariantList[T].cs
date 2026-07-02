@@ -158,7 +158,8 @@ public abstract partial class InvariantList<T> : IInvariantList<T>
     /// <param name="predicate"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    public bool Find(Predicate<T> predicate, out T value) => Items.Find(predicate, out value);
+    public bool TryFind(
+        Predicate<T> predicate, out T value) => Items.TryFind(predicate, out value);
 
     /// <summary>
     /// <inheritdoc/>
@@ -166,8 +167,8 @@ public abstract partial class InvariantList<T> : IInvariantList<T>
     /// <param name="predicate"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    public bool FindLast(
-        Predicate<T> predicate, out T value) => Items.FindLast(predicate, out value);
+    public bool TryFindLast(
+        Predicate<T> predicate, out T value) => Items.TryFindLast(predicate, out value);
 
     /// <summary>
     /// <inheritdoc/>
@@ -175,8 +176,8 @@ public abstract partial class InvariantList<T> : IInvariantList<T>
     /// <param name="predicate"></param>
     /// <param name="range"></param>
     /// <returns></returns>
-    public bool FindAll(
-        Predicate<T> predicate, out List<T> range) => Items.FindAll(predicate, out range);
+    public bool TryFindAll(
+        Predicate<T> predicate, out List<T> range) => Items.TryFindAll(predicate, out range);
 
     /// <summary>
     /// <inheritdoc/>

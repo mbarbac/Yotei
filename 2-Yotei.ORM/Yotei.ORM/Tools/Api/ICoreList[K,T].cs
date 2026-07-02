@@ -87,7 +87,7 @@ public partial interface ICoreList<K, T> : IList<T>, IList, ICollection<T>, ICol
     /// <param name="predicate"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    bool Find(Predicate<T> predicate, out T value);
+    bool TryFind(Predicate<T> predicate, out T value);
 
     /// <summary>
     /// Tries to find the last ocurrence of an element that matches the given predicate. If so,
@@ -97,7 +97,7 @@ public partial interface ICoreList<K, T> : IList<T>, IList, ICollection<T>, ICol
     /// <param name="predicate"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    bool FindLast(Predicate<T> predicate, out T value);
+    bool TryFindLast(Predicate<T> predicate, out T value);
 
     /// <summary>
     /// Tries to find all the ocurrences of elements that match the given predicate. If so, returns
@@ -107,7 +107,7 @@ public partial interface ICoreList<K, T> : IList<T>, IList, ICollection<T>, ICol
     /// <param name="predicate"></param>
     /// <param name="range"></param>
     /// <returns></returns>
-    bool FindAll(Predicate<T> predicate, out List<T> range);
+    bool TryFindAll(Predicate<T> predicate, out List<T> range);
 
     /// <summary>
     /// Returns an array with the elements of this collection.

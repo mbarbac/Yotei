@@ -106,14 +106,14 @@ public static partial class Test_ElementBag_T
         var chain = new Chain(engine) { AcceptDuplicates = true };
         chain = (Chain)chain.AddRange([xone, xtwo, xone, xthree]);
 
-        Assert.False(chain.Find(x => x is null, out item));
+        Assert.False(chain.TryFind(x => x is null, out item));
         Assert.Null(item);
 
-        Assert.True(chain.Find(x => x is Named named && named.Name.Contains('e'), out item));
+        Assert.True(chain.TryFind(x => x is Named named && named.Name.Contains('e'), out item));
         Assert.NotNull(item);
         Assert.Contains(item, chain);
 
-        Assert.True(chain.FindAll(x => x is Named named && named.Name.Contains('e'), out range));
+        Assert.True(chain.TryFindAll(x => x is Named named && named.Name.Contains('e'), out range));
         Assert.Equal(3, range.Count);
         Assert.Contains(xone, range);
         Assert.Contains(xthree, range);

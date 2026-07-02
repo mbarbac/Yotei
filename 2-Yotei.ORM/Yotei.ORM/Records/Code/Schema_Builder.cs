@@ -204,6 +204,39 @@ partial class Schema
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
+        /// <param name="identifier"></param>
+        /// <returns></returns>
+        public int LastIndexOf(string identifier)
+        {
+            identifier = identifier.NotNullNotEmpty(trim: true);
+
+            var key = new Identifier(Engine, identifier);
+            return LastIndexOf(key);
+        }
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <param name="identifier"></param>
+        /// <returns></returns>
+        public List<int> IndexesOf(string identifier)
+        {
+            identifier = identifier.NotNullNotEmpty(trim: true);
+
+            var key = new Identifier(Engine, identifier);
+            return IndexesOf(key);
+        }
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <param name="specs"></param>
+        /// <returns></returns>
+        public List<int> Match(string? specs) => Match(specs, out _);
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
         /// <param name="specs"></param>
         /// <param name="unique"></param>
         /// <returns></returns>
@@ -233,6 +266,35 @@ partial class Schema
 
             if (index < 0) return false;
             return RemoveAt(index) > 0;
+        }
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <param name="identifier"></param>
+        /// <returns></returns>
+        public virtual bool RemoveLast(string identifier)
+        {
+            var index = LastIndexOf(identifier);
+
+            if (index < 0) return false;
+            return RemoveAt(index) > 0;
+        }
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <param name="identifier"></param>
+        /// <returns></returns>
+        public virtual bool RemoveAll(string identifier)
+        {
+            var done = false; while (true)
+            {
+                var temp = Remove(identifier);
+                if (temp) done = true;
+                else break;
+            }
+            return done;
         }
     }
 }

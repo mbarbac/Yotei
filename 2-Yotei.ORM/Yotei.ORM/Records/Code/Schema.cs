@@ -123,6 +123,27 @@ public partial class Schema : ISchema
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
+    /// <param name="identifier"></param>
+    /// <returns></returns>
+    public int LastIndexOf(string identifier) => Items.LastIndexOf(identifier);
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="identifier"></param>
+    /// <returns></returns>
+    public List<int> IndexesOf(string identifier) => Items.IndexesOf(identifier);
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="specs"></param>
+    /// <returns></returns>
+    public List<int> Match(string? specs) => Items.Match(specs);
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
     /// <param name="specs"></param>
     /// <param name="unique"></param>
     /// <returns></returns>
@@ -138,6 +159,30 @@ public partial class Schema : ISchema
     {
         var builder = ToBuilder();
         var done = builder.Remove(identifier);
+        return done ? builder.ToInstance() : this;
+    }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="identifier"></param>
+    /// <returns></returns>
+    public virtual IHost RemoveLast(string identifier)
+    {
+        var builder = ToBuilder();
+        var done = builder.RemoveLast(identifier);
+        return done ? builder.ToInstance() : this;
+    }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="identifier"></param>
+    /// <returns></returns>
+    public virtual IHost RemoveAll(string identifier)
+    {
+        var builder = ToBuilder();
+        var done = builder.RemoveAll(identifier);
         return done ? builder.ToInstance() : this;
     }
 }
