@@ -12,8 +12,9 @@ partial interface IIdentifier
         /// <inheritdoc cref="IIdentifier.ToStringEx(bool, bool)"/>
         /// </summary>
         /// <param name="reduce"></param>
+        /// <param name="useTerminators"></param>
         /// <returns></returns>
-        string ToStringEx(bool reduce = true, bool wrap = true);
+        string ToStringEx(bool reduce = true, bool useTerminators = true);
 
         /// <summary>
         /// <inheritdoc cref="IIdentifier.Engine"/>

@@ -65,7 +65,7 @@ public partial class ElementBag_T : IHost
     /// </summary>
     /// <param name="other"></param>
     /// <returns></returns>
-    public bool Equals(IItem? other)
+    public bool Equals(IItem? other) // IItem only if IHost is itself an item...
     {
         if (ReferenceEquals(this, other)) return true;
         if (other is null) return false;
@@ -93,7 +93,8 @@ public partial class ElementBag_T : IHost
     /// </summary>
     /// <param name="obj"></param>
     /// <returns></returns>
-    public override bool Equals(object? obj) => Equals(obj as IItem);
+    public override bool Equals(
+        object? obj) => Equals(obj as IItem); // IItem only if IHost is itself an item...
 
     public static bool operator ==(THost? host, IHost? item)
     {

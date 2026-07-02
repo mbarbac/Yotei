@@ -147,6 +147,29 @@ public static partial class Test_Identifier_Common
         Assert.False(item.Match(".TWO."));
     }
 
+    //[Enforced]
+    [Fact]
+    public static void Test_Match_Populated_Against_Wrapped()
+    {
+        IIdentifier item;
+        var engine = new FakeEngine() { IgnoreCase = true };
+
+        item = new Identifier(engine, "one"); Assert.True(item.Match("[ONE]"));
+
+        item = new Identifier(engine, "one.two.three");
+        Assert.True(item.Match(null));
+        Assert.True(item.Match(".[THREE]"));
+        Assert.True(item.Match("..[THREE]"));
+        Assert.True(item.Match("[TWO].[THREE]"));
+        Assert.True(item.Match("[ONE]..[THREE]"));
+        Assert.True(item.Match("[ONE].[TWO]."));
+        Assert.True(item.Match(".[TWO]."));
+
+        item = new Identifier(engine, "one..three");
+        Assert.True(item.Match(null));
+        Assert.False(item.Match(".[TWO]."));
+    }
+
     // ----------------------------------------------------
 
     //[Enforced]
@@ -250,11 +273,11 @@ public static partial class Test_Identifier_Common
 
         target = source.Add(null, reduce: false);
         Assert.NotSame(source, target);
-        Assert.Equal(string.Empty, target.ToStringEx(reduce: false, wrap: true));
+        Assert.Equal(string.Empty, target.ToStringEx(reduce: false, useTerminators: true));
 
         target = source.Add("one");
         Assert.NotSame(source, target);
-        Assert.Equal("[one]", target.ToStringEx(reduce: false, wrap: true));
+        Assert.Equal("[one]", target.ToStringEx(reduce: false, useTerminators: true));
 
         source = new Identifier(engine, "one");
         target = source.Add("two..four");

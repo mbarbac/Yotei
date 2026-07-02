@@ -1,4 +1,5 @@
 ﻿namespace Yotei.ORM.Code;
+
 partial class Identifier
 {
     // ====================================================
@@ -61,16 +62,16 @@ partial class Identifier
         /// <inheritdoc/>
         /// </summary>
         /// <param name="reduce"></param>
-        /// <param name="wrap"></param>
+        /// <param name="useTerminators"></param>
         /// <returns></returns>
-        public string ToStringEx(bool reduce = true, bool wrap = true)
+        public string ToStringEx(bool reduce = true, bool useTerminators = true)
         {
             var items = reduce && Items.Any(static x => x == null)
                 ? Items.SkipWhile(x => x == null)
                 : Items;
 
             return items.Any()
-                ? string.Join('.', items.Select(x => Wrap(x, wrap)))
+                ? string.Join('.', items.Select(x => Wrap(x, useTerminators)))
                 : string.Empty;
         }
 
@@ -90,7 +91,9 @@ partial class Identifier
         /// <param name="str"></param>
         /// <returns></returns>
         string? UnWrap(string? str) => Engine.UseTerminators
-            ? str.Unwrap(Engine.LeftTerminator, Engine.RightTerminator, trim: true).NullWhenEmpty(trim: true)
+            ? str
+                .Unwrap(Engine.LeftTerminator, Engine.RightTerminator, trim: true)
+                .NullWhenEmpty(trim: true)
             : str;
 
         // ----------------------------------------------------
@@ -107,7 +110,7 @@ partial class Identifier
         {
             get
             {
-                var str = ToStringEx(reduce: true, wrap: true);
+                var str = ToStringEx(reduce: true, useTerminators: true);
                 return string.IsNullOrEmpty(str) ? null : str;
             }
             set

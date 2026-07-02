@@ -1,17 +1,17 @@
-﻿using TKey = string;
-using IItem = Yotei.ORM.InvariantGenerator.Tests.IElement;
-using IHost = Yotei.ORM.InvariantGenerator.Tests.IElementList_KT;
-using THost = Yotei.ORM.InvariantGenerator.Tests.ElementList_KT;
+﻿using TKey = Yotei.ORM.IIdentifier;
+using IItem = Yotei.ORM.Records.ISchemaEntry;
+using IHost = Yotei.ORM.Records.ISchema;
+using THost = Yotei.ORM.Records.Code.Schema;
 
-namespace Yotei.ORM.InvariantGenerator.Tests;
+namespace Yotei.ORM.Records.Code;
 
 // ========================================================
 /// <summary>
-/// <inheritdoc cref="IInvariantList{K, T}"/>
+/// <inheritdoc cref="IHost"/>
 /// </summary>
 [DebuggerDisplay("{ToDebugString(3)}")]
 [InvariantList<TKey, IItem>(ReturnType = typeof(IHost))]
-public partial class ElementList_KT : IHost
+public partial class Schema : ISchema
 {
     protected override Builder Items { get; }
 
@@ -20,30 +20,26 @@ public partial class ElementList_KT : IHost
     /// </summary>
     /// <param name="engine"></param>
     [SuppressMessage("", "IDE0290")]
-    public ElementList_KT(IEngine engine) => Items = new(engine);
+    public Schema(IEngine engine) => Items = new(engine);
 
     /// <summary>
     /// Initializes a new instance with the elements of the given range.
     /// </summary>
     /// <param name="engine"></param>
     /// <param name="range"></param>
-    public ElementList_KT(
+    public Schema(
         IEngine engine, IEnumerable<IItem> range) : this(engine) => Items.AddRange(range);
 
     /// <summary>
     /// Copy constructor.
     /// </summary>
     /// <param name="other"></param>
-    protected ElementList_KT(THost other) : this(other.Engine)
-    {
-        Items.AcceptDuplicates = other.AcceptDuplicates;
-        Items.AddRange(other);
-    }
+    protected Schema(THost other) : this(other.ThrowWhenNull().Engine) => Items.AddRange(other);
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// <inheritdoc cref="IInvariantList{K, T}.ToBuilder"/>
+    /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
     public override IHost.IBuilder ToBuilder() => Items.Clone();
@@ -53,12 +49,6 @@ public partial class ElementList_KT : IHost
     /// </summary>
     public IEngine Engine => Items.Engine;
 
-    public bool AcceptDuplicates // For debug purposes...
-    {
-        get => Items.AcceptDuplicates;
-        set => Items.AcceptDuplicates = value;
-    }
-
     // ----------------------------------------------------
 
     /// <summary>
@@ -66,26 +56,21 @@ public partial class ElementList_KT : IHost
     /// </summary>
     /// <param name="other"></param>
     /// <returns></returns>
-    public bool Equals(IItem? other) // IItem only if IHost is itself an item...
+    public bool Equals(IHost? other)
     {
         if (ReferenceEquals(this, other)) return true;
         if (other is null) return false;
-        if (other is not IHost valid) return false;
 
-        if (!Engine.Equals(valid.Engine)) return false;
-        if (Count != valid.Count) return false;
+        if (!Engine.Equals(other.Engine)) return false;
+        if (Count != other.Count) return false;
 
         for (int i = 0; i < Count; i++)
         {
-            var item = this[i];
-            var temp = valid[i];
-            var same = item is NamedElement xitem && temp is NamedElement xtemp
-                ? xitem.Equals(xtemp, Engine.IgnoreCase)
-                : item.EqualsEx(temp);
-
+            var item = Items[i];
+            var temp = other[i];
+            var same = item.Equals(temp);
             if (!same) return false;
         }
-
         return true;
     }
 
@@ -94,8 +79,7 @@ public partial class ElementList_KT : IHost
     /// </summary>
     /// <param name="obj"></param>
     /// <returns></returns>
-    public override bool Equals(
-        object? obj) => Equals(obj as IItem); // IItem only if IHost is itself an item...
+    public override bool Equals(object? obj) => Equals(obj as IHost);
 
     public static bool operator ==(THost? host, IHost? item)
     {
@@ -118,5 +102,42 @@ public partial class ElementList_KT : IHost
         code = HashCode.Combine(code, Count);
         for (int i = 0; i < Count; i++) code = HashCode.Combine(code, this[i]);
         return code;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="identifier"></param>
+    /// <returns></returns>
+    public bool Contains(string identifier) => Items.Contains(identifier);
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="identifier"></param>
+    /// <returns></returns>
+    public int IndexOf(string identifier) => Items.IndexOf(identifier);
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="specs"></param>
+    /// <param name="unique"></param>
+    /// <returns></returns>
+    public List<int> Match(
+        string? specs, out IItem? unique) => Items.Match(specs, out unique);
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="identifier"></param>
+    /// <returns></returns>
+    public virtual IHost Remove(string identifier)
+    {
+        var builder = ToBuilder();
+        var done = builder.Remove(identifier);
+        return done ? builder.ToInstance() : this;
     }
 }

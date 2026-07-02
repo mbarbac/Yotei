@@ -42,7 +42,7 @@ partial class ElementList_T
         /// <inheritdoc cref="IHost.IBuilder.ToInstance"/>
         /// </summary>
         /// <returns></returns>
-        public THost ToInstance()
+        public virtual THost ToInstance()
         {
             var host = new THost(Engine) { AcceptDuplicates = AcceptDuplicates };
             if (Count > 0) host.AddRange(this);

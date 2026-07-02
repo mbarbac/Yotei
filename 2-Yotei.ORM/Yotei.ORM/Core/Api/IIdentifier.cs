@@ -13,8 +13,9 @@ public partial interface IIdentifier : IEquatable<IIdentifier>
     /// wrapping or not the remaining parts with the engine terminators, as requested.
     /// </summary>
     /// <param name="reduce"></param>
+    /// <param name="useTerminators"></param>
     /// <returns></returns>
-    string ToStringEx(bool reduce = true, bool wrap = true);
+    string ToStringEx(bool reduce = true, bool useTerminators = true);
 
     /// <summary>
     /// The engine this instance is associated with.

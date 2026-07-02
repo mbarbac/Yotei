@@ -54,10 +54,10 @@ public sealed partial class Identifier : IIdentifier
     /// <inheritdoc/>
     /// </summary>
     /// <param name="reduce"></param>
-    /// <param name="wrap"></param>
+    /// <param name="useTerminators"></param>
     /// <returns></returns>
     public string ToStringEx(
-        bool reduce = true, bool wrap = true) => Items.ToStringEx(reduce, wrap);
+        bool reduce = true, bool useTerminators = true) => Items.ToStringEx(reduce, useTerminators);
 
     // ----------------------------------------------------
 
