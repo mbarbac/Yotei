@@ -1,5 +1,4 @@
-﻿using System.Xml.Schema;
-using Entry = Yotei.ORM.Records.Code.SchemaEntry;
+﻿using Entry = Yotei.ORM.Records.Code.SchemaEntry;
 
 namespace Yotei.ORM.Tests;
 
