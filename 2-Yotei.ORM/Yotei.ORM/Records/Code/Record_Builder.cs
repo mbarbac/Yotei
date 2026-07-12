@@ -11,10 +11,42 @@ partial class Record
     public partial class Builder : IRecord.IBuilder
     {
         /// <summary>
+        /// Initializes an empty schema-less instance.
+        /// </summary>
+        public Builder() { }
+
+        /// <summary>
+        /// Initializes a new schema-less instance with the given values.
+        /// </summary>
+        /// <param name="values"></param>
+        public Builder(IEnumerable<object?> values) => AddRange(values);
+
+        /// <summary>
+        /// Initializes an empty schema-ready instance.
+        /// </summary>
+        /// <param name="schema"></param>
+        public Builder(ISchema schema) => Schema = schema.ThrowWhenNull();
+
+        /// <summary>
+        /// Initializes a new schema-ready instance with the given schema and values.
+        /// </summary>
+        /// <param name="schema"></param>
+        /// <param name="values"></param>
+        public Builder(ISchema schema, IEnumerable<object?> values)
+            : this(schema)
+            => AddRange(values, schema);
+
+        /// <summary>
         /// Copy constructor.
         /// </summary>
         /// <param name="other"></param>
-        protected Builder(Builder other) => throw null;
+        protected Builder(Builder other)
+        {
+            ArgumentNullException.ThrowIfNull(other);
+
+            Values = [.. other];
+            SchemaBuilder = other.SchemaBuilder?.Clone();
+        }
 
         /// <summary>
         /// <inheritdoc/>
@@ -67,6 +99,9 @@ partial class Record
         readonly List<object?> Values = [];
         ISchema.IBuilder? SchemaBuilder;
 
+        /// <summary>
+        /// Throws an exception if this instance is a schema-less one.
+        /// </summary>
         void ThrowIfSchemaLess()
         {
             if (SchemaBuilder is null) throw new InvalidOperationException(
@@ -74,6 +109,9 @@ partial class Record
                 .WithData(this);
         }
 
+        /// <summary>
+        /// Throws an exception is this instance is a schema-ready one.
+        /// </summary>
         void ThrowIfSchemaReady()
         {
             if (SchemaBuilder is not null) throw new InvalidOperationException(
@@ -81,6 +119,9 @@ partial class Record
                 .WithData(this);
         }
 
+        /// <summary>
+        /// Gets the indexes of the redundant entries.
+        /// </summary>
         List<int> IndexesOf(ISchemaEntry entry)
         {
             List<int> items = [];
@@ -133,6 +174,7 @@ partial class Record
                 {
                     var entry = SchemaBuilder[index];
                     var indexes = IndexesOf(entry);
+
                     for (int i = 0; i < indexes.Count; i++)
                     {
                         index = indexes[i];
@@ -189,6 +231,7 @@ partial class Record
                     .WithData(identifier)
                     .WithData(this);
 
+                // Setting the value in all redundant entries...
                 for (int i = 0; i < indexes.Count; i++)
                 {
                     var index = indexes[i];
@@ -251,7 +294,7 @@ partial class Record
         /// <returns></returns>
         public virtual bool Replace(int index, object? value)
         {
-            Values[index] = value;
+            this[index] = value;
             return true;
         }
 
@@ -320,7 +363,15 @@ partial class Record
         /// </summary>
         /// <param name="values"></param>
         /// <returns></returns>
-        public virtual bool AddRange(IEnumerable<object> values) => throw null;
+        public virtual bool AddRange(IEnumerable<object?> values)
+        {
+            ThrowIfSchemaReady();
+            ArgumentNullException.ThrowIfNull(values);
+
+            var done = false;
+            foreach (var value in values) { Values.Add(values); done = true; }
+            return done;
+        }
 
         /// <summary>
         /// <inheritdoc/>
@@ -328,7 +379,35 @@ partial class Record
         /// <param name="values"></param>
         /// <param name="entries"></param>
         /// <returns></returns>
-        public virtual bool AddRange(IEnumerable<object> values, IEnumerable<ISchemaEntry> entries) => throw null;
+        public virtual bool AddRange(IEnumerable<object?> values, IEnumerable<ISchemaEntry> entries)
+        {
+            ThrowIfSchemaLess();
+            ArgumentNullException.ThrowIfNull(values);
+            ArgumentNullException.ThrowIfNull(entries);
+
+            using var ivalues = values.GetEnumerator();
+            using var ientries = entries.GetEnumerator();
+            var done = false;
+
+            while (ivalues.MoveNext())
+            {
+                if (!ientries.MoveNext()) throw new ArgumentException(
+                    "Size of the entries collection is less than the values one.")
+                    .WithData(values)
+                    .WithData(entries);
+
+                var value = ivalues.Current;
+                var entry = ientries.Current;
+                if (Add(value, entry)) done = true;
+            }
+
+            if (ientries.MoveNext()) throw new ArgumentException(
+                "Size of the entries collection is bigger than the values one.")
+                .WithData(values)
+                .WithData(entries);
+
+            return done;
+        }
 
         /// <summary>
         /// <inheritdoc/>
@@ -374,7 +453,20 @@ partial class Record
         /// <param name="index"></param>
         /// <param name="values"></param>
         /// <returns></returns>
-        public virtual bool InsertRange(int index, IEnumerable<object> values) => throw null;
+        public virtual bool InsertRange(int index, IEnumerable<object?> values)
+        {
+            ThrowIfSchemaReady();
+            ArgumentNullException.ThrowIfNull(values);
+
+            var done = false;
+            foreach (var value in values)
+            {
+                Values.Insert(index, values);
+                index++;
+                done = true;
+            }
+            return done;
+        }
 
         /// <summary>
         /// <inheritdoc/>
@@ -383,27 +475,103 @@ partial class Record
         /// <param name="values"></param>
         /// <param name="entries"></param>
         /// <returns></returns>
-        public virtual bool InsertRange(int index, IEnumerable<object> values, IEnumerable<ISchemaEntry> entries) => throw null;
+        public virtual bool InsertRange(
+            int index, IEnumerable<object?> values, IEnumerable<ISchemaEntry> entries)
+        {
+            ThrowIfSchemaLess();
+            ArgumentNullException.ThrowIfNull(values);
+            ArgumentNullException.ThrowIfNull(entries);
+
+            using var ivalues = values.GetEnumerator();
+            using var ientries = entries.GetEnumerator();
+            var done = false;
+
+            while (ivalues.MoveNext())
+            {
+                if (!ientries.MoveNext()) throw new ArgumentException(
+                    "Size of the entries collection is less than the values one.")
+                    .WithData(values)
+                    .WithData(entries);
+
+                var value = ivalues.Current;
+                var entry = ientries.Current;
+                if (Insert(index, value, entry))
+                {
+                    index++;
+                    done = true;
+                }
+            }
+
+            if (ientries.MoveNext()) throw new ArgumentException(
+                "Size of the entries collection is bigger than the values one.")
+                .WithData(values)
+                .WithData(entries);
+
+            return done;
+        }
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         /// <param name="index"></param>
         /// <returns></returns>
-        public virtual bool RemoveAt(int index) => throw null;
+        public virtual bool RemoveAt(int index)
+        {
+            if (SchemaBuilder is null) // Easy case...
+            {
+                Values.RemoveAt(index);
+                return true;
+            }
+            else // Removing also the redundant ones, if any...
+            {
+                var entry = SchemaBuilder[index];
+                var indexes = IndexesOf(entry);
+                var done = false;
+
+                for (int i = indexes.Count - 1; i >= 0; i--)
+                {
+                    index = indexes[i];
+                    Values.RemoveAt(index);
+                    SchemaBuilder.RemoveAt(index);
+                    done = true;
+                }
+                return done;
+            }
+        }
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         /// <param name="identifier"></param>
         /// <returns></returns>
-        public virtual bool Remove(string identifier) => throw null;
+        public virtual bool Remove(string identifier)
+        {
+            ThrowIfSchemaLess();
+
+            var indexes = SchemaBuilder!.IndexesOf(identifier);
+            var done = false;
+
+            for (int i = indexes.Count - 1; i >= 0; i--)
+            {
+                var index = indexes[i];
+                Values.RemoveAt(index);
+                SchemaBuilder.RemoveAt(index);
+                done = true;
+            }
+            return done;
+        }
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        /// <param name="keepEmptySchema"></param>
         /// <returns></returns>
-        public virtual bool Clear(bool keepEmptySchema = true) => throw null;
+        public virtual bool Clear()
+        {
+            if (Count == 0) return false;
+
+            Values.Clear();
+            SchemaBuilder?.Clear();
+            return true;
+        }
     }
 }

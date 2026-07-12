@@ -19,7 +19,7 @@ partial interface IRecord
 
         /// <summary>
         /// Gets or sets the schema associated with this instance. If the value of this property
-        /// is <see langword="null"/>, then this instance is a schema-less one that only contain
+        /// is <see langword="null"/>, then this instance is a schema-less one that only contains
         /// values and no metadata.
         /// </summary>
         ISchema? Schema { get; set; }
@@ -128,7 +128,7 @@ partial interface IRecord
         /// </summary>
         /// <param name="values"></param>
         /// <returns></returns>
-        bool AddRange(IEnumerable<object> values);
+        bool AddRange(IEnumerable<object?> values);
 
         /// <summary>
         /// Adds to this instance the values and metadata from the given ranges. This method throws
@@ -137,7 +137,7 @@ partial interface IRecord
         /// <param name="values"></param>
         /// <param name="entries"></param>
         /// <returns></returns>
-        bool AddRange(IEnumerable<object> values, IEnumerable<ISchemaEntry> entries);
+        bool AddRange(IEnumerable<object?> values, IEnumerable<ISchemaEntry> entries);
 
         /// <summary>
         /// Inserts into this instance the given value at the given index. This method throws an
@@ -165,7 +165,7 @@ partial interface IRecord
         /// <param name="index"></param>
         /// <param name="values"></param>
         /// <returns></returns>
-        bool InsertRange(int index, IEnumerable<object> values);
+        bool InsertRange(int index, IEnumerable<object?> values);
 
         /// <summary>
         /// Inserts into this instance the values and metadata from the given ranges, starting at
@@ -175,7 +175,7 @@ partial interface IRecord
         /// <param name="values"></param>
         /// <param name="entries"></param>
         /// <returns></returns>
-        bool InsertRange(int index, IEnumerable<object> values, IEnumerable<ISchemaEntry> entries);
+        bool InsertRange(int index, IEnumerable<object?> values, IEnumerable<ISchemaEntry> entries);
 
         /// <summary>
         /// Removes from this instance the values and metadata at the given index, or indexes if
@@ -186,7 +186,7 @@ partial interface IRecord
         bool RemoveAt(int index);
 
         /// <summary>
-        /// Removes from this instance all the values and entries with the given identifier. This
+        /// Removes from this instance all the values and entries with the given identifier, if any.
         /// This method throws an exception if this instance is a schema-less one.
         /// </summary>
         /// <param name="identifier"></param>
@@ -194,10 +194,10 @@ partial interface IRecord
         bool Remove(string identifier);
 
         /// <summary>
-        /// Clear this instance. By default, an empty schema is kept unless otherwise requested.
+        /// Clear this instance. If this instance is a schema-ready one, then the original schema
+        /// is cleared as well.
         /// </summary>
-        /// <param name="keepEmptySchema"></param>
         /// <returns></returns>
-        bool Clear(bool keepEmptySchema = true);
+        bool Clear();
     }
 }
