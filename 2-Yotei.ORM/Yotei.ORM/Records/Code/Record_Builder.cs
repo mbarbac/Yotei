@@ -6,26 +6,90 @@ partial class Record
     /// <summary>
     /// <inheritdoc cref="IRecord.IBuilder"/>
     /// </summary>
+    [DebuggerDisplay("{ToDebugString(3)}")]
     [Cloneable]
     public partial class Builder : IRecord.IBuilder
     {
+        List<object?> Values;
+        List<ISchemaEntry> Entries;
+
+        /// <summary>
+        /// Initializes a new empy and schema-less instance.
+        /// </summary>
+        public Builder()
+        {
+            Values = [];
+            Entries = [];
+        }
+
+        /// <summary>
+        /// Initializes a new schema-less instance that carries the given values.
+        /// </summary>
+        /// <param name="values"></param>
+        public Builder(IEnumerable<object?> values) : this() => AddRange(values);
+
+        /// <summary>
+        /// Initializes a new empy and schema-ready instance.
+        /// </summary>
+        /// <param name="engine"></param>
+        public Builder(IEngine engine) : this() => Engine = engine.ThrowWhenNull();
+
+        /// <summary>
+        /// Initializes a new schema-ready instance with the given elements.
+        /// </summary>
+        /// <param name="range"></param>
+        public Builder(IEnumerable<IRecord.IElement> range) : this() => AddRange(range);
+
         /// <summary>
         /// Copy constructor.
         /// </summary>
         /// <param name="other"></param>
-        protected Builder(Builder other) => throw null;
+        protected Builder(Builder other)
+        {
+            ArgumentNullException.ThrowIfNull(other);
+            Engine = other.Engine;
+            Values = [.. other.Values];
+            Entries = [.. other.Entries];
+        }
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         /// <returns></returns>
-        public override string ToString() => throw null;
+        public override string ToString() => $"Count: {Count}";
+
+        /// <summary>
+        /// Obtains a string representation of this instance suitable for debug purposes.
+        /// </summary>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        public string ToDebugString(int count)
+        {
+            if (Count == 0) return "0:[]";
+            if (count == 0) return $"{Count}:[...]";
+
+            var sb = new StringBuilder();
+            sb.Append($"{Count}:[");
+
+            for (int i = 0; i < count; i++)
+            {
+                if (i != 0) sb.Append(", ");
+
+                var value = Values[i].Sketch();
+                var entry = Engine is null ? $"#{i}" : Entries[i].Identifier!.Value!;
+                sb.Append($"{entry}='{value}'");
+            }
+
+            if (count < Count) sb.Append(", ...");
+            sb.Append(']');
+            return sb.ToString();
+        }
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         /// <returns></returns>
-        public IEnumerator<object?> GetEnumerator() => throw null;
+        public IEnumerator<object?> GetEnumerator() => Values.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         /// <summary>
@@ -36,15 +100,72 @@ partial class Record
 
         // ----------------------------------------------------
 
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
-        public IEnumerable<IRecord.IElement> Elements { get => throw null; }
+        protected void ThrowIfSchemaLess()
+        {
+            if (Engine is null) throw new InvalidOperationException(
+                "This instance is a schema-less one.")
+                .WithData(this);
+        }
+
+        protected void ThrowIfSchemaReady()
+        {
+            if (Engine is not null) throw new InvalidOperationException(
+                "This instance is a schema-ready one.")
+                .WithData(this);
+        }
+
+        // ----------------------------------------------------
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        public ISchema Schema { get => throw null; set => throw null; }
+        public IEngine? Engine { get; private set; }
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        public IEnumerable<IRecord.IElement> Elements
+        {
+            get
+            {
+                ThrowIfSchemaLess();
+                for (int i = 0; i < Count; i++) yield return new Element(Values[i], Entries[i]);
+            }
+        }
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        public ISchema? Schema
+        {
+            get // We may return null or a proper instance...
+            {
+                if (Engine is null) return null;
+                return Count == 0 ? new Schema(Engine) : new Schema(Engine, Entries);
+            }
+            set
+            {
+                if (value is null) // If null just clear...
+                {
+                    Engine = null;
+                    Entries.Clear();
+                }
+                else // If empty just grab the engine, otherwise validate sizes and capture...
+                {
+                    if (Count == 0 && value.Count == 0) Engine = value.Engine;
+                    else
+                    {
+                        if (Count != value.Count) throw new ArgumentException(
+                            "Schema has not the size of this instance.")
+                            .WithData(value)
+                            .WithData(this);
+
+                        Engine = value.Engine;
+                        Entries = [.. value];
+                    }
+                }
+            }
+        }
 
         /// <summary>
         /// <inheritdoc/>
@@ -158,9 +279,9 @@ partial class Record
         /// <inheritdoc/>
         /// </summary>
         /// <param name="index"></param>
-        /// <param name="element"></param>
+        /// <param name="item"></param>
         /// <returns></returns>
-        public virtual bool Replace(int index, IRecord.IElement element) => throw null;
+        public virtual bool Replace(int index, IRecord.IElement item) => throw null;
 
         /// <summary>
         /// <inheritdoc/>
@@ -172,9 +293,9 @@ partial class Record
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        /// <param name="element"></param>
+        /// <param name="item"></param>
         /// <returns></returns>
-        public virtual bool Add(IRecord.IElement element) => throw null;
+        public virtual bool Add(IRecord.IElement item) => throw null;
 
         /// <summary>
         /// <inheritdoc/>
@@ -202,9 +323,9 @@ partial class Record
         /// <inheritdoc/>
         /// </summary>
         /// <param name="index"></param>
-        /// <param name="element"></param>
+        /// <param name="item"></param>
         /// <returns></returns>
-        public virtual bool Insert(int index, IRecord.IElement element) => throw null;
+        public virtual bool Insert(int index, IRecord.IElement item) => throw null;
 
         /// <summary>
         /// <inheritdoc/>

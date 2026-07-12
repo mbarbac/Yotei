@@ -30,7 +30,7 @@ public partial interface IRecord : IEnumerable<object?>, IEquatable<IRecord>
     [With] ISchema? Schema { get; }
 
     /// <summary>
-    /// The number of elements in this instance.
+    /// The number of values in this instance.
     /// </summary>
     int Count { get; }
 
@@ -189,9 +189,9 @@ public partial interface IRecord : IEnumerable<object?>, IEquatable<IRecord>
     /// the newly given one. This method throws an exception if this instance is a schema-less one.
     /// </summary>
     /// <param name="index"></param>
-    /// <param name="element"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    IRecord Replace(int index, IElement element);
+    IRecord Replace(int index, IElement item);
 
     /// <summary>
     /// Returns a copy of this instance where the given value has been added to it. This method
@@ -205,9 +205,9 @@ public partial interface IRecord : IEnumerable<object?>, IEquatable<IRecord>
     /// Returns a copy of this instance where the given element has been added to it. This method
     /// throws an exception if this instance is a not-empty schema-less one.
     /// </summary>
-    /// <param name="element"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    IRecord Add(IElement element);
+    IRecord Add(IElement item);
 
     /// <summary>
     /// Returns a copy of this instance where the values from the given range have been added
@@ -241,9 +241,9 @@ public partial interface IRecord : IEnumerable<object?>, IEquatable<IRecord>
     /// one.
     /// </summary>
     /// <param name="index"></param>
-    /// <param name="element"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    IRecord Insert(int index, IElement element);
+    IRecord Insert(int index, IElement item);
 
     /// <summary>
     /// Returns a copy of this instance where the values from the given range have been inserted

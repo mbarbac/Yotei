@@ -19,15 +19,21 @@ partial interface IRecord
         // ----------------------------------------------------
 
         /// <summary>
+        /// The engine this instance is associated with, if it is a schema-ready one, or null if
+        /// it is a schema-less one.
+        /// </summary>
+        IEngine? Engine { get; }
+
+        /// <summary>
         /// <inheritdoc cref="IRecord.Elements"/>
         /// </summary>
         IEnumerable<IElement> Elements { get; }
 
         /// <summary>
-        /// Gets a new schema based upon the contents captured by this instance, or sets the given
-        /// one.
+        /// Gets a new schema based upon the contents captured by this instance, or null if it is
+        /// a schema-less one, or sets the given one (including null).
         /// </summary>
-        ISchema Schema { get; set; }
+        ISchema? Schema { get; set; }
 
         /// <summary>
         /// <inheritdoc cref="IRecord.Count"/>
@@ -143,9 +149,9 @@ partial interface IRecord
         /// <br/> Returns whether changes have been made or not.
         /// </summary>
         /// <param name="index"></param>
-        /// <param name="element"></param>
+        /// <param name="item"></param>
         /// <returns></returns>
-        bool Replace(int index, IElement element);
+        bool Replace(int index, IElement item);
 
         /// <summary>
         /// Adds the given value to this instance.
@@ -159,9 +165,9 @@ partial interface IRecord
         /// Adds the given element to this instance.
         /// <br/> Returns whether changes have been made or not.
         /// </summary>
-        /// <param name="element"></param>
+        /// <param name="item"></param>
         /// <returns></returns>
-        bool Add(IElement element);
+        bool Add(IElement item);
 
         /// <summary>
         /// Adds the values from the given range to this instance.
@@ -193,9 +199,9 @@ partial interface IRecord
         /// <br/> Returns whether changes have been made or not.
         /// </summary>
         /// <param name="index"></param>
-        /// <param name="element"></param>
+        /// <param name="item"></param>
         /// <returns></returns>
-        bool Insert(int index, IElement element);
+        bool Insert(int index, IElement item);
 
         /// <summary>
         /// Inserts into this instance the given values starting at the given index.

@@ -9,6 +9,29 @@
 public partial class Record : IRecord
 {
     /// <summary>
+    /// Initializes a new empy and schema-less instance.
+    /// </summary>
+    public Record() => throw null;
+
+    /// <summary>
+    /// Initializes a new schema-less instance that carries the given values.
+    /// </summary>
+    /// <param name="values"></param>
+    public Record(IEnumerable<object?> values) => throw null;
+
+    /// <summary>
+    /// Initializes a new empy and schema-ready instance.
+    /// </summary>
+    /// <param name="engine"></param>
+    public Record(IEngine engine) => throw null;
+
+    /// <summary>
+    /// Initializes a new schema-ready instance with the given elements.
+    /// </summary>
+    /// <param name="items"></param>
+    public Record(IEnumerable<IRecord.IElement> items) => throw null;
+
+    /// <summary>
     /// Copy constructor.
     /// </summary>
     /// <param name="other"></param>
@@ -225,9 +248,9 @@ public partial class Record : IRecord
     /// <inheritdoc/>
     /// </summary>
     /// <param name="index"></param>
-    /// <param name="element"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    public virtual IRecord Replace(int index, IRecord.IElement element) => throw null;
+    public virtual IRecord Replace(int index, IRecord.IElement item) => throw null;
 
     /// <summary>
     /// <inheritdoc/>
@@ -239,9 +262,9 @@ public partial class Record : IRecord
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="element"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    public virtual IRecord Add(IRecord.IElement element) => throw null;
+    public virtual IRecord Add(IRecord.IElement item) => throw null;
 
     /// <summary>
     /// <inheritdoc/>
@@ -269,9 +292,9 @@ public partial class Record : IRecord
     /// <inheritdoc/>
     /// </summary>
     /// <param name="index"></param>
-    /// <param name="element"></param>
+    /// <param name="item"></param>
     /// <returns></returns>
-    public virtual IRecord Insert(int index, IRecord.IElement element) => throw null;
+    public virtual IRecord Insert(int index, IRecord.IElement item) => throw null;
 
     /// <summary>
     /// <inheritdoc/>
