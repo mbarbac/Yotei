@@ -87,29 +87,103 @@ partial interface IRecord
 
         // ------------------------------------------------
 
+        /// <summary>
+        /// Replaces the value at the given index with the new given one.
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
         bool Replace(int index, object? value);
 
+        /// <summary>
+        /// Replaces the value and metadata at the given index with the new given one. This method
+        /// throws an exception if this instance is a schema-less one.
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="value"></param>
+        /// <param name="entry"></param>
+        /// <returns></returns>
         bool Replace(int index, object? value, ISchemaEntry entry);
 
+        /// <summary>
+        /// Adds to this instance the given value. This method throws an exception if this instance
+        /// is a schema-ready one.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         bool Add(object? value);
 
+        /// <summary>
+        /// Adds to this instance the given value and metadata. This method throws an exception if
+        /// this instance is a schema-less one.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="entry"></param>
+        /// <returns></returns>
         bool Add(object? value, ISchemaEntry entry);
 
+        /// <summary>
+        /// Adds to this instance the values from the given range. This method throws an exception
+        /// if this instance is a schema-ready one.
+        /// </summary>
+        /// <param name="values"></param>
+        /// <returns></returns>
         bool AddRange(IEnumerable<object> values);
 
+        /// <summary>
+        /// Adds to this instance the values and metadata from the given ranges. This method throws
+        /// an exception if this instance is a schema-less one.
+        /// </summary>
+        /// <param name="values"></param>
+        /// <param name="entries"></param>
+        /// <returns></returns>
         bool AddRange(IEnumerable<object> values, IEnumerable<ISchemaEntry> entries);
 
+        /// <summary>
+        /// Inserts into this instance the given value at the given index. This method throws an
+        /// exception if this instance is a schema-ready one.
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
         bool Insert(int index, object? value);
 
+        /// <summary>
+        /// Inserts into this instance the given value and metadata at the given index. This method
+        /// throws an exception if this instance is a schema-less one.
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="value"></param>
+        /// <param name="entry"></param>
+        /// <returns></returns>
         bool Insert(int index, object? value, ISchemaEntry entry);
 
+        /// <summary>
+        /// Inserts into this instance the values from the given range, starting at the given index.
+        /// This method throws an exception if this instance is a schema-ready one.
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="values"></param>
+        /// <returns></returns>
         bool InsertRange(int index, IEnumerable<object> values);
 
+        /// <summary>
+        /// Inserts into this instance the values and metadata from the given ranges, starting at
+        /// the given index. This method throws an exception if this instance is a schema-less one.
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="values"></param>
+        /// <param name="entries"></param>
+        /// <returns></returns>
         bool InsertRange(int index, IEnumerable<object> values, IEnumerable<ISchemaEntry> entries);
 
+        /// <summary>
+        /// Removes from this instance the values and metadata at the given index, or indexes if
+        /// there are redundant ones.
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
         bool RemoveAt(int index);
-
-        bool RemoveRange(int index, int count);
 
         /// <summary>
         /// Removes from this instance all the values and entries with the given identifier. This

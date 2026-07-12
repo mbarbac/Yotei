@@ -48,7 +48,7 @@ partial class Record
                 if (i != 0) sb.Append(", ");
 
                 var value = Values[i].Sketch();
-                var entry = Schema?[i].Identifier?.Value ?? $"#{i}";
+                var entry = SchemaBuilder?[i].Identifier?.Value ?? $"#{i}";
                 sb.Append($"{entry}='{value}'");
             }
             if (count < Count) sb.Append(", ...");
@@ -64,31 +64,44 @@ partial class Record
 
         // ------------------------------------------------
 
+        readonly List<object?> Values = [];
+        ISchema.IBuilder? SchemaBuilder;
+
         void ThrowIfSchemaLess()
         {
-            if (Schema is null) throw new InvalidOperationException(
+            if (SchemaBuilder is null) throw new InvalidOperationException(
                 "This instance is a schema-less one.")
                 .WithData(this);
         }
 
         void ThrowIfSchemaReady()
         {
-            if (Schema is not null) throw new InvalidOperationException(
+            if (SchemaBuilder is not null) throw new InvalidOperationException(
                 "This instance is a schema-ready one.")
                 .WithData(this);
         }
 
-        readonly List<object?> Values = [];
+        List<int> IndexesOf(ISchemaEntry entry)
+        {
+            List<int> items = [];
+
+            for (int i = 0; i < Count; i++)
+                if (ReferenceEquals(entry, SchemaBuilder![i])) items.Add(i);
+
+            return items;
+        }
+
+        // ------------------------------------------------
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         public ISchema? Schema
         {
-            get;
+            get => SchemaBuilder?.ToInstance();
             set
             {
-                if (value is null) field = null;
+                if (value is null) SchemaBuilder = null;
                 else
                 {
                     if (Count != value.Count) throw new ArgumentException(
@@ -96,7 +109,7 @@ partial class Record
                         .WithData(value)
                         .WithData(this);
 
-                    field = value;
+                    SchemaBuilder = value.ToBuilder();
                 }
             }
         }
@@ -114,7 +127,23 @@ partial class Record
         public object? this[int index]
         {
             get => Values[index];
-            set => Values[index] = value;
+            set
+            {
+                if (SchemaBuilder is not null) // We need to set the value in all redundant ones...
+                {
+                    var entry = SchemaBuilder[index];
+                    var indexes = IndexesOf(entry);
+                    for (int i = 0; i < indexes.Count; i++)
+                    {
+                        index = indexes[i];
+                        Values[index] = value;
+                    }
+                }
+                else // No redundant checking...
+                {
+                    Values[index] = value;
+                }
+            }
         }
 
         /// <summary>
@@ -126,7 +155,8 @@ partial class Record
         public object? Get(int index, out ISchemaEntry entry)
         {
             ThrowIfSchemaLess();
-            entry = Schema![index];
+
+            entry = SchemaBuilder![index];
             return Values[index];
         }
 
@@ -141,7 +171,7 @@ partial class Record
             {
                 ThrowIfSchemaLess();
 
-                var index = Schema!.IndexOf(identifier);
+                var index = SchemaBuilder!.IndexOf(identifier);
                 if (index < 0) throw new NotFoundException(
                     "No metadata entry with the given identifier.")
                     .WithData(identifier)
@@ -153,7 +183,7 @@ partial class Record
             {
                 ThrowIfSchemaLess();
 
-                var indexes = Schema!.IndexesOf(identifier);
+                var indexes = SchemaBuilder!.IndexesOf(identifier);
                 if (indexes.Count == 0) throw new NotFoundException(
                     "No metadata entry with the given identifier.")
                     .WithData(identifier)
@@ -180,11 +210,11 @@ partial class Record
         {
             ThrowIfSchemaLess();
 
-            var index = Schema!.IndexOf(identifier);
+            var index = SchemaBuilder!.IndexOf(identifier);
             if (index >= 0)
             {
                 value = Values[index];
-                entry = Schema[index];
+                entry = SchemaBuilder[index];
                 return true;
             }
 
@@ -210,5 +240,170 @@ partial class Record
         /// </summary>
         /// <returns></returns>
         public List<object?> ToList(int index, int count) => Values.GetRange(index, count);
+
+        // ------------------------------------------------
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public virtual bool Replace(int index, object? value)
+        {
+            Values[index] = value;
+            return true;
+        }
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="value"></param>
+        /// <param name="entry"></param>
+        /// <returns></returns>
+        public virtual bool Replace(int index, object? value, ISchemaEntry entry)
+        {
+            ThrowIfSchemaLess();
+            ArgumentNullException.ThrowIfNull(entry);
+
+            var temp = SchemaBuilder![index];
+            var indexes = IndexesOf(temp);
+
+            for (int i = 0; i < indexes.Count; i++)
+            {
+                index = indexes[i];
+                Values[index] = value;
+                SchemaBuilder[index] = entry;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public virtual bool Add(object? value)
+        {
+            ThrowIfSchemaReady();
+
+            Values.Add(value);
+            return true;
+        }
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="entry"></param>
+        /// <returns></returns>
+        public virtual bool Add(object? value, ISchemaEntry entry)
+        {
+            ThrowIfSchemaLess();
+            ArgumentNullException.ThrowIfNull(entry);
+
+            Values.Add(value);
+            SchemaBuilder!.Add(entry);
+
+            var indexes = IndexesOf(entry);
+            if (indexes.Count > 1) for (int i = 0; i < indexes.Count; i++)
+            {
+                var index = indexes[i];
+                Values[index] = value;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <param name="values"></param>
+        /// <returns></returns>
+        public virtual bool AddRange(IEnumerable<object> values) => throw null;
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <param name="values"></param>
+        /// <param name="entries"></param>
+        /// <returns></returns>
+        public virtual bool AddRange(IEnumerable<object> values, IEnumerable<ISchemaEntry> entries) => throw null;
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public virtual bool Insert(int index, object? value)
+        {
+            ThrowIfSchemaReady();
+
+            Values.Insert(index, value);
+            return true;
+        }
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="value"></param>
+        /// <param name="entry"></param>
+        /// <returns></returns>
+        public virtual bool Insert(int index, object? value, ISchemaEntry entry)
+        {
+            ThrowIfSchemaLess();
+            ArgumentNullException.ThrowIfNull(entry);
+
+            Values.Insert(index, value);
+            SchemaBuilder!.Insert(index, entry);
+
+            var indexes = IndexesOf(entry);
+            if (indexes.Count > 1) for (int i = 0; i < indexes.Count; i++)
+            {
+                index = indexes[i];
+                Values[index] = value;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="values"></param>
+        /// <returns></returns>
+        public virtual bool InsertRange(int index, IEnumerable<object> values) => throw null;
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="values"></param>
+        /// <param name="entries"></param>
+        /// <returns></returns>
+        public virtual bool InsertRange(int index, IEnumerable<object> values, IEnumerable<ISchemaEntry> entries) => throw null;
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public virtual bool RemoveAt(int index) => throw null;
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <param name="identifier"></param>
+        /// <returns></returns>
+        public virtual bool Remove(string identifier) => throw null;
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <param name="keepEmptySchema"></param>
+        /// <returns></returns>
+        public virtual bool Clear(bool keepEmptySchema = true) => throw null;
     }
 }
