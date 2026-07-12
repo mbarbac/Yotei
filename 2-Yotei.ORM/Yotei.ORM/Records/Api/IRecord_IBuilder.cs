@@ -10,52 +10,53 @@ partial interface IRecord
     public partial interface IBuilder : IEnumerable<object?>
     {
         /// <summary>
-        /// Returns a new builder based upon the contents of this instance, including or not the
-        /// captured schema as requested.
+        /// Returns a new record based upon de contents of this builder.
         /// </summary>
         /// <returns></returns>
-        IRecord ToRecord(bool withSchema);
+        IRecord ToInstance();
 
-        // ----------------------------------------------------
-
-        /// <summary>
-        /// The engine this instance is associated with, if it is a schema-ready one, or null if
-        /// it is a schema-less one.
-        /// </summary>
-        IEngine? Engine { get; }
+        // ------------------------------------------------
 
         /// <summary>
-        /// <inheritdoc cref="IRecord.Elements"/>
-        /// </summary>
-        IEnumerable<IElement> Elements { get; }
-
-        /// <summary>
-        /// Gets a new schema based upon the contents captured by this instance, or null if it is
-        /// a schema-less one, or sets the given one (including null).
+        /// Gets or sets the schema associated with this instance. If the value of this property
+        /// is <see langword="null"/>, then this instance is a schema-less one that only contain
+        /// values and no metadata.
         /// </summary>
         ISchema? Schema { get; set; }
 
         /// <summary>
-        /// <inheritdoc cref="IRecord.Count"/>
+        /// Gets the number of values in this instance.
         /// </summary>
         int Count { get; }
 
         /// <summary>
-        /// <inheritdoc cref="IRecord.this[int]"/>
+        /// Gets or sets the value carried by this instance at the given index.
         /// </summary>
         /// <param name="index"></param>
         /// <returns></returns>
-        object? this[int index] { get; }
+        object? this[int index] { get; set; }
 
         /// <summary>
-        /// <inheritdoc cref="IRecord.this[string]"/>
+        /// Gets the value and metadata carried by this instance at the given index. This method
+        /// throws an exception if this instance is a schema-less one.
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="entry"></param>
+        /// <returns></returns>
+        object? Get(int index, out ISchemaEntry entry);
+
+        /// <summary>
+        /// Gets or sets the value of the element whose identifier is given, including redundant
+        /// ones if any. This property throws an exception if such element cannot be found, or if
+        /// this instance is schema-less one.
         /// </summary>
         /// <param name="identifier"></param>
         /// <returns></returns>
-        object? this[string identifier] { get; }
+        object? this[string identifier] { get; set; }
 
         /// <summary>
-        /// Tries to get the value and metadata of the element whose unique identifier is given.
+        /// Tries to get the value of the element whose identifier is given. This method throws an
+        /// exception if this instance is schema-less one.
         /// </summary>
         /// <param name="identifier"></param>
         /// <param name="value"></param>
@@ -66,237 +67,63 @@ partial interface IRecord
             out object? value, [NotNullWhen(true)] out ISchemaEntry? entry);
 
         /// <summary>
-        /// Determines if this instance contains an element that matches the given predicate.
+        /// Gets an array with the values of this instance.
         /// </summary>
-        /// <param name="predicate"></param>
         /// <returns></returns>
-        bool Contains(Predicate<IElement> predicate);
+        object?[] ToArray();
 
         /// <summary>
-        /// Returns the index of the first element that matches the given predicate, or -1 if any.
+        /// Gets a list with the values of this instance.
         /// </summary>
-        /// <param name="predicate"></param>
         /// <returns></returns>
-        int IndexOf(Predicate<IElement> predicate);
+        List<object?> ToList();
 
         /// <summary>
-        /// Returns the index of the last element that matches the given predicate, or -1 if any.
-        /// </summary>
-        /// <param name="predicate"></param>
-        /// <returns></returns>
-        int LastIndexOf(Predicate<IElement> predicate);
-
-        /// <summary>
-        /// Returns the indexes of the elements that match the given predicate.
-        /// </summary>
-        /// <param name="predicate"></param>
-        /// <returns></returns>
-        List<int> IndexesOf(Predicate<IElement> predicate);
-
-        /// <summary>
-        /// <inheritdoc cref="IRecord.ToArrayOfValues"/>
+        /// Gets a list with the given number of values from this instance, starting at the given
+        /// index.
         /// </summary>
         /// <returns></returns>
-        object?[] ToArrayOfValues();
+        List<object?> ToList(int index, int count);
 
-        /// <summary>
-        /// <inheritdoc cref="IRecord.ToArray"/>
-        /// </summary>
-        /// <returns></returns>
-        IElement[] ToArray();
+        // ------------------------------------------------
 
-        /// <summary>
-        /// <inheritdoc cref="IRecord.ToListOfValues()"/>
-        /// </summary>
-        /// <returns></returns>
-        List<object?> ToListOfValues();
-
-        /// <summary>
-        /// <inheritdoc cref="IRecord.ToList()"/>
-        /// </summary>
-        /// <returns></returns>
-        List<IElement> ToList();
-
-        /// <summary>
-        /// <inheritdoc cref="IRecord.ToListOfValues(int, int)"/>
-        /// </summary>
-        /// <param name="index"></param>
-        /// <param name="count"></param>
-        /// <returns></returns>
-        List<object?> ToListOfValues(int index, int count);
-
-        /// <summary>
-        /// <inheritdoc cref="ToList(int, int)"/>
-        /// </summary>
-        /// <param name="index"></param>
-        /// <param name="count"></param>
-        /// <returns></returns>
-        List<IElement> ToList(int index, int count);
-
-        // ----------------------------------------------------
-
-        /// <summary>
-        /// Replaces the value of the element at the given index by the new given one.
-        /// <br/> Returns whether changes have been made or not.
-        /// </summary>
-        /// <param name="index"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
         bool Replace(int index, object? value);
 
-        /// <summary>
-        /// Replaces the element at the given index by the new given one.
-        /// <br/> Returns whether changes have been made or not.
-        /// </summary>
-        /// <param name="index"></param>
-        /// <param name="item"></param>
-        /// <returns></returns>
-        bool Replace(int index, IElement item);
+        bool Replace(int index, object? value, ISchemaEntry entry);
 
-        /// <summary>
-        /// Adds the given value to this instance.
-        /// <br/> Returns whether changes have been made or not.
-        /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
         bool Add(object? value);
 
-        /// <summary>
-        /// Adds the given element to this instance.
-        /// <br/> Returns whether changes have been made or not.
-        /// </summary>
-        /// <param name="item"></param>
-        /// <returns></returns>
-        bool Add(IElement item);
+        bool Add(object? value, ISchemaEntry entry);
 
-        /// <summary>
-        /// Adds the values from the given range to this instance.
-        /// <br/> Returns whether changes have been made or not.
-        /// </summary>
-        /// <param name="range"></param>
-        /// <returns></returns>
-        bool AddRange(IEnumerable<object?> range);
+        bool AddRange(IEnumerable<object> values);
 
-        /// <summary>
-        /// Adds the elements from the given range to this instance.
-        /// <br/> Returns whether changes have been made or not.
-        /// </summary>
-        /// <param name="range"></param>
-        /// <returns></returns>
-        bool AddRange(IEnumerable<IElement> range);
+        bool AddRange(IEnumerable<object> values, IEnumerable<ISchemaEntry> entries);
 
-        /// <summary>
-        /// Inserts into this instance the given value at the given index.
-        /// <br/> Returns whether changes have been made or not.
-        /// </summary>
-        /// <param name="index"></param>
-        /// <param name="value"></param>
-        /// <returns></returns>
         bool Insert(int index, object? value);
 
-        /// <summary>
-        /// Inserts into this instance the given element at the given index.
-        /// <br/> Returns whether changes have been made or not.
-        /// </summary>
-        /// <param name="index"></param>
-        /// <param name="item"></param>
-        /// <returns></returns>
-        bool Insert(int index, IElement item);
+        bool Insert(int index, object? value, ISchemaEntry entry);
 
-        /// <summary>
-        /// Inserts into this instance the given values starting at the given index.
-        /// <br/> Returns whether changes have been made or not.
-        /// </summary>
-        /// <param name="index"></param>
-        /// <param name="range"></param>
-        /// <returns></returns>
-        bool InsertRange(int index, IEnumerable<object?> range);
+        bool InsertRange(int index, IEnumerable<object> values);
 
-        /// <summary>
-        /// Inserts into this instance the given elements starting at the given index.
-        /// <br/> Returns whether changes have been made or not.
-        /// </summary>
-        /// <param name="index"></param>
-        /// <param name="range"></param>
-        /// <returns></returns>
-        bool InsertRange(int index, IEnumerable<IElement> range);
+        bool InsertRange(int index, IEnumerable<object> values, IEnumerable<ISchemaEntry> entries);
 
-        /// <summary>
-        /// Removes from this instance the element at the given index.
-        /// <br/> Returns whether changes have been made or not.
-        /// </summary>
-        /// <param name="index"></param>
-        /// <returns></returns>
         bool RemoveAt(int index);
 
-        /// <summary>
-        /// Removes from this instance the requested number of elements, starting at the given
-        /// index.
-        /// <br/> Returns whether changes have been made or not.
-        /// </summary>
-        /// <param name="index"></param>
-        /// <param name="count"></param>
-        /// <returns></returns>
         bool RemoveRange(int index, int count);
 
         /// <summary>
-        /// Removes from this instance the first ocurrence of a value that matches the given
-        /// predicate.
-        /// <br/> Returns whether changes have been made or not.
+        /// Removes from this instance all the values and entries with the given identifier. This
+        /// This method throws an exception if this instance is a schema-less one.
         /// </summary>
-        /// <param name="predicate"></param>
+        /// <param name="identifier"></param>
         /// <returns></returns>
-        bool RemoveValue(Predicate<object?> predicate);
+        bool Remove(string identifier);
 
         /// <summary>
-        /// Removes from this instance first ocurrence of an element that matches the given
-        /// predicate.
-        /// <br/> Returns whether changes have been made or not.
+        /// Clear this instance. By default, an empty schema is kept unless otherwise requested.
         /// </summary>
-        /// <param name="predicate"></param>
+        /// <param name="keepEmptySchema"></param>
         /// <returns></returns>
-        bool Remove(Predicate<IElement> predicate);
-
-        /// <summary>
-        /// Removes from this instance the last ocurrence of a value that matches the given
-        /// predicate.
-        /// <br/> Returns whether changes have been made or not.
-        /// </summary>
-        /// <param name="predicate"></param>
-        /// <returns></returns>
-        bool RemoveLastValue(Predicate<object?> predicate);
-
-        /// <summary>
-        /// Removes from this instance the last ocurrence of an element that matches the given
-        /// predicate.
-        /// <br/> Returns whether changes have been made or not.
-        /// </summary>
-        /// <param name="predicate"></param>
-        /// <returns></returns>
-        bool RemoveLast(Predicate<IElement> predicate);
-
-        /// <summary>
-        /// Removes from this instance all the ocurrences of values that matches the given
-        /// predicate.
-        /// <br/> Returns whether changes have been made or not.
-        /// </summary>
-        /// <param name="predicate"></param>
-        /// <returns></returns>
-        bool RemoveValues(Predicate<object?> predicate);
-
-        /// <summary>
-        /// Removes from this instance the ocurrences of elements that match the given predicate.
-        /// <br/> Returns whether changes have been made or not.
-        /// </summary>
-        /// <param name="predicate"></param>
-        /// <returns></returns>
-        bool RemoveAll(Predicate<IElement> predicate);
-
-        /// <summary>
-        /// Clears this instance.
-        /// <br/> Returns whether changes have been made or not.
-        /// </summary>
-        /// <returns></returns>
-        bool Clear();
+        bool Clear(bool keepEmptySchema = true);
     }
 }
