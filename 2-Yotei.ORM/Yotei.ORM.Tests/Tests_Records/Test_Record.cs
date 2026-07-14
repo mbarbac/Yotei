@@ -85,23 +85,59 @@ public static partial class Test_Record
         var engine = new FakeEngine() { IgnoreCase = true };
         var xid = new Entry(engine, "Emp.Id", isPrimaryKey: true);
         var xfirst = new Entry(engine, "Emp.FirstName");
-        var schema = new Schema(engine, [xid, xfirst, xid]);
+        var schema = new Schema(engine, [xid, xfirst, xid, xid]);
 
-        var record = new Record(["007", "James", "008"], schema);
-        Assert.Equal(3, record.Count);
+        var record = new Record(["007", "James", "008", "009"], schema);
+        Assert.Equal(4, record.Count);
         Assert.NotNull(record.Schema);
-        Assert.Equal("008", record[0]); // Last one wins!
+        Assert.Equal("009", record[0]); // Last one wins!
         Assert.Equal("James", record[1]);
-        Assert.Equal("008", record[2]);
+        Assert.Equal("009", record[2]);
+        Assert.Equal("009", record[3]);
     }
-
-    /*
 
     // ----------------------------------------------------
 
     //[Enforced]
     [Fact]
+    public static void Test_Indexed_Setter_WithDuplicates()
+    {
+        var engine = new FakeEngine() { IgnoreCase = true };
+        var xid = new Entry(engine, "Emp.Id", isPrimaryKey: true);
+        var xfirst = new Entry(engine, "Emp.FirstName");
+        var schema = new Schema(engine, [xid, xfirst, xid, xid]);
+        var builder = new Record.Builder(["007", "James", "007", "007"], schema);
+
+        builder[3] = "008";
+        Assert.Equal("008", builder[0]);
+        Assert.Equal("008", builder[2]);
+        Assert.Equal("008", builder[3]);
+
+        builder["Emp.Id"] = "009";
+        Assert.Equal("009", builder[0]);
+        Assert.Equal("009", builder[2]);
+        Assert.Equal("009", builder[3]);
+    }
+
+    //[Enforced]
+    [Fact]
     public static void Test_Get()
+    {
+        var engine = new FakeEngine();
+        var xid = new Entry(engine, "Emp.Id", isPrimaryKey: true);
+        var xfirst = new Entry(engine, "Emp.FirstName");
+        var schema = new Schema(engine, [xid, xfirst, xid]);
+        var record = new Record(["007", "James", "008"], schema);
+
+        var value = record.Get(0, out var entry);
+        Assert.Equal("008", value);
+        Assert.Same(xid, entry);
+
+        try { new Record().Get(0, out entry); Assert.Fail(); }
+        catch (InvalidOperationException) { }
+    }
+
+    /*
 
     //[Enforced]
     [Fact]

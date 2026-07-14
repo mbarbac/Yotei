@@ -53,7 +53,7 @@ partial class Record
                     throw new ArgumentException("Collection of metadata entries cannot be null.");
                 }
             }
-            else
+            else // Create an empty schema and then add the entries...
             {
                 Schema = new Schema(entry.Engine);
                 AddRange(values, entries);
