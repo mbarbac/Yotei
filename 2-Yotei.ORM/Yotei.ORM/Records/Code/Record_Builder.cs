@@ -1,4 +1,6 @@
-﻿namespace Yotei.ORM.Records.Code;
+﻿using System.Data;
+
+namespace Yotei.ORM.Records.Code;
 
 partial class Record
 {
@@ -24,17 +26,39 @@ partial class Record
         /// <summary>
         /// Initializes an empty schema-ready instance.
         /// </summary>
-        /// <param name="schema"></param>
-        public Builder(ISchema schema) => Schema = schema.ThrowWhenNull();
+        /// <param name="engine"></param>
+        public Builder(IEngine engine) => Schema = new Schema(engine);
 
         /// <summary>
-        /// Initializes a new schema-ready instance with the given schema and values.
+        /// Initializes a new instance with the given values and metadata.
         /// </summary>
-        /// <param name="schema"></param>
         /// <param name="values"></param>
-        public Builder(ISchema schema, IEnumerable<object?> values)
-            : this(schema)
-            => AddRange(values, schema);
+        /// <param name="entries"></param>
+        public Builder(IEnumerable<object?> values, IEnumerable<ISchemaEntry> entries)
+        {
+            ArgumentNullException.ThrowIfNull(values);
+            ArgumentNullException.ThrowIfNull(entries);
+
+            var entry = entries.FirstOrDefault();
+            if (entry is null)
+            {
+                // Special case: empty schema...
+                if (entries is ISchema schema)
+                {
+                    Schema = schema;
+                    AddRange(values, entries);
+                }
+                else
+                {
+                    throw new ArgumentException("Collection of metadata entries cannot be null.");
+                }
+            }
+            else
+            {
+                Schema = new Schema(entry.Engine);
+                AddRange(values, entries);
+            }
+        }
 
         /// <summary>
         /// Copy constructor.
@@ -75,24 +99,36 @@ partial class Record
 
             var sb = new StringBuilder();
             sb.Append($"{Count}:[");
+
             for (int i = 0; i < Count; i++)
             {
                 if (i != 0) sb.Append(", ");
 
                 var value = Values[i].Sketch();
-                var entry = SchemaBuilder?[i].Identifier?.Value ?? $"#{i}";
+                var valid =
+                    SchemaBuilder is not null &&
+                    SchemaBuilder.Count > i &&
+                    SchemaBuilder[i].Identifier?.Value is not null;
+
+                var entry = valid ? SchemaBuilder![i].Identifier!.Value : $"#{i}";
                 sb.Append($"{entry}='{value}'");
             }
+
             if (count < Count) sb.Append(", ...");
             sb.Append(']');
             return sb.ToString();
         }
 
+#pragma warning disable IDE0028
+#pragma warning disable IDE0306
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         /// <returns></returns>
-        public virtual IRecord ToInstance() => throw null;
+        public virtual IRecord ToInstance() => Schema is null
+            ? new Record(this)
+            : new Record(this, Schema);
+#pragma warning restore
 
         // ------------------------------------------------
 
@@ -369,7 +405,7 @@ partial class Record
             ArgumentNullException.ThrowIfNull(values);
 
             var done = false;
-            foreach (var value in values) { Values.Add(values); done = true; }
+            foreach (var value in values) { Values.Add(value); done = true; }
             return done;
         }
 
@@ -461,7 +497,7 @@ partial class Record
             var done = false;
             foreach (var value in values)
             {
-                Values.Insert(index, values);
+                Values.Insert(index, value);
                 index++;
                 done = true;
             }

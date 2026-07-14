@@ -1,4 +1,9 @@
-﻿namespace Yotei.ORM.Records.Code;
+﻿#pragma warning disable IDE0028
+#pragma warning disable IDE0306
+
+using System.ComponentModel;
+
+namespace Yotei.ORM.Records.Code;
 
 // ========================================================
 /// <summary>
@@ -9,66 +14,89 @@
 [DebuggerDisplay("{ToDebugString(3)}")]
 public partial class Record : IRecord
 {
+    Builder Items;
+
     /// <summary>
     /// Initializes an empty schema-less instance.
     /// </summary>
-    public Record() => throw null;
+    public Record() => Items = new();
 
     /// <summary>
     /// Initializes a new schema-less instance with the given values.
     /// </summary>
     /// <param name="values"></param>
-    public Record(IEnumerable<object?> values) => throw null;
+    public Record(IEnumerable<object?> values) => Items = new(values);
 
     /// <summary>
     /// Initializes an empty schema-ready instance.
     /// </summary>
-    /// <param name="schema"></param>
-    public Record(ISchema schema) => throw null;
+    /// <param name="engine"></param>
+    public Record(IEngine engine) => Items = new(engine);
 
     /// <summary>
-    /// Initializes a new schema-ready instance with the given schema and values.
+    /// Initializes a new instance with the given values and metadata.
     /// </summary>
-    /// <param name="schema"></param>
     /// <param name="values"></param>
-    public Record(ISchema schema, IEnumerable<object?> values) => throw null;
+    /// <param name="entries"></param>
+    public Record(
+        IEnumerable<object?> values, IEnumerable<ISchemaEntry> entries)
+        => Items = new(values, entries);
 
     /// <summary>
     /// Copy constructor.
     /// </summary>
     /// <param name="other"></param>
-    protected Record(Record other) => throw null;
+    protected Record(Record other)
+    {
+        ArgumentNullException.ThrowIfNull(other);
+        Items = other.Schema is null ? new(other) : new(other, other.Schema);
+    }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public IEnumerator<object?> GetEnumerator() => throw null;
+    public IEnumerator<object?> GetEnumerator() => Items.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => throw null;
+    public override string ToString() => Items.ToString();
 
     /// <summary>
     /// Obtains a string representation of this instance for debug purposes.
     /// </summary>
     /// <param name="count"></param>
     /// <returns></returns>
-    public string ToDebugString(int count) => throw null;
+    public string ToDebugString(int count) => Items.ToDebugString(count);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public virtual IRecord.IBuilder ToBuilder() => throw null;
+    public virtual IRecord.IBuilder ToBuilder() => Items.Clone();
 
     // ----------------------------------------------------
 
     /// <inheritdoc/>
-    public virtual bool Equals(IRecord? other) => throw null;
+    public virtual bool Equals(IRecord? other)
+    {
+        if (ReferenceEquals(this, other)) return true;
+        if (other is null) return false;
+
+        if (!Schema.EqualsEx(other.Schema)) return false;
+        if (Count != other.Count) return false;
+
+        for (int i = 0; i < Count; i++)
+        {
+            var item = Items[i];
+            var temp = other[i];
+            if (!item.EqualsEx(temp)) return false;
+        }
+        return true;
+    }
 
     /// <inheritdoc/>
     public override bool Equals(object? obj) => Equals(obj as IRecord);
@@ -84,26 +112,36 @@ public partial class Record : IRecord
     public static bool operator !=(Record? host, IRecord? item) => !(host == item);
 
     /// <inheritdoc/>
-    public override int GetHashCode() => throw null;
+    public override int GetHashCode()
+    {
+        var code = Schema?.GetHashCode() ?? 0;
+        for (int i = 0; i < Count; i++) code = HashCode.Combine(code, Items[i]);
+        return code;
+    }
 
     // ------------------------------------------------
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public ISchema? Schema { get => throw null; init => throw null; }
+    public ISchema? Schema
+    {
+        get => _Schema ??= Items.Schema;
+        init { _Schema = null; Items.Schema = value; }
+    }
+    ISchema? _Schema; // Cache
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public int Count { get => throw null; }
+    public int Count => Items.Count;
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    public object? this[int index] { get => throw null; }
+    public object? this[int index] => Items[index];
 
     /// <summary>
     /// <inheritdoc/>
@@ -111,14 +149,14 @@ public partial class Record : IRecord
     /// <param name="index"></param>
     /// <param name="entry"></param>
     /// <returns></returns>
-    public object? Get(int index, out ISchemaEntry entry) => throw null;
+    public object? Get(int index, out ISchemaEntry entry) => Items.Get(index, out entry);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="identifier"></param>
     /// <returns></returns>
-    public object? this[string identifier] { get => throw null; }
+    public object? this[string identifier] => Items[identifier];
 
     /// <summary>
     /// <inheritdoc/>
@@ -129,25 +167,26 @@ public partial class Record : IRecord
     /// <returns></returns>
     public bool TryGet(
         string identifier,
-        out object? value, [NotNullWhen(true)] out ISchemaEntry? entry) => throw null;
+        out object? value, [NotNullWhen(true)] out ISchemaEntry? entry)
+        => Items.TryGet(identifier, out value, out entry);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public object?[] ToArray() => throw null;
+    public object?[] ToArray() => [.. Items];
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public List<object?> ToList() => throw null;
+    public List<object?> ToList() => [.. Items];
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public List<object?> ToList(int index, int count) => throw null;
+    public List<object?> ToList(int index, int count) => Items.ToList(index, count);
 
     // ------------------------------------------------
 
@@ -157,7 +196,12 @@ public partial class Record : IRecord
     /// <param name="index"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    public virtual IRecord Replace(int index, object? value) => throw null;
+    public virtual IRecord Replace(int index, object? value)
+    {
+        var builder = Items.Clone();
+        var done = builder.Replace(index, value);
+        return done ? builder.ToInstance() : this;
+    }
 
     /// <summary>
     /// <inheritdoc/>
@@ -166,14 +210,24 @@ public partial class Record : IRecord
     /// <param name="value"></param>
     /// <param name="entry"></param>
     /// <returns></returns>
-    public virtual IRecord Replace(int index, object? value, ISchemaEntry entry) => throw null;
+    public virtual IRecord Replace(int index, object? value, ISchemaEntry entry)
+    {
+        var builder = Items.Clone();
+        var done = builder.Replace(index, value, entry);
+        return done ? builder.ToInstance() : this;
+    }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
-    public virtual IRecord Add(object? value) => throw null;
+    public virtual IRecord Add(object? value)
+    {
+        var builder = Items.Clone();
+        var done = builder.Add(value);
+        return done ? builder.ToInstance() : this;
+    }
 
     /// <summary>
     /// <inheritdoc/>
@@ -181,14 +235,24 @@ public partial class Record : IRecord
     /// <param name="value"></param>
     /// <param name="entry"></param>
     /// <returns></returns>
-    public virtual IRecord Add(object? value, ISchemaEntry entry) => throw null;
+    public virtual IRecord Add(object? value, ISchemaEntry entry)
+    {
+        var builder = Items.Clone();
+        var done = builder.Add(value, entry);
+        return done ? builder.ToInstance() : this;
+    }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="values"></param>
     /// <returns></returns>
-    public virtual IRecord AddRange(IEnumerable<object?> values) => throw null;
+    public virtual IRecord AddRange(IEnumerable<object?> values)
+    {
+        var builder = Items.Clone();
+        var done = builder.AddRange(values);
+        return done ? builder.ToInstance() : this;
+    }
 
     /// <summary>
     /// <inheritdoc/>
@@ -196,7 +260,12 @@ public partial class Record : IRecord
     /// <param name="values"></param>
     /// <param name="entries"></param>
     /// <returns></returns>
-    public virtual IRecord AddRange(IEnumerable<object?> values, IEnumerable<ISchemaEntry> entries) => throw null;
+    public virtual IRecord AddRange(IEnumerable<object?> values, IEnumerable<ISchemaEntry> entries)
+    {
+        var builder = Items.Clone();
+        var done = builder.AddRange(values, entries);
+        return done ? builder.ToInstance() : this;
+    }
 
     /// <summary>
     /// <inheritdoc/>
@@ -204,7 +273,12 @@ public partial class Record : IRecord
     /// <param name="index"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    public virtual IRecord Insert(int index, object? value) => throw null;
+    public virtual IRecord Insert(int index, object? value)
+    {
+        var builder = Items.Clone();
+        var done = builder.Insert(index, value);
+        return done ? builder.ToInstance() : this;
+    }
 
     /// <summary>
     /// <inheritdoc/>
@@ -213,7 +287,12 @@ public partial class Record : IRecord
     /// <param name="value"></param>
     /// <param name="entry"></param>
     /// <returns></returns>
-    public virtual IRecord Insert(int index, object? value, ISchemaEntry entry) => throw null;
+    public virtual IRecord Insert(int index, object? value, ISchemaEntry entry)
+    {
+        var builder = Items.Clone();
+        var done = builder.Insert(index, value, entry);
+        return done ? builder.ToInstance() : this;
+    }
 
     /// <summary>
     /// <inheritdoc/>
@@ -221,7 +300,12 @@ public partial class Record : IRecord
     /// <param name="index"></param>
     /// <param name="values"></param>
     /// <returns></returns>
-    public virtual IRecord InsertRange(int index, IEnumerable<object?> values) => throw null;
+    public virtual IRecord InsertRange(int index, IEnumerable<object?> values)
+    {
+        var builder = Items.Clone();
+        var done = builder.InsertRange(index, values);
+        return done ? builder.ToInstance() : this;
+    }
 
     /// <summary>
     /// <inheritdoc/>
@@ -230,25 +314,46 @@ public partial class Record : IRecord
     /// <param name="values"></param>
     /// <param name="entries"></param>
     /// <returns></returns>
-    public virtual IRecord InsertRange(int index, IEnumerable<object?> values, IEnumerable<ISchemaEntry> entries) => throw null;
+    public virtual IRecord InsertRange(
+        int index, IEnumerable<object?> values, IEnumerable<ISchemaEntry> entries)
+    {
+        var builder = Items.Clone();
+        var done = builder.InsertRange(index, values, entries);
+        return done ? builder.ToInstance() : this;
+    }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    public virtual IRecord RemoveAt(int index) => throw null;
+    public virtual IRecord RemoveAt(int index)
+    {
+        var builder = Items.Clone();
+        var done = builder.RemoveAt(index);
+        return done ? builder.ToInstance() : this;
+    }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="identifier"></param>
     /// <returns></returns>
-    public virtual IRecord Remove(string identifier) => throw null;
+    public virtual IRecord Remove(string identifier)
+    {
+        var builder = Items.Clone();
+        var done = builder.Remove(identifier);
+        return done ? builder.ToInstance() : this;
+    }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public virtual IRecord Clear() => throw null;
+    public virtual IRecord Clear()
+    {
+        var builder = Items.Clone();
+        var done = builder.Clear();
+        return done ? builder.ToInstance() : this;
+    }
 }
