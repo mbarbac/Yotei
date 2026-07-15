@@ -330,8 +330,23 @@ partial class Record
         /// <returns></returns>
         public virtual bool Replace(int index, object? value)
         {
-            this[index] = value;
-            return true;
+            if (Schema is not null)
+            {
+                var entry = Schema[index];
+                var indexes = IndexesOf(entry);
+
+                for (int i = 0; i < indexes.Count; i++)
+                {
+                    index = indexes[i];
+                    Values[index] = value;
+                }
+                return true;
+            }
+            else
+            {
+                this[index] = value;
+                return true;
+            }
         }
 
         /// <summary>
@@ -404,9 +419,11 @@ partial class Record
             ThrowIfSchemaReady();
             ArgumentNullException.ThrowIfNull(values);
 
-            var done = false;
-            foreach (var value in values) { Values.Add(value); done = true; }
-            return done;
+            // We only need to know if there were some values to add...
+            var count = Count;
+            Values.AddRange(values);
+
+            return count != Count;
         }
 
         /// <summary>
@@ -494,14 +511,11 @@ partial class Record
             ThrowIfSchemaReady();
             ArgumentNullException.ThrowIfNull(values);
 
-            var done = false;
-            foreach (var value in values)
-            {
-                Values.Insert(index, value);
-                index++;
-                done = true;
-            }
-            return done;
+            // We only need to know if there were some values to insert...
+            var count = Count;
+            Values.InsertRange(index, values);
+
+            return count != Count;
         }
 
         /// <summary>
@@ -550,28 +564,38 @@ partial class Record
         /// <inheritdoc/>
         /// </summary>
         /// <param name="index"></param>
+        /// <param name="removeRedundantEntries"></param>
         /// <returns></returns>
-        public virtual bool RemoveAt(int index)
+        public virtual bool RemoveAt(int index, bool removeRedundantEntries = false)
         {
             if (SchemaBuilder is null) // Easy case...
             {
                 Values.RemoveAt(index);
                 return true;
             }
-            else // Removing also the redundant ones, if any...
+            else // we have a schema builder in place...
             {
-                var entry = SchemaBuilder[index];
-                var indexes = IndexesOf(entry);
-                var done = false;
-
-                for (int i = indexes.Count - 1; i >= 0; i--)
+                if (removeRedundantEntries) // We must check for redundancies...
                 {
-                    index = indexes[i];
+                    var entry = SchemaBuilder[index];
+                    var indexes = IndexesOf(entry);
+                    var done = false;
+
+                    for (int i = indexes.Count - 1; i >= 0; i--)
+                    {
+                        index = indexes[i];
+                        Values.RemoveAt(index);
+                        SchemaBuilder.RemoveAt(index);
+                        done = true;
+                    }
+                    return done;
+                }
+                else // No need to check any redundancies...
+                {
                     Values.RemoveAt(index);
                     SchemaBuilder.RemoveAt(index);
-                    done = true;
+                    return true;
                 }
-                return done;
             }
         }
 
@@ -600,13 +624,14 @@ partial class Record
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
+        /// <param name="removeSchema"></param>
         /// <returns></returns>
-        public virtual bool Clear()
+        public virtual bool Clear(bool removeSchema = false)
         {
             if (Count == 0) return false;
 
             Values.Clear();
-            SchemaBuilder?.Clear();
+            if (removeSchema) SchemaBuilder = null; else SchemaBuilder?.Clear();
             return true;
         }
     }

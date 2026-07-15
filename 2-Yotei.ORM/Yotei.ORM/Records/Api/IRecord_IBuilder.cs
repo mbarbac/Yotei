@@ -179,11 +179,12 @@ partial interface IRecord
 
         /// <summary>
         /// Removes from this instance the values and metadata at the given index, or indexes if
-        /// there are redundant ones.
+        /// there are redundant ones and requested.
         /// </summary>
         /// <param name="index"></param>
+        /// <param name="removeRedundantEntries"></param>
         /// <returns></returns>
-        bool RemoveAt(int index);
+        bool RemoveAt(int index, bool removeRedundantEntries = false);
 
         /// <summary>
         /// Removes from this instance all the values and entries with the given identifier, if any.
@@ -195,9 +196,9 @@ partial interface IRecord
 
         /// <summary>
         /// Clear this instance. If this instance is a schema-ready one, then the original schema
-        /// is cleared as well.
+        /// is cleared as well. Optionally, the schema (if any) is completely removed.
         /// </summary>
         /// <returns></returns>
-        bool Clear();
+        bool Clear(bool removeSchema = false);
     }
 }

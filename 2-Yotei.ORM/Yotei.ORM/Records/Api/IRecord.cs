@@ -183,11 +183,12 @@ public partial interface IRecord : IEnumerable<object?>, IEquatable<IRecord>
 
     /// <summary>
     /// Returns a copy of this instance where the value and metadata at the given index, and
-    /// redundant ones, if any, have been removed from it.
+    /// redundant ones if requested and any, have been removed from it.
     /// </summary>
     /// <param name="index"></param>
+    /// <param name="removeRedundantEntries"></param>
     /// <returns></returns>
-    IRecord RemoveAt(int index);
+    IRecord RemoveAt(int index, bool removeRedundantEntries = false);
 
     /// <summary>
     /// Returns a copy of this instance where where the value and metadata of the entry whose
@@ -200,8 +201,9 @@ public partial interface IRecord : IEnumerable<object?>, IEquatable<IRecord>
 
     /// <summary>
     /// Returns a copy of this instance where all the values and metadata, if any, have been
-    /// cleared.
+    /// cleared. Optionally, the schema (if any) is completely removed.
     /// </summary>
+    /// <param name="removeSchema"></param>
     /// <returns></returns>
-    IRecord Clear();
+    IRecord Clear(bool removeSchema = false);
 }

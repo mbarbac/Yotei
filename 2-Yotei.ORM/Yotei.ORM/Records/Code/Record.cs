@@ -326,11 +326,12 @@ public partial class Record : IRecord
     /// <inheritdoc/>
     /// </summary>
     /// <param name="index"></param>
+    /// <param name="removeRedundantEntries"></param>
     /// <returns></returns>
-    public virtual IRecord RemoveAt(int index)
+    public virtual IRecord RemoveAt(int index, bool removeRedundantEntries = false)
     {
         var builder = Items.Clone();
-        var done = builder.RemoveAt(index);
+        var done = builder.RemoveAt(index, removeRedundantEntries);
         return done ? builder.ToInstance() : this;
     }
 
@@ -349,11 +350,12 @@ public partial class Record : IRecord
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
+    /// <param name="removeSchema"></param>
     /// <returns></returns>
-    public virtual IRecord Clear()
+    public virtual IRecord Clear(bool removeSchema = false)
     {
         var builder = Items.Clone();
-        var done = builder.Clear();
+        var done = builder.Clear(removeSchema);
         return done ? builder.ToInstance() : this;
     }
 }
