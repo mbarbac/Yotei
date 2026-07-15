@@ -56,9 +56,28 @@ public partial interface IConnection : ORM.IConnection
     new ITransaction StartTransaction();
 
     /// <summary>
+    /// Starts the active database transaction associated with this instance, using the given
+    /// isolation level (which is set as the new default one).
+    /// </summary>
+    /// <param name="level"></param>
+    /// <returns></returns>
+    ITransaction StartTransaction(IsolationLevel level);
+
+    /// <summary>
     /// <inheritdoc cref="ORM.IConnection.StartTransaction"/>
     /// </summary>
     /// <param name="token"></param>
     /// <returns></returns>
     new ValueTask<ITransaction> StartTransactionAsync(CancellationToken token = default);
+
+    /// <summary>
+    /// Starts the active database transaction associated with this instance, using the given
+    /// isolation level (which is set as the new default one).
+    /// </summary>
+    /// <param name="level"></param>
+    /// <param name="token"></param>
+    /// <returns></returns>
+    ValueTask<ITransaction> StartTransactionAsync(
+        IsolationLevel level,
+        CancellationToken token = default);
 }

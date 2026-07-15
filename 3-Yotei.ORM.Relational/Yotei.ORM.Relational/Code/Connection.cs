@@ -232,9 +232,34 @@ public partial class Connection : ORM.Code.Connection, IConnection
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
+    /// <param name="level"></param>
+    /// <returns></returns>
+    public virtual ITransaction StartTransaction(IsolationLevel level)
+    {
+        IsolationLevel = level;
+        return StartTransaction();
+    }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
     /// <param name="token"></param>
     /// <returns></returns>
     public new async ValueTask<ITransaction> StartTransactionAsync(
         CancellationToken token = default)
         => (ITransaction)await base.StartTransactionAsync(token);
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="level"></param>
+    /// <param name="token"></param>
+    /// <returns></returns>
+    public virtual ValueTask<ITransaction> StartTransactionAsync(
+        IsolationLevel level,
+        CancellationToken token = default)
+    {
+        IsolationLevel = level;
+        return StartTransactionAsync(token);
+    }
 }

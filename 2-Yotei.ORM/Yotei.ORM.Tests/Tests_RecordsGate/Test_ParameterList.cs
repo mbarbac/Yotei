@@ -1,8 +1,7 @@
-﻿using IChain = Yotei.ORM.IParameterList;
-using Chain = Yotei.ORM.Code.ParameterList;
-using IItem = Yotei.ORM.IParameter;
-using Item = Yotei.ORM.Code.Parameter;
-using System.Xml.Linq;
+﻿using IChain = Yotei.ORM.Records.IParameterList;
+using Chain = Yotei.ORM.Records.Code.ParameterList;
+using IItem = Yotei.ORM.Records.IParameter;
+using Item = Yotei.ORM.Records.Code.Parameter;
 
 namespace Yotei.ORM.Tests;
 

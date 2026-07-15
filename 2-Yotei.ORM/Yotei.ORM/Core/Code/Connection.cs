@@ -44,7 +44,7 @@ public abstract partial class Connection : DisposableClass, IConnection
     {
         if (IsDisposed || !disposing) return;
 
-        try { Transaction?.Abort(); } catch { }
+        try { Transaction?.Abort(); Transaction = null; } catch { }
         try { if (IsOpen) Close(); } catch { }
         try { TransactionSemaphore.Dispose(); } catch { }
         try { ConnectionSemaphore.Dispose(); } catch { }
@@ -59,7 +59,7 @@ public abstract partial class Connection : DisposableClass, IConnection
     {
         if (IsDisposed || !disposing) return;
 
-        try { if (Transaction != null) await Transaction.AbortAsync().ConfigureAwait(false); } catch { }
+        try { if (Transaction != null) await Transaction.AbortAsync().ConfigureAwait(false); Transaction = null; } catch { }
         try { if (IsOpen) await CloseAsync().ConfigureAwait(false); } catch { }
         try { TransactionSemaphore.Dispose(); } catch { }
         try { ConnectionSemaphore.Dispose(); } catch { }
@@ -208,6 +208,7 @@ public abstract partial class Connection : DisposableClass, IConnection
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
+    [SuppressMessage("", "IDE0031")]
     public void Close()
     {
         if (IsDisposed) return;
@@ -217,6 +218,7 @@ public abstract partial class Connection : DisposableClass, IConnection
         {
             try
             {
+                if (Transaction != null) { Transaction.Abort(); Transaction = null; }
                 if (IsOpen) OnClose();
                 return;
             }
@@ -237,6 +239,11 @@ public abstract partial class Connection : DisposableClass, IConnection
         {
             try
             {
+                if (Transaction != null)
+                {
+                    await Transaction.AbortAsync().ConfigureAwait(false);
+                    Transaction = null;
+                }
                 if (IsOpen) await OnCloseAsync().ConfigureAwait(false);
                 return;
             }

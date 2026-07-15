@@ -1,9 +1,9 @@
-﻿using IHost = Yotei.ORM.IParameterList;
-using THost = Yotei.ORM.Code.ParameterList;
-using IItem = Yotei.ORM.IParameter;
+﻿using IHost = Yotei.ORM.Records.IParameterList;
+using THost = Yotei.ORM.Records.Code.ParameterList;
+using IItem = Yotei.ORM.Records.IParameter;
 using TKey = string;
 
-namespace Yotei.ORM.Code;
+namespace Yotei.ORM.Records.Code;
 
 partial class ParameterList
 {
