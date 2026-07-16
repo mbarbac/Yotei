@@ -77,7 +77,8 @@ public partial interface ICommandInfo
     /// <br/> If both text and values are used, the later ones must be enconded into the text
     /// using either a positional '{n}' form, or a named '{name}' one, where 'name' may or
     /// may not start with the engine's prefix.
-    /// <br/> If text is null, then only the values are taken into consideration.
+    /// <br/> If text is null, then only the values are taken into consideration, provided that
+    /// range is not an empty one (null can be used alone as a first value).
     /// </summary>
     /// <param name="text"></param>
     /// <param name="range"></param>

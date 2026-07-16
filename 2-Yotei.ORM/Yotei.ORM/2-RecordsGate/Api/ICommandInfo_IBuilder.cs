@@ -5,9 +5,9 @@ partial interface ICommandInfo
     // ====================================================
     /// <summary>
     /// Represents a builder of <see cref="ICommandInfo"/> instances.
-    /// <br/> Methods in this instance may render it into an inconsitent state. When such happens,
-    /// this state prevents obtaining a record instance from this builder. Inconsistent states are
-    /// allowed while this instance is being constructed for flexibility purposes.
+    /// <br/> Methods in this instance may render it into an inconsitent state. When this happens,
+    /// record instances cannot be obtained from this builder.Inconsistent states are accepted as
+    /// temporary ones while the record is being constructed.
     /// </summary>
     [Cloneable]
     public partial interface IBuilder
@@ -87,7 +87,8 @@ partial interface ICommandInfo
         /// <br/> If both text and values are used, the later ones must be enconded into the text
         /// using either a positional '{n}' form, or a named '{name}' one, where 'name' may or
         /// may not start with the engine's prefix.
-        /// <br/> If text is null, then only the values are taken into consideration.
+        /// <br/> If text is null, then only the values are taken into consideration, provided that
+        /// range is not an empty one (null can be used alone as a first value).
         /// </summary>
         /// <param name="text"></param>
         /// <param name="range"></param>
