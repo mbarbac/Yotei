@@ -171,21 +171,28 @@ partial class CommandInfo
         /// <param name="iterable"></param>
         /// <returns></returns>
         public virtual bool Add(
-            ICommand source, bool iterable) => Add(source.ThrowWhenNull().GetCommandInfo(iterable));
+            ICommand source, bool iterable)
+            => Add(source.ThrowWhenNull().GetCommandInfo(iterable));
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         /// <param name="source"></param>
         /// <returns></returns>
-        public virtual bool Add(ICommandInfo source) => throw null;
+        public virtual bool Add(ICommandInfo source)
+        {
+            throw null;
+        }
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         /// <param name="source"></param>
         /// <returns></returns>
-        public virtual bool Add(ICommandInfo.IBuilder source) => throw null;
+        public virtual bool Add(ICommandInfo.IBuilder source)
+        {
+            throw null;
+        }
 
         /// <summary>
         /// <inheritdoc/>
@@ -193,7 +200,10 @@ partial class CommandInfo
         /// <param name="text"></param>
         /// <param name="range"></param>
         /// <returns></returns>
-        public virtual bool Add(string? text, params object?[]? range) => throw null;
+        public virtual bool Add(string? text, params object?[]? range)
+        {
+            throw null;
+        }
 
         // ------------------------------------------------
 
@@ -218,7 +228,24 @@ partial class CommandInfo
         /// </summary>
         /// <param name="range"></param>
         /// <returns></returns>
-        public virtual bool ReplaceValues(params object?[]? range) => throw null;
+        public virtual bool ReplaceValues(params object?[]? range)
+        {
+            range ??= [null];
+
+            // Shortcut when range is empty...
+            if (range.Length == 0)
+            {
+                if (_Parameters.Count == 0) return false;
+                _Parameters.Clear();
+                return true;
+            }
+
+            // Standard case...
+            else
+            {
+                throw null;
+            }
+        }
 
         /// <summary>
         /// <inheritdoc/>
@@ -231,35 +258,6 @@ partial class CommandInfo
             _Text.Clear();
             _Parameters.Clear();
             return true;
-        }
-
-        // ------------------------------------------------
-
-        /// <summary>
-        /// Appends to this instance the given text and the collection of parameters obtained
-        /// from the given range of values.
-        /// <br/> If both text and values are used, the later ones must be enconded into the text
-        /// using either a positional '{n}' form, or a named '{name}' one, where 'name' may or
-        /// may not start with the engine's prefix.
-        /// 
-        /// <br/> If text is null, then the values are captured without validating that their
-        /// names, if any, appear in that null text.
-        /// 
-        /// 
-        /// <br/> Returns whether changes have been made or not.
-        /// </summary>
-        /// <param name="strictNames"></param>
-        /// <param name="strictValues"></param>
-        /// <param name="text"></param>
-        /// <param name="range"></param>
-        /// <returns></returns>
-        bool Append(
-            bool strictNames,
-            bool strictValues,
-            string? text,
-            params object?[]? range)
-        {
-            throw null;
         }
     }
 }

@@ -19,8 +19,8 @@ public static class TypeExtensions
            source.IsCompilerGenerated &&
            source.IsGenericType &&
            source.Namespace is null &&
-           source.Name.Contains("Anonymous") &&
-           source.Name.StartsWith("<>");
+           source.Name.Contains("AnonymousType") /*&&
+           source.Name.StartsWith("<>")*/;
 
         /// <summary>
         /// Determines if this type is a compiler generated one, or not.
