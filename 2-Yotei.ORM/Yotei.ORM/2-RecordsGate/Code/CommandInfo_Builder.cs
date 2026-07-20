@@ -1,6 +1,4 @@
-﻿using System.Runtime.Intrinsics.X86;
-
-namespace Yotei.ORM.Records.Code;
+﻿namespace Yotei.ORM.Records.Code;
 
 partial class CommandInfo
 {
@@ -106,7 +104,15 @@ partial class CommandInfo
         /// <inheritdoc/>
         /// </summary>
         /// <returns></returns>
-        public virtual ICommandInfo ToInstance() => throw null;
+        public virtual ICommandInfo ToInstance()
+        {
+            if (!IsConsistent) throw new InvalidOperationException(
+                "This builder is in an inconsistent state.")
+                .WithData(this);
+
+            return IsEmpty ? new CommandInfo(Engine) : new CommandInfo(this);
+
+        }
 
         // ------------------------------------------------
 
@@ -136,12 +142,226 @@ partial class CommandInfo
         /// </summary>
         public bool IsEmpty => _Text.Length == 0 && _Parameters.Count == 0;
 
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        public bool IsConsistent
+        {
+            get
+            {
+                var text = Text;
+                int pos, index;
+
+                // Empty instances are consistent by definition...
+                if (IsEmpty) return true;
+
+                // No unused parameters...
+                foreach (var par in _Parameters)
+                {
+                    index = FindNameSequence(text, 0, par.Name, false, out _);
+                    if (index < 0) return false;
+                }
+
+                // No remaining '{...}' brackets...
+                index = FindBracket(text, 0, out _);
+                if (index >= 0) return false;
+
+                // No invalid '#...' sequences...
+                pos = 0;
+                while (FindNameSequence(text, pos, out var sequence) >= 0)
+                {
+                    index = _Parameters.IndexOf(sequence!);
+                    if (index < 0) return false;
+
+                    pos += sequence!.Length;
+                }
+
+                // All tests passed, instance in a consistent state...
+                return true;
+            }
+        }
+
+        // ------------------------------------------------
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        public virtual bool Add(ICommand source)
+        {
+            ArgumentNullException.ThrowIfNull(source);
+
+            var info = source.GetCommandInfo();
+            var strict = true;
+            var done = Append(strict, info.Text, info.Parameters);
+            return done;
+        }
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="iterable"></param>
+        /// <returns></returns>
+        public virtual bool Add(ICommand source, bool iterable)
+        {
+            ArgumentNullException.ThrowIfNull(source);
+
+            var info = source.GetCommandInfo(iterable);
+            var strict = true;
+            var done = Append(strict, info.Text, info.Parameters);
+            return done;
+        }
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        public virtual bool Add(ICommandInfo source)
+        {
+            ArgumentNullException.ThrowIfNull(source);
+
+            var strict = true;
+            var done = Append(strict, source.Text, source.Parameters);
+            return done;
+        }
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        public virtual bool Add(ICommandInfo.IBuilder source)
+        {
+            ArgumentNullException.ThrowIfNull(source);
+
+            var strict = false;
+            var done = Append(strict, source.Text, source.Parameters);
+            return done;
+        }
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="values"></param>
+        /// <returns></returns>
+        public virtual bool Add(string text, params object?[]? values)
+        {
+            ArgumentNullException.ThrowIfNull(text);
+            values ??= [null];
+
+            var strict = true;
+            var done = Append(strict, text, values);
+            return done;
+        }
+
+        // ------------------------------------------------
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public virtual bool AddText(string text)
+        {
+            ArgumentNullException.ThrowIfNull(text);
+
+            if (text.Length == 0) return false;
+
+            _Text.Append(text);
+            return true;
+        }
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <param name="values"></param>
+        /// <returns></returns>
+        public virtual bool AddValues(params object?[]? values)
+        {
+            values ??= [null];
+
+            if (values.Length == 0) return false;
+
+            var strict = false;
+            var done = Append(strict, string.Empty, values);
+            return done;
+        }
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public virtual bool ReplaceText(string text)
+        {
+            ArgumentNullException.ThrowIfNull(text);
+
+            _Text.Clear();
+            _Text.Append(text);
+            return true;
+        }
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <param name="values"></param>
+        /// <returns></returns>
+        public virtual bool ReplaceValues(params object?[]? values)
+        {
+            values ??= [null];
+
+            // Shortcut when value is an empty range...
+            if (values.Length == 0)
+            {
+                if (_Parameters.Count == 0) return false; // Trivial case...
+
+                _Parameters.Clear();
+                return true;
+            }
+
+            // Standard case...
+            var old = _Parameters.Clone();
+            var strict = false;
+            var done = Append(strict, string.Empty, values);
+
+            if (done) // We need to remove the old ones as they have been replaced...
+            {
+                for (int i = 0; i < old.Count; i++) _Parameters.RemoveAt(0);
+            }
+            else // Something happened, let's play in the safe zone...
+            {
+                _Parameters.Clear();
+                _Parameters.AddRange(old);
+            }
+
+            return done;
+        }
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <returns></returns>
+        public virtual bool Clear()
+        {
+            if (IsEmpty) return false;
+
+            _Text.Clear();
+            _Parameters.Clear();
+            return true;
+        }
+
         // ------------------------------------------------
 
         /// <summary>
         /// Appends to this instance the given text, if not null, and the collection of parameters
-        /// obtained from the given range of values. In strict mode, there must be a correspondence
-        /// among the given parameters and their representation in the given text.
+        /// obtained from the given range of values. If a parameter name already exists, it is
+        /// changed to prevent name collisions.
+        /// <br/> Strict mode is used when a consistent source text and is enforced. Otherwise, it
+        /// is assumed they may be in an inconsistent state.
         /// </summary>
         bool Append(bool strict, string text, params object?[]? range)
         {
@@ -230,12 +450,6 @@ partial class CommandInfo
             }
 
             // Finishing...
-            if (strict)
-            {
-                ValidateNoUnusedValues();
-                ValidateNoDanglingBrackets();
-            }
-
             if (text.Length > 0) { _Text.Append(text); changed = true; }
             if (items.Any(x => x.Used)) changed = true;
             return changed;
@@ -306,9 +520,9 @@ partial class CommandInfo
                 while ((index = FindOrdinalBracket(text, pos, out bracket, out value)) >= 0)
                 {
                     if (value >= items.Length) throw new ArgumentException(
-                            "Ordinal bracket value bigger than the number of values.")
-                            .WithData(value)
-                            .WithData(items);
+                        "Ordinal bracket value bigger than the number of values.")
+                        .WithData(value)
+                        .WithData(items);
 
                     pos = index + bracket!.Length;
                 }
@@ -317,24 +531,24 @@ partial class CommandInfo
             /// <summary>
             /// Validates that there are no remaining unused values.
             /// </summary>
-            void ValidateNoUnusedValues()
+            /*void ValidateNoUnusedValues()
             {
                 if (items.Any(x => !x.Used)) throw new ArgumentException(
                     "There are unused values in the given range.")
                     .WithData(text)
                     .WithData(range);
-            }
+            }*/
 
             /// <summary>
             /// Validates that there are no remaining dangling '{...}' brackets.
             /// </summary>
-            void ValidateNoDanglingBrackets()
+            /*void ValidateNoDanglingBrackets()
             {
                 if (FindBracket(text, 0, out _) >= 0) throw new ArgumentException(
                     "There are unused '{...}' brackets in the given text.")
                     .WithData(text)
                     .WithData(range);
-            }
+            }*/
         }
 
         // ------------------------------------------------
@@ -412,7 +626,7 @@ partial class CommandInfo
         /// from the given initial index, or -1 if any is found. If found, returns the bracket
         /// in the out argument, even if it is an empty one (only the '{}' bracket).
         /// </summary>
-        int FindBracket(string text, int ini, out string? bracket)
+        static int FindBracket(string text, int ini, out string? bracket)
         {
             bracket = null;
 
@@ -428,7 +642,7 @@ partial class CommandInfo
         /// at the given initial index, or -1 if any is found. If found, then the bracket and
         /// its ordinal value are returned in the out arguments.
         /// </summary>
-        int FindOrdinalBracket(string text, int ini, out string? bracket, out int value)
+        static int FindOrdinalBracket(string text, int ini, out string? bracket, out int value)
         {
             bracket = null;
             value = 0;
@@ -532,13 +746,12 @@ partial class CommandInfo
         /// or -1 if any. If found, returns that sequence in the out argument, even if it is an
         /// empty one (only the engine's prefix).
         /// </summary>
-        /*int FindNameSequence(string text, int ini, out string? sequence)
+        int FindNameSequence(string text, int ini, out string? sequence)
         {
             sequence = null;
             var comparer = char.CharComparer(Comparison);
 
             var pos = text.IndexOf(Prefix, ini, Comparison);
-
             if (pos < 0) return -1;
             if (pos > 0)
             {
@@ -549,17 +762,44 @@ partial class CommandInfo
             var span = text.AsSpan(pos + Prefix.Length);
             var end = span.IndexOfAny(IsolatedFinder.SEPARATORS, Comparison);
 
-            if (end >= 0) // We found an embedded sequence...
+            if (end >= 0) // Found an embedded sequence...
             {
                 sequence = text.Substring(pos, end + Prefix.Length);
                 return pos;
             }
-            else // We've reached the end...
+            else // Sequence spans to the end of the text...
             {
                 sequence = text[pos..];
                 return pos;
             }
-        }*/
+        }
+
+        /// <summary>
+        /// Returns the index of the first ocurrence of a name sequence '#...' using the given
+        /// parameter name and the engine's prefix, starting from the given initial index, or
+        /// -1 if any is found. If relax mode is requeste, the name is also tested adding at
+        /// its head the engine's prefix. If found, the sequence is returned in the out argument.
+        /// </summary>
+        int FindNameSequence(string text, int ini, string name, bool relax, out string? sequence)
+        {
+            var finder = new IsolatedFinder();
+            int pos;
+
+            if (name.StartsWith(Prefix, Comparison))
+            {
+                pos = finder.Find(text, ini, name);
+                if (pos >= 0) { sequence = name; return pos; }
+            }
+            else if (relax)
+            {
+                name = Prefix + name;
+                pos = finder.Find(text, ini, name);
+                if (pos >= 0) { sequence = name; return pos; }
+            }
+
+            sequence = null;
+            return -1;
+        }
 
         // ------------------------------------------------
 
