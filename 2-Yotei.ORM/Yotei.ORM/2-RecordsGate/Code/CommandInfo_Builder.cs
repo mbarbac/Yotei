@@ -23,6 +23,21 @@ partial class CommandInfo
         }
 
         /// <summary>
+        /// Initializes a new instance using the the given text and the parameters obtained from
+        /// the given range of values. If used, the parameters should be encoded in the given text
+        /// using either a positional '{n}' specification, or a '{name}' named one.
+        /// </summary>
+        /// <param name="engine"></param>
+        /// <param name="text"></param>
+        /// <param name="values"></param>
+        public Builder(IEngine engine, string text, params object?[]? values) : this(engine)
+        {
+            // Being a builder we accept by exception to initialize in an inconsistent state...
+            var strict = false;
+            Append(strict, text, values);
+        }
+
+        /// <summary>
         /// Initializes a new instance using the contents of the given source, using its default
         /// iterable mode.
         /// </summary>
@@ -377,7 +392,7 @@ partial class CommandInfo
             // Validations...
             PreventInvalidRangeValues();
             PreventInitialDuplicatedNames();
-            if (strict) PreventInvalidOrdinals();
+            PreventInvalidOrdinals();
 
             // Intercepting ranges with just one special element...
             if (items.Length == 1)
@@ -403,7 +418,7 @@ partial class CommandInfo
             {
                 var item = items[i];
                 IParameter par;
-                string name;
+                string name, xname;
 
                 // Capturing a parameter from the value...
                 switch (item.Value)
@@ -414,7 +429,9 @@ partial class CommandInfo
                         break;
 
                     case AnonymousElement temp:
-                        par = new Parameter(temp.Name, temp.Value);
+                        xname = temp.Name;
+                        if (!xname.StartsWith(Prefix, Comparison)) xname = Prefix + xname;
+                        par = new Parameter(xname, temp.Value);
                         par = Capture(par, changeDuplicatedName: true);
                         name = temp.Name;
                         break;
@@ -430,22 +447,26 @@ partial class CommandInfo
 
                 // Finding by named bracket ('name' may not be 'par.Name')...
                 pos = 0;
-                while ((pos = FindNamedBracket(text, pos, name, out bracket, strict: false)) >= 0)
+                while ((index = FindNamedBracket(text, pos, name, out bracket, strict: false)) >= 0)
                 {
-                    text = text.Remove(pos, bracket!.Length);
-                    text = text.Insert(pos, par.Name);
-                    pos += par.Name.Length;
+                    text = text.Remove(index, bracket!.Length);
+                    text = text.Insert(index, par.Name);
                     item.Used = true;
+
+                    pos = index + par.Name.Length;
                 }
 
                 // Finding by ordinal bracket...
                 pos = 0;
                 while ((index = FindOrdinalBracket(text, pos, out bracket, out value)) >= 0)
                 {
-                    text = text.Remove(pos, bracket!.Length);
-                    text = text.Insert(pos, par.Name);
-                    pos += par.Name.Length;
-                    item.Used = true;
+                    if (value == i)
+                    {
+                        text = text.Remove(index, bracket!.Length);
+                        text = text.Insert(index, par.Name);
+                        item.Used = true;
+                    }
+                    pos = index + par.Name.Length;
                 }
             }
 
@@ -480,34 +501,30 @@ partial class CommandInfo
             void PreventInitialDuplicatedNames()
             {
                 List<string> names = [];
+
                 foreach (var item in items)
                 {
-                    // Only parameters and anonymous carry names...
-                    var name = item.Value switch
+                    string? name = item.Value switch
                     {
                         IParameter temp => temp.Name,
                         AnonymousElement temp => temp.Name,
                         _ => null
                     };
-                    if (name is null) continue;
-
-                    // Normalizing (and maybe re-storing, no harm in this)...
-                    if (!name.StartsWith(Prefix, Comparison))
+                    if (name is not null)
                     {
-                        name = Prefix + name;
-                        switch (item.Value)
-                        {
-                            case IParameter temp: item.Value = new Parameter(name, temp.Value); break;
-                            case AnonymousElement temp: item.Value = new Parameter(name, temp.Value); break;
-                        }
+                        // Normalizing...
+                        if (!name.StartsWith(Prefix, Comparison)) name = Prefix + name;
+
+                        // Trying to find...
+                        var temp = names.Find(x => string.Compare(x, name, Comparison) == 0);
+                        if (temp != null) throw new DuplicateException(
+                            "Range of values contains duplicated names.")
+                            .WithData(name, "name")
+                            .WithData(items);
+
+                        // Iterating...
+                        names.Add(name);
                     }
-
-                    // Intercepting...
-                    if (names.Any(x => string.Compare(x, name, Comparison) == 0))
-                        throw new DuplicateException(
-                            "Range of given values contains duplicated names.").WithData(items);
-
-                    names.Add(name);
                 }
             }
 
@@ -629,6 +646,7 @@ partial class CommandInfo
         static int FindBracket(string text, int ini, out string? bracket)
         {
             bracket = null;
+            if (ini >= text.Length) return -1;
 
             var pos = text.IndexOf('{', ini); if (pos < 0) return -1;
             var end = text.IndexOf('}', pos); if (end < 0) return -1;
@@ -646,6 +664,7 @@ partial class CommandInfo
         {
             bracket = null;
             value = 0;
+            if (ini >= text.Length) return -1;
 
             int pos = ini;
             while ((pos = FindBracket(text, pos, out bracket)) >= 0)
@@ -685,6 +704,7 @@ partial class CommandInfo
         /*int FindNamedBracket(string text, int ini, out string? bracket)
         {
             bracket = null;
+            if (ini >= text.Length) return -1;
 
             int pos = ini;
             while ((pos = FindBracket(text, pos, out bracket)) >= 0)
@@ -709,7 +729,7 @@ partial class CommandInfo
         /// </summary>
         int FindNamedBracket(string text, int ini, string name, out string? bracket, bool strict)
         {
-            if (ini < text.Length)
+            if (ini < text.Length && name.Length > 0)
             {
                 bracket = $"{{{name}}}";
                 var pos = text.IndexOf(bracket, ini, Comparison);
@@ -720,13 +740,16 @@ partial class CommandInfo
                     if (!name.StartsWith(Prefix, Comparison)) // Add the engine's prefix
                     {
                         bracket = $"{{{Prefix + name}}}";
+                        
                         pos = text.IndexOf(bracket, ini, Comparison);
                         if (pos >= 0) return pos;
                     }
                     else // Remove the engine's prefix...
                     {
                         name = name.Remove(0, Prefix.Length);
-                        if (name.Length > 0)
+
+                        if (name.Length > 0 &&
+                            !name.All(x => char.IsAsciiDigit(x)))
                         {
                             bracket = $"{{{name}}}";
                             pos = text.IndexOf(bracket, ini, Comparison);
@@ -749,8 +772,9 @@ partial class CommandInfo
         int FindNameSequence(string text, int ini, out string? sequence)
         {
             sequence = null;
-            var comparer = char.CharComparer(Comparison);
+            if (ini >= text.Length) return -1;
 
+            var comparer = char.CharComparer(Comparison);
             var pos = text.IndexOf(Prefix, ini, Comparison);
             if (pos < 0) return -1;
             if (pos > 0)
@@ -782,6 +806,9 @@ partial class CommandInfo
         /// </summary>
         int FindNameSequence(string text, int ini, string name, bool relax, out string? sequence)
         {
+            sequence = null;
+            if (ini >= text.Length) return -1;
+
             var finder = new IsolatedFinder();
             int pos;
 
@@ -796,8 +823,6 @@ partial class CommandInfo
                 pos = finder.Find(text, ini, name);
                 if (pos >= 0) { sequence = name; return pos; }
             }
-
-            sequence = null;
             return -1;
         }
 
