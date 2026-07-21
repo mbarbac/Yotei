@@ -44,6 +44,9 @@ public static partial class Test_CommandInfoBuilder
         Assert.Empty(builder.Parameters);
         Assert.False(builder.IsEmpty);
         Assert.True(builder.IsConsistent);
+
+        try { _ = new Builder(engine, null!); Assert.Fail(); }
+        catch (ArgumentNullException) { }
     }
 
     //[Enforced]
@@ -60,6 +63,12 @@ public static partial class Test_CommandInfoBuilder
         Assert.Equal("#1", builder.Parameters[1].Name); Assert.Equal("Bond", builder.Parameters[1].Value);
         Assert.False(builder.IsEmpty);
         Assert.True(builder.IsConsistent);
+
+        builder = new Builder(engine, "any {other}", "James");
+        Assert.False(builder.IsConsistent);
+
+        try { _ = new Builder(engine, "any {999}", "James"); Assert.Fail(); }
+        catch (ArgumentException) { }
     }
 
     //[Enforced]
@@ -138,6 +147,104 @@ public static partial class Test_CommandInfoBuilder
         Assert.Equal("#1", builder.Parameters[1].Name); Assert.Equal("Bond", builder.Parameters[1].Value);
         Assert.False(builder.IsEmpty);
         Assert.False(builder.IsConsistent);
-        try { _ = builder.ToInstance(); Assert.Fail(); } catch (InvalidOperationException) { }
+
+        try { _ = builder.ToInstance(); Assert.Fail(); }
+        catch (InvalidOperationException) { }
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Create_From_Command()
+    {
+        var engine = new FakeEngine() { IgnoreCase = true };
+        var connection = new FakeConnection(engine);
+        var command = new FakeCommand(connection);
+
+        var builder = new Builder(command);
+        Assert.Equal("", builder.ToString());
+        Assert.Empty(builder.Text);
+        Assert.Empty(builder.Parameters);
+        Assert.True(builder.IsEmpty);
+        Assert.True(builder.IsConsistent);
+
+        var source = new Builder(engine, "any {0} {1}", "James", "Bond");
+        command.FakeInfo = new CommandInfo(source);
+
+        builder = new Builder(command);
+        Assert.Equal("any #0 #1 -- [#0='James', #1='Bond']", builder.ToString());
+        Assert.Equal(2, builder.Parameters.Count);
+        Assert.Equal("#0", builder.Parameters[0].Name); Assert.Equal("James", builder.Parameters[0].Value);
+        Assert.Equal("#1", builder.Parameters[1].Name); Assert.Equal("Bond", builder.Parameters[1].Value);
+        Assert.False(builder.IsEmpty);
+        Assert.True(builder.IsConsistent);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Create_From_CommandInfo()
+    {
+        var engine = new FakeEngine() { IgnoreCase = true };
+        var connection = new FakeConnection(engine);
+        var source = new Builder(engine, "any {0} {1}", "James", "Bond");
+        var info = new CommandInfo(source);
+
+        var builder = new Builder(info);
+        Assert.Equal("any #0 #1 -- [#0='James', #1='Bond']", builder.ToString());
+        Assert.Equal(2, builder.Parameters.Count);
+        Assert.Equal("#0", builder.Parameters[0].Name); Assert.Equal("James", builder.Parameters[0].Value);
+        Assert.Equal("#1", builder.Parameters[1].Name); Assert.Equal("Bond", builder.Parameters[1].Value);
+        Assert.False(builder.IsEmpty);
+        Assert.True(builder.IsConsistent);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Create_From_Builder()
+    {
+        var engine = new FakeEngine() { IgnoreCase = true };
+        var connection = new FakeConnection(engine);
+        var source = new Builder(engine, "any {0} {1}", "James", "Bond");
+
+        var builder = new Builder(source);
+        Assert.Equal("any #0 #1 -- [#0='James', #1='Bond']", builder.ToString());
+        Assert.Equal(2, builder.Parameters.Count);
+        Assert.Equal("#0", builder.Parameters[0].Name); Assert.Equal("James", builder.Parameters[0].Value);
+        Assert.Equal("#1", builder.Parameters[1].Name); Assert.Equal("Bond", builder.Parameters[1].Value);
+        Assert.False(builder.IsEmpty);
+        Assert.True(builder.IsConsistent);
+    }
+
+    // ----------------------------------------------------
+
+
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Add_Command()
+    {
+        var engine = new FakeEngine() { IgnoreCase = true };
+        var builder = new Builder(engine, "any {0} {1}", "James", "Bond");
+        Assert.Equal("any #0 #1 -- [#0='James', #1='Bond']", builder.ToString());
+
+        var connection = new FakeConnection(engine);
+        var command = new FakeCommand(connection);
+        //var source = new Builder(engine);
+        //command.FakeInfo = new CommandInfo(source);
+
+        //var done = builder.Add(command);
+        //Assert.False(done);
+
+        var source = new Builder(engine, " other {0} {1}", "UK", 50);
+        Assert.Equal(" other #0 #1 -- [#0='UK', #1='50']", source.ToString());
+        command.FakeInfo = new CommandInfo(source);
+
+        var done = builder.Add(command);
+        Assert.True(done);
+        Assert.Equal("any #0 #1 other #2 #3 -- [#0='James', #1='Bond', #2='UK', #3='50]", builder.ToString());
+        Assert.Equal(3, builder.Parameters.Count);
+        Assert.False(builder.IsEmpty);
+        Assert.True(builder.IsConsistent);
     }
 }

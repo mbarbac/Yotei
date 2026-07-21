@@ -30,12 +30,9 @@ partial class CommandInfo
         /// <param name="engine"></param>
         /// <param name="text"></param>
         /// <param name="values"></param>
-        public Builder(IEngine engine, string text, params object?[]? values) : this(engine)
-        {
-            // Being a builder we accept by exception to initialize in an inconsistent state...
-            var strict = false;
-            Append(strict, text, values);
-        }
+        public Builder(IEngine engine, string text, params object?[]? values)
+            : this(engine)
+            => Add(text, values);
 
         /// <summary>
         /// Initializes a new instance using the contents of the given source, using its default
@@ -48,7 +45,7 @@ partial class CommandInfo
 
             var info = source.GetCommandInfo();
             _Text = new(info.Text);
-            _Parameters = new(Engine, info.Parameters);
+            _Parameters = new(info.Parameters.Engine, info.Parameters);
         }
 
         /// <summary>
@@ -62,7 +59,7 @@ partial class CommandInfo
 
             var info = source.GetCommandInfo(iterable);
             _Text = new(info.Text);
-            _Parameters = new(Engine, info.Parameters);
+            _Parameters = new(info.Parameters.Engine, info.Parameters);
         }
 
         /// <summary>
@@ -74,7 +71,7 @@ partial class CommandInfo
             ArgumentNullException.ThrowIfNull(source);
 
             _Text = new(source.Text);
-            _Parameters = new(Engine, source.Parameters);
+            _Parameters = new(source.Parameters.Engine, source.Parameters);
         }
 
         /// <summary>
@@ -86,7 +83,7 @@ partial class CommandInfo
             ArgumentNullException.ThrowIfNull(source);
 
             _Text = new(source.Text);
-            _Parameters = new(Engine, source.Parameters);
+            _Parameters = new(source.Parameters.Engine, source.Parameters);
         }
 
         /// <summary>
@@ -98,7 +95,7 @@ partial class CommandInfo
             ArgumentNullException.ThrowIfNull(other);
 
             _Text = new(other._Text.ToString());
-            _Parameters = new(Engine, other._Parameters);
+            _Parameters = new(other._Parameters.Engine, other._Parameters);
         }
 
         /// <summary>
@@ -173,7 +170,7 @@ partial class CommandInfo
                 // No unused parameters...
                 foreach (var par in _Parameters)
                 {
-                    index = FindNameSequence(text, 0, par.Name, false, out _);
+                    index = FindNamedSequence(text, 0, par.Name, out _);
                     if (index < 0) return false;
                 }
 
@@ -183,12 +180,12 @@ partial class CommandInfo
 
                 // No invalid '#...' sequences...
                 pos = 0;
-                while (FindNameSequence(text, pos, out var sequence) >= 0)
+                while (FindNamedSequence(text, pos, out var str) >= 0)
                 {
-                    index = _Parameters.IndexOf(sequence!);
+                    index = _Parameters.IndexOf(str!);
                     if (index < 0) return false;
 
-                    pos += sequence!.Length;
+                    pos += str!.Length;
                 }
 
                 // All tests passed, instance in a consistent state...
@@ -208,8 +205,7 @@ partial class CommandInfo
             ArgumentNullException.ThrowIfNull(source);
 
             var info = source.GetCommandInfo();
-            var strict = true;
-            var done = Append(strict, info.Text, info.Parameters);
+            var done = Add(info.Text, info.Parameters);
             return done;
         }
 
@@ -224,8 +220,7 @@ partial class CommandInfo
             ArgumentNullException.ThrowIfNull(source);
 
             var info = source.GetCommandInfo(iterable);
-            var strict = true;
-            var done = Append(strict, info.Text, info.Parameters);
+            var done = Add(info.Text, info.Parameters);
             return done;
         }
 
@@ -238,8 +233,7 @@ partial class CommandInfo
         {
             ArgumentNullException.ThrowIfNull(source);
 
-            var strict = true;
-            var done = Append(strict, source.Text, source.Parameters);
+            var done = Add(source.Text, source.Parameters);
             return done;
         }
 
@@ -252,24 +246,7 @@ partial class CommandInfo
         {
             ArgumentNullException.ThrowIfNull(source);
 
-            var strict = false;
-            var done = Append(strict, source.Text, source.Parameters);
-            return done;
-        }
-
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
-        /// <param name="text"></param>
-        /// <param name="values"></param>
-        /// <returns></returns>
-        public virtual bool Add(string text, params object?[]? values)
-        {
-            ArgumentNullException.ThrowIfNull(text);
-            values ??= [null];
-
-            var strict = true;
-            var done = Append(strict, text, values);
+            var done = Add(source.Text, source.Parameters);
             return done;
         }
 
@@ -301,8 +278,7 @@ partial class CommandInfo
 
             if (values.Length == 0) return false;
 
-            var strict = false;
-            var done = Append(strict, string.Empty, values);
+            var done = Add(string.Empty, values);
             return done;
         }
 
@@ -340,8 +316,7 @@ partial class CommandInfo
 
             // Standard case...
             var old = _Parameters.Clone();
-            var strict = false;
-            var done = Append(strict, string.Empty, values);
+            var done = Add(string.Empty, values);
 
             if (done) // We need to remove the old ones as they have been replaced...
             {
@@ -372,406 +347,137 @@ partial class CommandInfo
         // ------------------------------------------------
 
         /// <summary>
-        /// Appends to this instance the given text, if not null, and the collection of parameters
-        /// obtained from the given range of values. If a parameter name already exists, it is
-        /// changed to prevent name collisions.
-        /// <br/> Strict mode is used when a consistent source text and is enforced. Otherwise, it
-        /// is assumed they may be in an inconsistent state.
+        /// <inheritdoc/>
         /// </summary>
-        bool Append(bool strict, string text, params object?[]? range)
+        /// <param name="text"></param>
+        /// <param name="values"></param>
+        /// <returns></returns>
+        public virtual bool Add(string text, params object?[]? values)
         {
             ArgumentNullException.ThrowIfNull(text);
-            range ??= [null];
+            values ??= [null];
 
-            // Capturing range of values...
-            var items = RangeElement.Capture(range);
-            var changed = false;
-            int pos, index, value;
-            string? bracket;
-
-            // Validations...
-            PreventInvalidRangeValues();
-            PreventInitialDuplicatedNames();
-            PreventInvalidOrdinals();
-
-            // Intercepting ranges with just one special element...
-            if (items.Length == 1)
-            {
-                switch (items[0].Value)
-                {
-                    case IParameterList pars:
-                        if (pars.Count == 1) { items[0] = new RangeElement(pars[0]); break; }
-                        //text = NamesToOrdinals(text, pars, Comparison);
-                        range = [.. pars];
-                        return Append(strict, text, range);
-
-                    case IParameterList.IBuilder pars:
-                        if (pars.Count == 1) { items[0] = new RangeElement(pars[0]); break; }
-                        //text = NamesToOrdinals(text, pars, Comparison);
-                        range = [.. pars];
-                        return Append(strict, text, range);
-                }
-            }
-
-            // Iterating to capture parameters, and to change brackets into sequences...
-            for (int i = 0; i < items.Length; i++)
-            {
-                var item = items[i];
-                IParameter par;
-                string name, xname;
-
-                // Capturing a parameter from the value...
-                switch (item.Value)
-                {
-                    case IParameter temp:
-                        par = Capture(temp, changeDuplicatedName: true);
-                        name = temp.Name;
-                        break;
-
-                    case AnonymousElement temp:
-                        xname = temp.Name;
-                        if (!xname.StartsWith(Prefix, Comparison)) xname = Prefix + xname;
-                        par = new Parameter(xname, temp.Value);
-                        par = Capture(par, changeDuplicatedName: true);
-                        name = temp.Name;
-                        break;
-
-                    default:
-                        _Parameters.AddNew(item.Value, out par);
-                        name = par.Name;
-                        break;
-                }
-
-                // Not strict mode...
-                if (!strict) item.Used = true;
-
-                // Finding by named bracket ('name' may not be 'par.Name')...
-                pos = 0;
-                while ((index = FindNamedBracket(text, pos, name, out bracket, strict: false)) >= 0)
-                {
-                    text = text.Remove(index, bracket!.Length);
-                    text = text.Insert(index, par.Name);
-                    item.Used = true;
-
-                    pos = index + par.Name.Length;
-                }
-
-                // Finding by ordinal bracket...
-                pos = 0;
-                while ((index = FindOrdinalBracket(text, pos, out bracket, out value)) >= 0)
-                {
-                    if (value == i)
-                    {
-                        text = text.Remove(index, bracket!.Length);
-                        text = text.Insert(index, par.Name);
-                        item.Used = true;
-                    }
-                    pos = index + par.Name.Length;
-                }
-            }
-
-            // Finishing...
-            if (text.Length > 0) { _Text.Append(text); changed = true; }
-            if (items.Any(x => x.Used)) changed = true;
-            return changed;
-
-            // --------------------------------------------
-
-            /// <summary>
-            /// Prevents receiving a range with invalid values.
-            /// </summary>
-            void PreventInvalidRangeValues()
-            {
-                foreach (var item in items)
-                {
-                    switch (item.Value)
-                    {
-                        case ICommand:
-                        case ICommandInfo:
-                        case ICommandInfo.IBuilder:
-                            throw new ArgumentException("Element cannot be a command-alike one.")
-                            .WithData(item.Value);
-                    }
-                }
-            }
-
-            /// <summary>
-            /// Prevents receiving a range with duplicated names.
-            /// </summary>
-            void PreventInitialDuplicatedNames()
-            {
-                List<string> names = [];
-
-                foreach (var item in items)
-                {
-                    string? name = item.Value switch
-                    {
-                        IParameter temp => temp.Name,
-                        AnonymousElement temp => temp.Name,
-                        _ => null
-                    };
-                    if (name is not null)
-                    {
-                        // Normalizing...
-                        if (!name.StartsWith(Prefix, Comparison)) name = Prefix + name;
-
-                        // Trying to find...
-                        var temp = names.Find(x => string.Compare(x, name, Comparison) == 0);
-                        if (temp != null) throw new DuplicateException(
-                            "Range of values contains duplicated names.")
-                            .WithData(name, "name")
-                            .WithData(items);
-
-                        // Iterating...
-                        names.Add(name);
-                    }
-                }
-            }
-
-            /// <summary>
-            /// Prevents invalid ordinals to appear in the given text.
-            /// </summary>
-            void PreventInvalidOrdinals()
-            {
-                pos = 0;
-                while ((index = FindOrdinalBracket(text, pos, out bracket, out value)) >= 0)
-                {
-                    if (value >= items.Length) throw new ArgumentException(
-                        "Ordinal bracket value bigger than the number of values.")
-                        .WithData(value)
-                        .WithData(items);
-
-                    pos = index + bracket!.Length;
-                }
-            }
-
-            /// <summary>
-            /// Validates that there are no remaining unused values.
-            /// </summary>
-            /*void ValidateNoUnusedValues()
-            {
-                if (items.Any(x => !x.Used)) throw new ArgumentException(
-                    "There are unused values in the given range.")
-                    .WithData(text)
-                    .WithData(range);
-            }*/
-
-            /// <summary>
-            /// Validates that there are no remaining dangling '{...}' brackets.
-            /// </summary>
-            /*void ValidateNoDanglingBrackets()
-            {
-                if (FindBracket(text, 0, out _) >= 0) throw new ArgumentException(
-                    "There are unused '{...}' brackets in the given text.")
-                    .WithData(text)
-                    .WithData(range);
-            }*/
+            throw null;
         }
 
         // ------------------------------------------------
 
         /// <summary>
-        /// Replaces the named '{name}' specifications in the given text with their corresponding
-        /// ordinal '{n}' ones, where 'n' is the ordinal of the named specification in the given
-        /// collection of parameters.
+        /// Tries to returns the ordinal value carried by the given source, looking into '{...}'
+        /// brackets and '#...' named sequences if needed.
         /// </summary>
-        /*static string NamesToOrdinals(
-            string text, IEnumerable<IParameter> pars, StringComparison comparison)
+        bool ToOrdinal(string str, out int value)
         {
-            text.ThrowWhenNull();
-            pars.ThrowWhenNull();
-
-            var finder = new IsolatedFinder();
-            var i = 0;
-            foreach (var par in pars)
+            if (str.StartsWith('{') && str.EndsWith('}'))
             {
-                var bracket = $"{{{i}}}"; i++;
-                var pos = 0;
-
-                while ((pos = finder.Find(text, pos, par.Name, comparison)) >= 0)
-                {
-                    text = text.Remove(pos, par.Name.Length);
-                    text = text.Insert(pos, bracket);
-                    pos += bracket.Length;
-                }
-            }
-            return text;
-        }*/
-
-        // ------------------------------------------------
-
-        /// <summary>
-        /// Validates that the name of the given parameter starts with the engine's prefix, and
-        /// if not, return a new instance that starts with it.
-        /// </summary>
-        IParameter WithValidatedName(IParameter par)
-        {
-            return par.Name.StartsWith(Prefix, Comparison)
-                ? par
-                : par.WithName(Prefix + par.Name);
-        }
-
-        /// <summary>
-        /// Captures the given parameter into this instance. If its name already exists in this
-        /// instance, either it is changed to a new one to prevent collisions, if requested, or
-        /// an exception is thrown.
-        /// </summary>
-        IParameter Capture(IParameter par, bool changeDuplicatedName)
-        {
-            par = WithValidatedName(par);
-
-            if (_Parameters.Contains(par.Name))
-            {
-                if (changeDuplicatedName) _Parameters.AddNew(par.Value, out par);
-                else throw new DuplicateException(
-                    "Name of parameter is a duplicated.")
-                    .WithData(par)
-                    .WithData(this);
-            }
-            else
-            {
-                _Parameters.Add(par);
+                str = str.Unwrap('{', '}', trim: true)!;
+                return TryParse(str, out value);
             }
 
-            return par;
+            if (str.StartsWith(Prefix, Comparison)) str = str[Prefix.Length..];
+            return TryParse(str, out value);
+
+            bool TryParse(string str, out int value)
+            {
+                if (str.Length == 0) { value = 0; return false; }
+                foreach (var c in str) if (!char.IsAsciiDigit(c)) { value = 0; return false; }
+                return int.TryParse(str, out value);
+            }
         }
 
         // ------------------------------------------------
 
         /// <summary>
-        /// Returns the index of the first '{...}' bracket in the given source text, starting
-        /// from the given initial index, or -1 if any is found. If found, returns the bracket
-        /// in the out argument, even if it is an empty one (only the '{}' bracket).
+        /// Returns the index of the first ocurrence of a bracket (as in '{...}') starting at the
+        /// given initial index, or -1 if any is found. When found, the bracket is returned in the
+        /// out argument.
         /// </summary>
-        static int FindBracket(string text, int ini, out string? bracket)
+        static int FindBracket(string text, int ini, out string? str)
         {
-            bracket = null;
+            str = null;
             if (ini >= text.Length) return -1;
 
             var pos = text.IndexOf('{', ini); if (pos < 0) return -1;
             var end = text.IndexOf('}', pos); if (end < 0) return -1;
 
-            bracket = text.Substring(pos, end - pos + 1);
+            str = text.Substring(pos, end - pos + 1);
             return pos;
         }
 
         /// <summary>
-        /// Returns the index of the next ordinal bracket in the given source text, starting
-        /// at the given initial index, or -1 if any is found. If found, then the bracket and
-        /// its ordinal value are returned in the out arguments.
+        /// Returns the index of the first ocurrence of a '{value}' bracket starting at the given
+        /// initial index, or -1 if any is found. When found, the bracket is returned in the out
+        /// argument.
         /// </summary>
-        static int FindOrdinalBracket(string text, int ini, out string? bracket, out int value)
+        int FindNamedBracket(string text, int ini, string name, out string? str)
         {
-            bracket = null;
+            var xtra = false;
+            var xname = name;
+            if (!name.StartsWith(Prefix, Comparison)) { xname = Prefix + name; xtra = true; }
+
+            int index;
+            while ((index = FindBracket(text, ini, out str)) >= 0)
+            {
+                str = str.Unwrap('{', '}', trim: false);
+                if (string.Compare(name, str, Comparison) == 0) return index;
+
+                if (xtra &&
+                    string.Compare(xname, str, Comparison) == 0) return index;
+
+                ini = index + str!.Length;
+            }
+
+            str = null;
+            return -1;
+        }
+
+        /// <summary>
+        /// Returns the index of the first ocurrence of an ordinal sequence (as in '{n}'), starting
+        /// at the given initial index, or -1 if any is found. If found, the sequence and its value
+        /// are returned in the out arguments.
+        /// </summary>
+        int FindOrdinalBracket(string text, int ini, out string? str, out int value)
+        {
+            int index;
+            while ((index = FindBracket(text, ini, out str)) >= 0)
+            {
+                if (ToOrdinal(str!, out value)) return index;
+                ini = index + str!.Length;
+            }
+
+            str = null;
             value = 0;
-            if (ini >= text.Length) return -1;
-
-            int pos = ini;
-            while ((pos = FindBracket(text, pos, out bracket)) >= 0)
-            {
-                var span = bracket.AsSpan(1, bracket!.Length - 2);
-                var valid = true;
-                foreach (var c in span) if (!char.IsAsciiDigit(c)) { valid = false; break; }
-
-                if (valid && int.TryParse(span, out value)) return pos;
-                pos += bracket.Length;
-            }
-
             return -1;
         }
 
         /// <summary>
-        /// Returns the index of the next ocurrence of an ordinal '{value} bracket in the given
-        /// source text, starting at the given initial index, or -1 if any is found.
+        /// Returns the index of the first ocurrence of the ordinal '{n}' bracket starting at the
+        /// given initial index, or -1 if any is found. If found, the sequence is returned in the
+        /// out argument.
         /// </summary>
-        /*int FindOrdinalBracket(string text, int ini, int value)
+        int FindOrdinalBracket(string text, int ini, int value, out string? str)
         {
-            if (ini < text.Length)
+            int index;
+            while ((index = FindBracket(text, ini, out str)) >= 0)
             {
-                var bracket = $"{{{value}}}";
-
-                var pos = text.IndexOf(bracket, ini);
-                if (pos >= 0) return pos;
-            }
-            return -1;
-        }*/
-
-        /// <summary>
-        /// Returns the index of the next named bracket in the given source text, starting at
-        /// the given initial index, or -1 if any is found. If found, the bracket is returned
-        /// in the out argument.
-        /// </summary>
-        /*int FindNamedBracket(string text, int ini, out string? bracket)
-        {
-            bracket = null;
-            if (ini >= text.Length) return -1;
-
-            int pos = ini;
-            while ((pos = FindBracket(text, pos, out bracket)) >= 0)
-            {
-                var span = bracket.AsSpan(1, bracket!.Length - 2);
-                var valid = false;
-                foreach (var c in span) if (!char.IsAsciiDigit(c)) { valid = true; break; }
-
-                if (valid) return pos;
-                pos += bracket.Length;
+                if (ToOrdinal(str!, out var temp) && temp == value) return index;
+                ini = index + str!.Length;
             }
 
-            return -1;
-        }*/
-
-        /// <summary>
-        /// Returns the index of the next ocurrence of a named '{name} bracket in the given source
-        /// text, starting at the given initial index, or -1 if any is found. If found, the bracket
-        /// is returned in the out argument.
-        /// <br/> If strict mode is requested, then the name must match the bracket's contents.
-        /// Otherwise, such contents are tested with and without the engine's prefix.
-        /// </summary>
-        int FindNamedBracket(string text, int ini, string name, out string? bracket, bool strict)
-        {
-            if (ini < text.Length && name.Length > 0)
-            {
-                bracket = $"{{{name}}}";
-                var pos = text.IndexOf(bracket, ini, Comparison);
-                if (pos >= 0) return pos;
-
-                if (!strict)
-                {
-                    if (!name.StartsWith(Prefix, Comparison)) // Add the engine's prefix
-                    {
-                        bracket = $"{{{Prefix + name}}}";
-                        
-                        pos = text.IndexOf(bracket, ini, Comparison);
-                        if (pos >= 0) return pos;
-                    }
-                    else // Remove the engine's prefix...
-                    {
-                        name = name.Remove(0, Prefix.Length);
-
-                        if (name.Length > 0 &&
-                            !name.All(x => char.IsAsciiDigit(x)))
-                        {
-                            bracket = $"{{{name}}}";
-                            pos = text.IndexOf(bracket, ini, Comparison);
-                            if (pos >= 0) return pos;
-                        }
-                    }
-                }
-            }
-
-            bracket = null;
+            str = null;
             return -1;
         }
 
+        // ------------------------------------------------
+
         /// <summary>
-        /// Returns the index of the first ocurrence of a named sequence, as in '#...' (where '#'
-        /// is the engine prefix), in the given source text starting from the given initial index,
-        /// or -1 if any. If found, returns that sequence in the out argument, even if it is an
-        /// empty one (only the engine's prefix).
+        /// Returns the index of the first ocurrence of a named sequence (as in '#...', where '#'
+        /// is the engine's prefix), starting at the given initial index, or -1 if any is found.
+        /// When found, that sequence is returned in the out argument.
         /// </summary>
-        int FindNameSequence(string text, int ini, out string? sequence)
+        int FindNamedSequence(string text, int ini, out string? str)
         {
-            sequence = null;
+            str = null;
             if (ini >= text.Length) return -1;
 
             var comparer = char.CharComparer(Comparison);
@@ -788,118 +494,74 @@ partial class CommandInfo
 
             if (end >= 0) // Found an embedded sequence...
             {
-                sequence = text.Substring(pos, end + Prefix.Length);
+                str = text.Substring(pos, end + Prefix.Length);
                 return pos;
             }
             else // Sequence spans to the end of the text...
             {
-                sequence = text[pos..];
+                str = text[pos..];
                 return pos;
             }
         }
 
         /// <summary>
-        /// Returns the index of the first ocurrence of a name sequence '#...' using the given
-        /// parameter name and the engine's prefix, starting from the given initial index, or
-        /// -1 if any is found. If relax mode is requeste, the name is also tested adding at
-        /// its head the engine's prefix. If found, the sequence is returned in the out argument.
+        /// Returns the index of the first ocurrence of the named '#name' sequence starting at the
+        /// given initial index, or -1 if any is found. If found, that sequence is returned in the
+        /// out argument.
         /// </summary>
-        int FindNameSequence(string text, int ini, string name, bool relax, out string? sequence)
+        int FindNamedSequence(string text, int ini, string name, out string? str)
         {
-            sequence = null;
-            if (ini >= text.Length) return -1;
+            if (!name.StartsWith(Prefix, Comparison)) name = name[Prefix.Length..];
+            if (name.Length == 0) { str = null; return -1; }
 
-            var finder = new IsolatedFinder();
-            int pos;
+            int index;
+            while ((index = FindNamedSequence(text, ini, out str)) >= 0)
+            {
+                if (string.Compare(name, str, Comparison) == 0) return index;
+                ini = index + str!.Length;
+            }
 
-            if (name.StartsWith(Prefix, Comparison))
+            str = null;
+            return -1;
+        }
+
+        /// <summary>
+        /// Returns the index of the first ocurrence of an ordinal sequence (as in '#n'), starting
+        /// at the given initial index, or -1 if any is found. If found, the sequence and its value
+        /// are returned in the out arguments.
+        /// </summary>
+        int FindOrdinalSequence(string text, int ini, out string? str, out int value)
+        {
+            int index;
+            while ((index = FindNamedSequence(text, ini, out str)) >= 0)
             {
-                pos = finder.Find(text, ini, name);
-                if (pos >= 0) { sequence = name; return pos; }
+                if (ToOrdinal(str!, out value)) return index;
+                ini = index + str!.Length;
             }
-            else if (relax)
+
+            str = null;
+            value = 0;
+            return -1;
+        }
+
+        /// <summary>
+        /// Returns the index of the first ocurrence of the ordinal '#n' sequence starting at the
+        /// given initial index, or -1 if any is found. If found, the sequence is returned in the
+        /// out argument.
+        /// </summary>/returns>
+        int FindOrdinalSequence(string text, int ini, int value, out string? str)
+        {
+            int index;
+            while ((index = FindNamedSequence(text, ini, out str)) >= 0)
             {
-                name = Prefix + name;
-                pos = finder.Find(text, ini, name);
-                if (pos >= 0) { sequence = name; return pos; }
+                if (ToOrdinal(str!, out var temp) && temp == value) return index;
+                ini = index + str!.Length;
             }
+
+            str = null;
             return -1;
         }
 
         // ------------------------------------------------
-
-        /// <summary>
-        /// Represents an arbitrary element in the range of values.
-        /// </summary>
-        class RangeElement(object? value, bool used = false)
-        {
-            public object? Value = value;
-            public bool Used = used;
-            public override string ToString()
-            {
-                var str = Value switch
-                {
-                    IParameter item => $"Parameter: {item}",
-                    AnonymousElement item => $"Anonymous: {item}",
-                    _ => $"Value: {Value.Sketch()}",
-                };
-                if (Used) str += " (Used)";
-                return str;
-            }
-
-            /// <summary>
-            /// Captures the given range of values into a collection of normalized elements.
-            /// </summary>
-            public static RangeElement[] Capture(object?[]? range)
-            {
-                range ??= [null];
-                if (range.Length == 0) return [];
-
-                var items = new RangeElement[range.Length];
-                for (int i = 0; i < range.Length; i++)
-                {
-                    var temp = AnonymousElement.TryCapture(range[i]);
-                    items[i] = new(temp, false);
-                }
-                return items;
-            }
-        }
-
-        // ------------------------------------------------
-
-        /// <summary>
-        /// Represents an anonymous element in the range of values, as in '{ Name = Value }'
-        /// </summary>
-        class AnonymousElement(string name, object? value)
-        {
-            public string Name = name;
-            public object? Value = value;
-            public override string ToString() => $"{Name}:'{Value}'";
-
-            /// <summary>
-            /// Tries to capture the given value into an anonymous item. If not possible, returns
-            /// the original value itself.
-            /// </summary>
-            public static object? TryCapture(object? value)
-            {
-                if (value is not null)
-                {
-                    var type = value.GetType();
-                    if (type.IsAnonymous)
-                    {
-                        var members = type.GetProperties();
-                        if (members.Length == 0) throw new ArgumentException("Anonymous element with no properties.").WithData(value);
-                        if (members.Length > 1) throw new ArgumentException("Anonymous element with too many properties.").WithData(value);
-
-                        var member = members[0];
-                        var name = member.Name;
-                        var temp = member.GetValue(value);
-
-                        value = new AnonymousElement(name, temp);
-                    }
-                }
-                return value;
-            }
-        }
     }
 }

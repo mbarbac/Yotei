@@ -13,12 +13,12 @@ public partial interface ICommand
     /// </summary>
     IConnection Connection { get; }
 
-    // ----------------------------------------------------
-
     /// <summary>
     /// Determines whether this instance is in a valid runnable state, or not.
     /// </summary>
     bool IsValid { get; }
+
+    // ----------------------------------------------------
 
     /// <summary>
     /// Obtains the information needed to run this command, using its default iterable mode.

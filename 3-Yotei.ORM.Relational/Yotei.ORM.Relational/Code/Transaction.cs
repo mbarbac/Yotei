@@ -47,10 +47,8 @@ public class Transaction : ORM.Code.Transaction, ITransaction
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    protected override void Start()
+    protected override void OnStart()
     {
-        base.Start();
-
         var conn = Connection.DbConnection!;
         DbTransaction = conn.BeginTransaction(IsolationLevel);
     }
@@ -60,10 +58,8 @@ public class Transaction : ORM.Code.Transaction, ITransaction
     /// </summary>
     /// <param name="token"></param>
     /// <returns></returns>
-    protected override async ValueTask StartAsync(CancellationToken token)
+    protected override async ValueTask OnStartAsync(CancellationToken token)
     {
-        await base.StartAsync(token).ConfigureAwait(false);
-
         var conn = Connection.DbConnection!;
         DbTransaction = await conn.BeginTransactionAsync(IsolationLevel, token).ConfigureAwait(false);
     }

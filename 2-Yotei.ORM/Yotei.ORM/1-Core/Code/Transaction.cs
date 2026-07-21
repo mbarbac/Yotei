@@ -71,6 +71,8 @@ public abstract class Transaction : DisposableClass, ITransaction
             Connection.Open();
             HasOpenedConnection = true;
         }
+
+        OnStart();
     }
     void ITransaction.Start() => Start();
 
@@ -91,6 +93,8 @@ public abstract class Transaction : DisposableClass, ITransaction
             await Connection.OpenAsync(token).ConfigureAwait(false);
             HasOpenedConnection = true;
         }
+
+        await OnStartAsync(token);
     }
     ValueTask ITransaction.StartAsync(CancellationToken token) => StartAsync(token);
 
@@ -164,6 +168,17 @@ public abstract class Transaction : DisposableClass, ITransaction
     }
 
     // ----------------------------------------------------
+
+    /// <summary>
+    /// Invoked to start the underlying physical transaction.
+    /// </summary>
+    protected abstract void OnStart();
+
+    /// <summary>
+    /// Invoked to start the underlying physical transaction.
+    /// </summary>
+    /// <param name="token"></param>
+    protected abstract ValueTask OnStartAsync(CancellationToken token);
 
     /// <summary>
     /// Invoked to commit the underlying physical transaction
