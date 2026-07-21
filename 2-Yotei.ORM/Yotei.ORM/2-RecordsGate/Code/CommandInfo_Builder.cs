@@ -351,13 +351,249 @@ partial class CommandInfo
         /// </summary>
         /// <param name="text"></param>
         /// <param name="values"></param>
-        /// <returns></returns>
         public virtual bool Add(string text, params object?[]? values)
         {
             ArgumentNullException.ThrowIfNull(text);
             values ??= [null];
 
-            throw null;
+            // Capturing the range of values...
+            var items = RangeItem.CaptureValues(values);
+            var done = false;
+            int pos, index, ordinal;
+            string? str, name;
+
+            // Validations...
+            PreventInvalidValues(items);
+            PreventDuplicatedNames(items);
+            PreventInvalidOrdinals(text, items);
+
+            // Intercepting ranges with just one special element...
+            if (items.Length == 1)
+            {
+                switch (items[0].Payload)
+                {
+                    case IParameterList pars:
+                        values = [.. pars];
+                        items = RangeItem.CaptureValues(values);
+                        break;
+
+                    case IParameterList.IBuilder pars:
+                        values = [.. pars];
+                        items = RangeItem.CaptureValues(values);
+                        break;
+                }
+            }
+
+            // Intercepting collisions...
+            for (int i = 0; i < items.Length; i++)
+            {
+                var need = items[i].Payload switch
+                {
+                    IParameter temp => IsCollision(i, temp.Name),
+                    AnonymousElement temp => IsCollision(i, temp.Name),
+                    _ => false
+                };
+                if (need)
+                {
+                    name = _Parameters.NextName();
+                    string oldname = "";
+                    
+                    switch (items[i].Payload)
+                    {
+                        case IParameter temp:
+                            oldname = temp.Name;
+                            items[i] = new(new Parameter(name, temp.Value));
+                            break;
+
+                        case AnonymousElement temp:
+                            oldname = temp.Name;
+                            items[i] = new(new Parameter(name, temp.Value));
+                            break;
+                    }
+
+                    pos = 0;
+                    while ((index = FindNamedBracket(text, pos, oldname, out str)) >= 0)
+                    {
+                        text = text.Remove(index, str!.Length);
+                        text = text.Insert(index, name);
+                        pos = index + name.Length;
+                    }
+
+                    pos = 0;
+                    while ((index = FindNamedSequence(text, pos, oldname, out str)) >= 0)
+                    {
+                        text = text.Remove(index, str!.Length);
+                        text = text.Insert(index, name);
+                        pos = index + name.Length;
+                    }
+                }
+            }
+
+            // Iterating through captured items...
+            for (int i = 0; i < items.Length; i++)
+            {
+                var item = items[i];
+                IParameter par;
+
+                // Capturing into a parameter...
+                switch (item.Payload)
+                {
+                    case IParameter temp:
+                        name = temp.Name;
+                        par = Capture(temp);
+                        break;
+
+                    case AnonymousElement temp:
+                        name = temp.Name;
+                        par = new Parameter(temp.Name, temp.Value);
+                        par = Capture(par);
+                        break;
+
+                    default:
+                        name = string.Empty;
+                        _Parameters.AddNew(item.Payload, out par);
+                        break;
+                }
+
+                pos = 0;
+                while ((index = FindNamedBracket(text, pos, name, out str)) >= 0)
+                {
+                    text = text.Remove(index, str!.Length);
+                    text = text.Insert(index, par.Name);
+                    pos = index + par.Name.Length;
+                }
+
+                pos = 0;
+                while ((index = FindNamedSequence(text, pos, name, out str)) >= 0)
+                {
+                    text = text.Remove(index, str!.Length);
+                    text = text.Insert(index, par.Name);
+                    pos = index + par.Name.Length;
+                }
+
+                pos = 0;
+                while ((index = FindOrdinalBracket(text, pos, out str, out ordinal)) >= 0)
+                {
+                    if (ordinal == i)
+                    {
+                        text = text.Remove(index, str!.Length);
+                        text = text.Insert(index, par.Name);
+                    }
+                    pos = index + par.Name.Length;
+                }
+
+                pos = 0;
+                while ((index = FindOrdinalSequence(text, pos, out str, out ordinal)) >= 0)
+                {
+                    if (ordinal == i)
+                    {
+                        text = text.Remove(index, str!.Length);
+                        text = text.Insert(index, par.Name);
+                    }
+                    pos = index + par.Name.Length;
+                }
+            }
+
+            // Finishing...
+            if (items.Length > 0) done = true;
+            if (text.Length > 0) { _Text.Append(text); done = true; }
+            return done;
+        }
+
+        /// <summary>
+        /// Prevents invalid initial values.
+        /// </summary>
+        static void PreventInvalidValues(RangeItem[] items)
+        {
+            foreach (var item in items)
+            {
+                switch (item.Payload)
+                {
+                    case ICommand:
+                    case ICommandInfo:
+                    case ICommandInfo.IBuilder:
+                        throw new ArgumentException("Element cannot be a command-alike one.")
+                        .WithData(item.Payload);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Prevents initial ranges with duplicated names.
+        /// </summary>
+        /// <param name="items"></param>
+        void PreventDuplicatedNames(RangeItem[] items)
+        {
+            List<string> names = [];
+
+            foreach (var item in items)
+            {
+                string? name = item.Payload switch
+                {
+                    IParameter temp => temp.Name,
+                    AnonymousElement temp => temp.Name,
+                    _ => null
+                };
+                if (name is not null)
+                {
+                    if (!name.StartsWith(Prefix, Comparison)) name = Prefix + name;
+
+                    var temp = names.Find(x => string.Compare(x, name, Comparison) == 0);
+                    if (temp != null) throw new DuplicateException(
+                        "Range of values contains duplicated names.")
+                        .WithData(name, "name")
+                        .WithData(items);
+
+                    names.Add(name);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Prevents invalid initial ordinals.
+        /// </summary>
+        void PreventInvalidOrdinals(string text, RangeItem[] items)
+        {
+            int index, pos = 0;
+
+            while ((index = FindOrdinalBracket(text, pos, out var str, out var value)) >= 0)
+            {
+                if (value >= items.Length) throw new ArgumentException(
+                    "Ordinal bracket value bigger than the number of values.")
+                    .WithData(value)
+                    .WithData(items);
+
+                pos = index + str!.Length;
+            }
+        }
+
+        // ------------------------------------------------
+
+        /// <summary>
+        /// Guarantees that the name of the given parameter starts with the engine's prefix, or
+        /// creates and returns a new one that does it.
+        /// </summary>
+        IParameter WithPrefixName(IParameter par)
+        {
+            return par.Name.StartsWith(Prefix, Comparison)
+                ? par
+                : par.WithName(Prefix + par.Name);
+        }
+
+        /// <summary>
+        /// Captures the given parameter into this instance. If its name already exists, then it
+        /// is changed to prevent name collisions.
+        /// </summary>
+        /// <param name="par"></param>
+        /// <returns></returns>
+        IParameter Capture(IParameter par)
+        {
+            par = WithPrefixName(par);
+
+            if (_Parameters.Contains(par.Name)) _Parameters.AddNew(par.Value, out par);
+            else _Parameters.Add(par);
+
+            return par;
         }
 
         // ------------------------------------------------
@@ -377,12 +613,40 @@ partial class CommandInfo
             if (str.StartsWith(Prefix, Comparison)) str = str[Prefix.Length..];
             return TryParse(str, out value);
 
-            bool TryParse(string str, out int value)
+            static bool TryParse(string str, out int value)
             {
                 if (str.Length == 0) { value = 0; return false; }
                 foreach (var c in str) if (!char.IsAsciiDigit(c)) { value = 0; return false; }
                 return int.TryParse(str, out value);
             }
+        }
+
+        /// <summary>
+        /// Determines if either the given ordinal or the given name represent a collision with
+        /// the contents already captured. If the ordinal if less than cero or the name is null
+        /// then they are ignored.
+        /// </summary>
+        bool IsCollision(int ordinal, string name)
+        {
+            var text = Text;
+            var xname = $"{Prefix}{ordinal}";
+
+            if (ordinal >= 0)
+            {
+                if (FindOrdinalBracket(text, 0, ordinal, out _) >= 0) return true;
+                if (FindOrdinalSequence(text, 0, ordinal, out _) >= 0) return true;
+                foreach (var par in _Parameters)
+                    if (string.Compare(par.Name, xname, Comparison) == 0) return true;
+            }
+            if (name is not null)
+            {
+                if (FindNamedBracket(text, 0, name, out _) >= 0) return true;
+                if (FindNamedSequence(text, 0, name, out _) >= 0) return true;
+                foreach (var par in _Parameters)
+                    if (string.Compare(par.Name, name, Comparison) == 0) return true;
+            }
+
+            return false; // No collisions detected...
         }
 
         // ------------------------------------------------
@@ -391,6 +655,7 @@ partial class CommandInfo
         /// Returns the index of the first ocurrence of a bracket (as in '{...}') starting at the
         /// given initial index, or -1 if any is found. When found, the bracket is returned in the
         /// out argument.
+        /// <br/>- This method accepts empty '{}' brackets to signal potential errors.
         /// </summary>
         static int FindBracket(string text, int ini, out string? str)
         {
@@ -411,6 +676,9 @@ partial class CommandInfo
         /// </summary>
         int FindNamedBracket(string text, int ini, string name, out string? str)
         {
+            str = null;
+            if (ini >= text.Length) return -1;
+
             var xtra = false;
             var xname = name;
             if (!name.StartsWith(Prefix, Comparison)) { xname = Prefix + name; xtra = true; }
@@ -438,6 +706,10 @@ partial class CommandInfo
         /// </summary>
         int FindOrdinalBracket(string text, int ini, out string? str, out int value)
         {
+            str = null;
+            value = 0;
+            if (ini >= text.Length) return -1;
+
             int index;
             while ((index = FindBracket(text, ini, out str)) >= 0)
             {
@@ -457,6 +729,9 @@ partial class CommandInfo
         /// </summary>
         int FindOrdinalBracket(string text, int ini, int value, out string? str)
         {
+            str = null;
+            if (ini >= text.Length) return -1;
+
             int index;
             while ((index = FindBracket(text, ini, out str)) >= 0)
             {
@@ -474,6 +749,7 @@ partial class CommandInfo
         /// Returns the index of the first ocurrence of a named sequence (as in '#...', where '#'
         /// is the engine's prefix), starting at the given initial index, or -1 if any is found.
         /// When found, that sequence is returned in the out argument.
+        /// <br/>- This method accepts empty '#' sequences to signal potential errors.
         /// </summary>
         int FindNamedSequence(string text, int ini, out string? str)
         {
@@ -511,6 +787,9 @@ partial class CommandInfo
         /// </summary>
         int FindNamedSequence(string text, int ini, string name, out string? str)
         {
+            str = null;
+            if (ini >= text.Length) return -1;
+
             if (!name.StartsWith(Prefix, Comparison)) name = name[Prefix.Length..];
             if (name.Length == 0) { str = null; return -1; }
 
@@ -532,6 +811,10 @@ partial class CommandInfo
         /// </summary>
         int FindOrdinalSequence(string text, int ini, out string? str, out int value)
         {
+            str = null;
+            value = 0;
+            if (ini >= text.Length) return -1;
+
             int index;
             while ((index = FindNamedSequence(text, ini, out str)) >= 0)
             {
@@ -551,6 +834,9 @@ partial class CommandInfo
         /// </summary>/returns>
         int FindOrdinalSequence(string text, int ini, int value, out string? str)
         {
+            str = null;
+            if (ini >= text.Length) return -1;
+
             int index;
             while ((index = FindNamedSequence(text, ini, out str)) >= 0)
             {
@@ -563,5 +849,91 @@ partial class CommandInfo
         }
 
         // ------------------------------------------------
+
+        /// <summary>
+        /// Represents an item in the range of captured arguments.
+        /// </summary>
+        class RangeItem(object? payload, bool used = false)
+        {
+            public object? Payload = payload;
+            public bool Used = used;
+
+            // The string representation of this instance.
+            public override string ToString()
+            {
+                var str = Payload switch
+                {
+                    IParameter payload => $"Parameter: {payload}",
+                    AnonymousElement payload => $"Anonymous: {payload}",
+                    _ => $"Payload: {Payload.Sketch()}"
+                };
+                if (Used) str += " (Used)";
+                return str;
+            }
+
+            /// <summary>
+            /// Captures the given collection of values into a collection of range items.
+            /// </summary>
+            public static RangeItem[] CaptureValues(object?[]? values)
+            {
+                values ??= [null];
+                if (values.Length == 0) return [];
+
+                var items = new RangeItem[values.Length];
+                for (int i = 0; i < values.Length; i++)
+                {
+                    var value = values[i];
+
+                    items[i] = AnonymousElement.TryCapture(value, out var element)
+                        ? new RangeItem(element)
+                        : new RangeItem(value);
+                }
+                return items;
+            }
+        }
+
+        // ------------------------------------------------
+
+        /// <summary>
+        /// Represent a payload in the form of an anonymous element, as in '{ Name = Value }'
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        class AnonymousElement(string name, object? value)
+        {
+            public string Name = name;
+            public object? Value = value;
+
+            // The string representation of this instance.
+            public override string ToString() => $"{Name}:'{Value}'";
+
+            /// <summary>
+            /// Tries to capture the given source as an anonymous element. Returns true and the
+            /// captured element in the out argument if such was possible, or false otherwise.
+            /// </summary>
+            public static bool TryCapture(object? source, out AnonymousElement? element)
+            {
+                if (source is not null)
+                {
+                    var type = source.GetType();
+                    if (type.IsAnonymous)
+                    {
+                        var members = type.GetProperties();
+                        if (members.Length == 0) throw new ArgumentException("Anonymous element with no properties.").WithData(source);
+                        if (members.Length > 1) throw new ArgumentException("Anonymous element with too many properties.").WithData(source);
+
+                        var member = members[0];
+                        var name = member.Name;
+                        var value = member.GetValue(source);
+
+                        element = new AnonymousElement(name, value);
+                        return true;
+                    }
+                }
+
+                element = null;
+                return false;
+            }
+        }
     }
 }

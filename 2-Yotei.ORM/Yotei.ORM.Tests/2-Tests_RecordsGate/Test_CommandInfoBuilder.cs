@@ -186,7 +186,6 @@ public static partial class Test_CommandInfoBuilder
     public static void Test_Create_From_CommandInfo()
     {
         var engine = new FakeEngine() { IgnoreCase = true };
-        var connection = new FakeConnection(engine);
         var source = new Builder(engine, "any {0} {1}", "James", "Bond");
         var info = new CommandInfo(source);
 
@@ -204,7 +203,6 @@ public static partial class Test_CommandInfoBuilder
     public static void Test_Create_From_Builder()
     {
         var engine = new FakeEngine() { IgnoreCase = true };
-        var connection = new FakeConnection(engine);
         var source = new Builder(engine, "any {0} {1}", "James", "Bond");
 
         var builder = new Builder(source);
