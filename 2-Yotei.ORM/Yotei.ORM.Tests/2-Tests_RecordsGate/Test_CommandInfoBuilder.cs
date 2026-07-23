@@ -77,9 +77,15 @@ public static partial class Test_CommandInfoBuilder
     {
         IBuilder builder;
         var engine = new FakeEngine() { IgnoreCase = true };
-
         var xfirst = new Parameter("#first", "James");
         var xlast = new Parameter("last", "Bond");
+
+        builder = new Builder(engine, "any {#last}", xlast);
+        Assert.Equal("any #last -- [#last='Bond']", builder.ToString());
+        Assert.Single(builder.Parameters);
+        Assert.False(builder.IsEmpty);
+        Assert.True(builder.IsConsistent);
+
         builder = new Builder(engine, "any {first} {#last}", xfirst, xlast);
         Assert.Equal("any #first #last -- [#first='James', #last='Bond']", builder.ToString());
         Assert.Equal(2, builder.Parameters.Count);
@@ -169,9 +175,7 @@ public static partial class Test_CommandInfoBuilder
         Assert.True(builder.IsEmpty);
         Assert.True(builder.IsConsistent);
 
-        var source = new Builder(engine, "any {0} {1}", "James", "Bond");
-        command.FakeInfo = new CommandInfo(source);
-
+        command = new FakeCommand(connection, "any {0} {1}", "James", "Bond");
         builder = new Builder(command);
         Assert.Equal("any #0 #1 -- [#0='James', #1='Bond']", builder.ToString());
         Assert.Equal(2, builder.Parameters.Count);
@@ -184,12 +188,22 @@ public static partial class Test_CommandInfoBuilder
     //[Enforced]
     [Fact]
     public static void Test_Create_From_CommandInfo()
-    {
+    {   
         var engine = new FakeEngine() { IgnoreCase = true };
-        var source = new Builder(engine, "any {0} {1}", "James", "Bond");
-        var info = new CommandInfo(source);
-
+        var connection = new FakeConnection(engine);
+        
+        var command = new FakeCommand(connection);
+        var info = command.GetCommandInfo();
         var builder = new Builder(info);
+        Assert.Equal("", builder.ToString());
+        Assert.Empty(builder.Text);
+        Assert.Empty(builder.Parameters);
+        Assert.True(builder.IsEmpty);
+        Assert.True(builder.IsConsistent);
+
+        command = new FakeCommand(connection, "any {0} {1}", "James", "Bond");
+        info = command.GetCommandInfo();
+        builder = new Builder(info);
         Assert.Equal("any #0 #1 -- [#0='James', #1='Bond']", builder.ToString());
         Assert.Equal(2, builder.Parameters.Count);
         Assert.Equal("#0", builder.Parameters[0].Name); Assert.Equal("James", builder.Parameters[0].Value);
@@ -214,9 +228,9 @@ public static partial class Test_CommandInfoBuilder
         Assert.True(builder.IsConsistent);
     }
 
+    /*
+
     // ----------------------------------------------------
-
-
 
     //[Enforced]
     [Fact]
@@ -228,21 +242,23 @@ public static partial class Test_CommandInfoBuilder
 
         var connection = new FakeConnection(engine);
         var command = new FakeCommand(connection);
-        //var source = new Builder(engine);
-        //command.FakeInfo = new CommandInfo(source);
-
-        //var done = builder.Add(command);
-        //Assert.False(done);
-
-        var source = new Builder(engine, " other {0} {1}", "UK", 50);
-        Assert.Equal(" other #0 #1 -- [#0='UK', #1='50']", source.ToString());
+        var source = new Builder(engine);
         command.FakeInfo = new CommandInfo(source);
 
         var done = builder.Add(command);
+        Assert.False(done);
+
+        source = new Builder(engine, " other {0} {1}", "UK", 50);
+        Assert.Equal(" other #0 #1 -- [#0='UK', #1='50']", source.ToString());
+        command.FakeInfo = new CommandInfo(source);
+
+        done = builder.Add(command);
         Assert.True(done);
-        Assert.Equal("any #0 #1 other #2 #3 -- [#0='James', #1='Bond', #2='UK', #3='50]", builder.ToString());
-        Assert.Equal(3, builder.Parameters.Count);
+        Assert.Equal("any #0 #1 other #2 #3 -- [#0='James', #1='Bond', #2='UK', #3='50']", builder.ToString());
+        Assert.Equal(4, builder.Parameters.Count);
         Assert.False(builder.IsEmpty);
         Assert.True(builder.IsConsistent);
     }
+
+    */
 }

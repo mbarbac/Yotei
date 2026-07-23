@@ -91,31 +91,30 @@ partial interface ICommandInfo
         // ------------------------------------------------
 
         /// <summary>
-        /// Adds to this instance the given text without validating its consistency.
+        /// Inconditionally adds to this instance the given text.
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
         bool AddText(string text);
 
         /// <summary>
-        /// Adds to this instance the parameters obtained from the given range of values, without
-        /// validating their consistency.
+        /// Inconditionally adds to this instance the parameters obtained from the given range of
+        /// values.
         /// </summary>
         /// <param name="values"></param>
         /// <returns></returns>
         bool AddValues(params object?[]? values);
 
         /// <summary>
-        /// Replaces the text of this instance by the new given one, without validating its
-        /// consistency.
+        /// Inconditionally replaces the text of this instance by the new given one.
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
         bool ReplaceText(string text);
 
         /// <summary>
-        /// Replaces the collection of parameters of this instance with the new one obtained from
-        /// the given range of values, without validating its consistency.
+        /// Inconditionally replaces the collection of parameters of this instance with the new
+        /// one obtained from the given range of values.
         /// </summary>
         /// <param name="values"></param>
         /// <returns></returns>

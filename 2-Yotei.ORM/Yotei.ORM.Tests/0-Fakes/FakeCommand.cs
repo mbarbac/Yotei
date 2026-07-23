@@ -8,6 +8,13 @@ public partial class FakeCommand : Command
         : base(connection)
         => FakeInfo = new(connection.Engine);
 
+    public FakeCommand(
+        IConnection connection, string text, params object?[]? values) : base(connection)
+    {
+        var info = new CommandInfo(connection.Engine, text, values);
+        FakeInfo = info;
+    }
+
     protected FakeCommand(FakeCommand other)
         : base(other)
         => FakeInfo = other.FakeInfo;
