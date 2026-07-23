@@ -598,15 +598,21 @@ partial class CommandInfo
                 // No collisions...
                 var xname = name;
                 if (!xname.StartsWith(Prefix, Comparison)) xname = Prefix + name;
-                if (_Parameters.IndexOf(xname) > 0) return;
+                if (_Parameters.IndexOf(xname) < 0) return;
+
+                // Generating a new element...
+                var temp = NextOrdinal();
+                var par = new Parameter(Prefix + temp.ToString(), value);
+                var item = new Item(par);
+                items[ordinal] = item;
 
                 // Processing '#...' sequences...
                 pos = 0;
-                while ((index = FindBracket(text, pos, name, out str)) >= 0)
+                while ((index = FindSequence(text, pos, name, out str)) >= 0)
                 {
                     text = text.Remove(index, str!.Length);
-                    text = text.Insert(index, name);
-                    pos = index + name.Length;
+                    text = text.Insert(index, par.Name);
+                    pos = index + par.Name.Length;
                 }
 
                 // Processing '{...}' brackets...
@@ -614,14 +620,34 @@ partial class CommandInfo
                 while ((index = FindBracket(text, pos, name, out str)) >= 0)
                 {
                     text = text.Remove(index, str!.Length);
-                    text = text.Insert(index, name);
-                    pos = index + name.Length;
+                    text = text.Insert(index, par.Name);
+                    pos = index + par.Name.Length;
+                }
+            }
+
+            // Gets the next available ordinal...
+            int NextOrdinal()
+            {
+                int value = _Parameters.Count;
+
+                foreach (var par in _Parameters)
+                {
+                    var done = ParseOrdinal(par.Name, out var candidate);
+                    if (done) value = Math.Max(value, ++candidate);
+                }
+                foreach (var item in items)
+                {
+                    int candidate = 0;
+                    var done = item.Payload switch
+                    {
+                        IParameter par => ParseOrdinal(par.Name, out candidate),
+                        AnonymousElement par => ParseOrdinal(par.Name, out candidate),
+                        _ => false
+                    };
+                    if (done) value = Math.Max(value, ++candidate);
                 }
 
-                // Adjusting the element itself...
-                var par = new Parameter(xname, value);
-                var item = new Item(par);
-                items[ordinal] = item;
+                return value;
             }
         }
 

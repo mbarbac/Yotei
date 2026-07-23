@@ -228,8 +228,6 @@ public static partial class Test_CommandInfoBuilder
         Assert.True(builder.IsConsistent);
     }
 
-    /*
-
     // ----------------------------------------------------
 
     //[Enforced]
@@ -237,20 +235,18 @@ public static partial class Test_CommandInfoBuilder
     public static void Test_Add_Command()
     {
         var engine = new FakeEngine() { IgnoreCase = true };
+        var connection = new FakeConnection(engine);
+
         var builder = new Builder(engine, "any {0} {1}", "James", "Bond");
         Assert.Equal("any #0 #1 -- [#0='James', #1='Bond']", builder.ToString());
-
-        var connection = new FakeConnection(engine);
         var command = new FakeCommand(connection);
-        var source = new Builder(engine);
-        command.FakeInfo = new CommandInfo(source);
 
         var done = builder.Add(command);
         Assert.False(done);
 
-        source = new Builder(engine, " other {0} {1}", "UK", 50);
-        Assert.Equal(" other #0 #1 -- [#0='UK', #1='50']", source.ToString());
-        command.FakeInfo = new CommandInfo(source);
+        builder = new Builder(engine, "any {0} {1}", "James", "Bond");
+        command = new FakeCommand(connection, " other {0} {1}", "UK", 50);
+        Assert.Equal(" other #0 #1 -- [#0='UK', #1='50']", command.ToString());
 
         done = builder.Add(command);
         Assert.True(done);
@@ -258,7 +254,290 @@ public static partial class Test_CommandInfoBuilder
         Assert.Equal(4, builder.Parameters.Count);
         Assert.False(builder.IsEmpty);
         Assert.True(builder.IsConsistent);
+
+        builder = new Builder(engine, "any {0} {1}", "James", "Bond");
+        var xctry = new Parameter("#country", "UK");
+        var xage = new Parameter("age", 50);
+        command = new FakeCommand(connection, " other {country} {#age}", xctry, xage);
+        Assert.Equal(" other #country #age -- [#country='UK', #age='50']", command.ToString());
+
+        done = builder.Add(command);
+        Assert.True(done);
+        Assert.Equal("any #0 #1 other #country #age -- [#0='James', #1='Bond', #country='UK', #age='50']", builder.ToString());
+        Assert.Equal(4, builder.Parameters.Count);
+        Assert.False(builder.IsEmpty);
+        Assert.True(builder.IsConsistent);
+
+        builder = new Builder(engine, "any {0} {1}", "James", "Bond");
+        var yctry = new { Country = "UK" };
+        var yage = new { Age = 50 };
+        command = new FakeCommand(connection, " other {country} {#age}", yctry, yage);
+        Assert.Equal(" other #Country #Age -- [#Country='UK', #Age='50']", command.ToString());
+
+        done = builder.Add(command);
+        Assert.True(done);
+        Assert.Equal("any #0 #1 other #Country #Age -- [#0='James', #1='Bond', #Country='UK', #Age='50']", builder.ToString());
+        Assert.Equal(4, builder.Parameters.Count);
+        Assert.False(builder.IsEmpty);
+        Assert.True(builder.IsConsistent);
     }
 
-    */
+    //[Enforced]
+    [Fact]
+    public static void Test_Add_CommandInfo()
+    {
+        var engine = new FakeEngine() { IgnoreCase = true };
+        var builder = new Builder(engine, "any {0} {1}", "James", "Bond");
+        Assert.Equal("any #0 #1 -- [#0='James', #1='Bond']", builder.ToString());
+
+        var connection = new FakeConnection(engine);
+        var command = new FakeCommand(connection);
+        var info = command.GetCommandInfo();
+
+        var done = builder.Add(info);
+        Assert.False(done);
+
+        builder = new Builder(engine, "any {0} {1}", "James", "Bond");
+        command = new FakeCommand(connection, " other {0} {1}", "UK", 50);
+        Assert.Equal(" other #0 #1 -- [#0='UK', #1='50']", command.ToString());
+        info = command.GetCommandInfo();
+
+        done = builder.Add(info);
+        Assert.True(done);
+        Assert.Equal("any #0 #1 other #2 #3 -- [#0='James', #1='Bond', #2='UK', #3='50']", builder.ToString());
+        Assert.Equal(4, builder.Parameters.Count);
+        Assert.False(builder.IsEmpty);
+        Assert.True(builder.IsConsistent);
+
+        builder = new Builder(engine, "any {0} {1}", "James", "Bond");
+        var xctry = new Parameter("#country", "UK");
+        var xage = new Parameter("age", 50);
+        command = new FakeCommand(connection, " other {country} {#age}", xctry, xage);
+        Assert.Equal(" other #country #age -- [#country='UK', #age='50']", command.ToString());
+        info = command.GetCommandInfo();
+
+        done = builder.Add(info);
+        Assert.True(done);
+        Assert.Equal("any #0 #1 other #country #age -- [#0='James', #1='Bond', #country='UK', #age='50']", builder.ToString());
+        Assert.Equal(4, builder.Parameters.Count);
+        Assert.False(builder.IsEmpty);
+        Assert.True(builder.IsConsistent);
+
+        builder = new Builder(engine, "any {0} {1}", "James", "Bond");
+        var yctry = new { Country = "UK" };
+        var yage = new { Age = 50 };
+        command = new FakeCommand(connection, " other {country} {#age}", yctry, yage);
+        Assert.Equal(" other #Country #Age -- [#Country='UK', #Age='50']", command.ToString());
+        info = command.GetCommandInfo();
+
+        done = builder.Add(info);
+        Assert.True(done);
+        Assert.Equal("any #0 #1 other #Country #Age -- [#0='James', #1='Bond', #Country='UK', #Age='50']", builder.ToString());
+        Assert.Equal(4, builder.Parameters.Count);
+        Assert.False(builder.IsEmpty);
+        Assert.True(builder.IsConsistent);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Add_CommandInfoBuilder()
+    {
+        var engine = new FakeEngine() { IgnoreCase = true };
+        var builder = new Builder(engine, "any {0} {1}", "James", "Bond");
+        Assert.Equal("any #0 #1 -- [#0='James', #1='Bond']", builder.ToString());
+
+        var other = new Builder(engine);
+        var done = builder.Add(other);
+        Assert.False(done);
+
+        builder = new Builder(engine, "any {0} {1}", "James", "Bond");
+        other = new Builder(engine, " other {0} {1}", "UK", 50);
+        Assert.Equal(" other #0 #1 -- [#0='UK', #1='50']", other.ToString());
+
+        done = builder.Add(other);
+        Assert.True(done);
+        Assert.Equal("any #0 #1 other #2 #3 -- [#0='James', #1='Bond', #2='UK', #3='50']", builder.ToString());
+        Assert.Equal(4, builder.Parameters.Count);
+        Assert.False(builder.IsEmpty);
+        Assert.True(builder.IsConsistent);
+
+        builder = new Builder(engine, "any {0} {1}", "James", "Bond");
+        var xctry = new Parameter("#country", "UK");
+        var xage = new Parameter("age", 50);
+        other = new Builder(engine, " other {country} {#age}", xctry, xage);
+        Assert.Equal(" other #country #age -- [#country='UK', #age='50']", other.ToString());
+
+        done = builder.Add(other);
+        Assert.True(done);
+        Assert.Equal(
+            "any #0 #1 other #country #age -- [#0='James', #1='Bond', #country='UK', #age='50']", 
+            builder.ToString());
+        Assert.Equal(4, builder.Parameters.Count);
+        Assert.False(builder.IsEmpty);
+        Assert.True(builder.IsConsistent);
+
+        builder = new Builder(engine, "any {0} {1}", "James", "Bond");
+        var yctry = new { Country = "UK" };
+        var yage = new { Age = 50 };
+        other = new Builder(engine, " other {Country} {#Age}", yctry, yage);
+        Assert.Equal(" other #Country #Age -- [#Country='UK', #Age='50']", other.ToString());
+
+        done = builder.Add(other);
+        Assert.True(done);
+        Assert.Equal(
+            "any #0 #1 other #Country #Age -- [#0='James', #1='Bond', #Country='UK', #Age='50']",
+            builder.ToString());
+        Assert.Equal(4, builder.Parameters.Count);
+        Assert.False(builder.IsEmpty);
+        Assert.True(builder.IsConsistent);
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Add_Source()
+    {
+        var engine = new FakeEngine() { IgnoreCase = true };
+        var builder = new Builder(engine, "any {0} {1}", "James", "Bond");
+        Assert.Equal("any #0 #1 -- [#0='James', #1='Bond']", builder.ToString());
+
+        var done = builder.Add(" other {0} {1}", "UK", 50);
+        Assert.True(done);
+        Assert.Equal(
+            "any #0 #1 other #2 #3 -- [#0='James', #1='Bond', #2='UK', #3='50']", 
+            builder.ToString());
+        Assert.Equal(4, builder.Parameters.Count);
+        Assert.False(builder.IsEmpty);
+        Assert.True(builder.IsConsistent);
+
+        builder = new Builder(engine, "any {0} {1}", "James", "Bond");
+        var xctry = new Parameter("#country", "UK");
+        var xage = new Parameter("age", 50);
+        done = builder.Add(" other {country} {#age}", xctry, xage);
+        Assert.True(done);
+        Assert.Equal(
+            "any #0 #1 other #country #age -- [#0='James', #1='Bond', #country='UK', #age='50']",
+            builder.ToString());
+        Assert.Equal(4, builder.Parameters.Count);
+        Assert.False(builder.IsEmpty);
+        Assert.True(builder.IsConsistent);
+
+        builder = new Builder(engine, "any {0} {1}", "James", "Bond");
+        var yctry = new { Country = "UK" };
+        var yage = new { Age = 50 };
+        done = builder.Add(" other {Country} {#Age}", yctry, yage);
+        Assert.True(done);
+        Assert.Equal(
+            "any #0 #1 other #Country #Age -- [#0='James', #1='Bond', #Country='UK', #Age='50']",
+            builder.ToString());
+        Assert.Equal(4, builder.Parameters.Count);
+        Assert.False(builder.IsEmpty);
+        Assert.True(builder.IsConsistent);
+
+        builder = new Builder(engine, "any {country}", xctry);
+        done = builder.Add(" {#country}", xctry);
+        Assert.Equal("any #country #1 -- [#country='UK', #1='UK']", builder.ToString());
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Add_Text()
+    {
+        var engine = new FakeEngine() { IgnoreCase = true };
+        var connection = new FakeConnection(engine);
+
+        var builder = new Builder(engine, "any {0} {1}", "James", "Bond");
+        Assert.Equal("any #0 #1 -- [#0='James', #1='Bond']", builder.ToString());
+
+        try { builder.AddText(null!); Assert.Fail(); }
+        catch (ArgumentNullException) { }
+
+        var done = builder.AddText("");
+        Assert.False(done);
+
+        done = builder.AddText(" other #0 #foo");
+        Assert.True(done);
+        Assert.Equal("any #0 #1 other #0 #foo -- [#0='James', #1='Bond']", builder.ToString());
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Add_Values()
+    {
+        var engine = new FakeEngine() { IgnoreCase = true };
+        var connection = new FakeConnection(engine);
+
+        var builder = new Builder(engine, "any {0} {1}", "James", "Bond");
+        Assert.Equal("any #0 #1 -- [#0='James', #1='Bond']", builder.ToString());
+
+        var done = builder.AddValues();
+        Assert.False(done);
+        Assert.Equal("any #0 #1 -- [#0='James', #1='Bond']", builder.ToString());
+
+        done = builder.AddValues([null, new Parameter("Country", "UK"), new { Age = 50 }]);
+        Assert.True(done);
+        Assert.Equal(
+            "any #0 #1 -- [#0='James', #1='Bond', #2=NULL, #Country='UK', #Age='50']", 
+            builder.ToString());
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Replace_Text()
+    {
+        var engine = new FakeEngine() { IgnoreCase = true };
+        var connection = new FakeConnection(engine);
+
+        var builder = new Builder(engine, "any {0} {1}", "James", "Bond");
+        Assert.Equal("any #0 #1 -- [#0='James', #1='Bond']", builder.ToString());
+
+        try { builder.ReplaceText(null!); Assert.Fail(); }
+        catch (ArgumentNullException) { }
+
+        var done = builder.ReplaceText("");
+        Assert.True(done);
+        Assert.Equal("[#0='James', #1='Bond']", builder.ToString());
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Replace_Values()
+    {
+        var engine = new FakeEngine() { IgnoreCase = true };
+        var connection = new FakeConnection(engine);
+
+        var builder = new Builder(engine);
+        var done = builder.ReplaceValues();
+        Assert.False(done);
+
+        builder = new Builder(engine, "any {0} {1}", "James", "Bond");
+        done = builder.ReplaceValues();
+        Assert.True(done);
+        Assert.Equal("any #0 #1", builder.ToString());
+
+        builder = new Builder(engine, "any {0} {1}", "James", "Bond");
+        done = builder.ReplaceValues([null, new Parameter("Country", "UK"), new { Age = 50 }]);
+        Assert.True(done);
+        Assert.Equal("any #0 #1 -- [#2=NULL, #Country='UK', #Age='50']", builder.ToString());
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Clear()
+    {
+        var engine = new FakeEngine() { IgnoreCase = true };
+        var connection = new FakeConnection(engine);
+
+        var builder = new Builder(engine);
+        var done = builder.Clear();
+        Assert.False(done);
+
+        builder = new Builder(engine, "any {0} {1}", "James", "Bond");
+        done = builder.Clear();
+        Assert.True(done);
+        Assert.Empty(builder.ToString());
+    }
 }
