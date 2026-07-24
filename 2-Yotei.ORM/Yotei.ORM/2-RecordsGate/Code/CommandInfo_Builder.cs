@@ -326,16 +326,22 @@ partial class CommandInfo
         {
             values ??= [null];
 
-            // Shortcut when value is an empty range...
+            // Shortcut trivial case...
             if (values.Length == 0)
             {
-                if (_Parameters.Count == 0) return false; // Trivial case...
-
+                if (_Parameters.Count == 0) return false;
                 _Parameters.Clear();
                 return true;
             }
 
-            // Standard case, we use 'Append' to capture the values without collisions...
+            // Standard...
+            _Parameters.Clear();
+            var adjustSources = false;
+            var done = Append(adjustSources, string.Empty, values);
+            return done;
+
+#if OLD_CODE
+            // Standard case...
             var old = _Parameters.Clone();
             var adjustSources = true;
             var done = Append(adjustSources, string.Empty, values);
@@ -349,8 +355,8 @@ partial class CommandInfo
                 _Parameters.Clear();
                 _Parameters.AddRange(old);
             }
-
             return done;
+#endif
         }
 
         /// <summary>

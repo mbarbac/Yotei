@@ -437,6 +437,7 @@ public static partial class Test_CommandInfoBuilder
 
         builder = new Builder(engine, "any {country}", xctry);
         done = builder.Add(" {#country}", xctry);
+        Assert.True(done);
         Assert.Equal("any #country #1 -- [#country='UK', #1='UK']", builder.ToString());
     }
 
@@ -447,8 +448,6 @@ public static partial class Test_CommandInfoBuilder
     public static void Test_Add_Text()
     {
         var engine = new FakeEngine() { IgnoreCase = true };
-        var connection = new FakeConnection(engine);
-
         var builder = new Builder(engine, "any {0} {1}", "James", "Bond");
         Assert.Equal("any #0 #1 -- [#0='James', #1='Bond']", builder.ToString());
 
@@ -468,8 +467,6 @@ public static partial class Test_CommandInfoBuilder
     public static void Test_Add_Values()
     {
         var engine = new FakeEngine() { IgnoreCase = true };
-        var connection = new FakeConnection(engine);
-
         var builder = new Builder(engine, "any {0} {1}", "James", "Bond");
         Assert.Equal("any #0 #1 -- [#0='James', #1='Bond']", builder.ToString());
 
@@ -489,8 +486,6 @@ public static partial class Test_CommandInfoBuilder
     public static void Test_Replace_Text()
     {
         var engine = new FakeEngine() { IgnoreCase = true };
-        var connection = new FakeConnection(engine);
-
         var builder = new Builder(engine, "any {0} {1}", "James", "Bond");
         Assert.Equal("any #0 #1 -- [#0='James', #1='Bond']", builder.ToString());
 
@@ -507,8 +502,6 @@ public static partial class Test_CommandInfoBuilder
     public static void Test_Replace_Values()
     {
         var engine = new FakeEngine() { IgnoreCase = true };
-        var connection = new FakeConnection(engine);
-
         var builder = new Builder(engine);
         var done = builder.ReplaceValues();
         Assert.False(done);
@@ -521,7 +514,7 @@ public static partial class Test_CommandInfoBuilder
         builder = new Builder(engine, "any {0} {1}", "James", "Bond");
         done = builder.ReplaceValues([null, new Parameter("Country", "UK"), new { Age = 50 }]);
         Assert.True(done);
-        Assert.Equal("any #0 #1 -- [#2=NULL, #Country='UK', #Age='50']", builder.ToString());
+        Assert.Equal("any #0 #1 -- [#0=NULL, #Country='UK', #Age='50']", builder.ToString());
     }
 
     //[Enforced]
@@ -529,7 +522,6 @@ public static partial class Test_CommandInfoBuilder
     public static void Test_Clear()
     {
         var engine = new FakeEngine() { IgnoreCase = true };
-        var connection = new FakeConnection(engine);
 
         var builder = new Builder(engine);
         var done = builder.Clear();
@@ -539,5 +531,38 @@ public static partial class Test_CommandInfoBuilder
         done = builder.Clear();
         Assert.True(done);
         Assert.Empty(builder.ToString());
+    }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_Example()
+    {
+        var engine = new FakeEngine() { IgnoreCase = true };
+        var builder = new Builder(engine, "any {first} {last}", new { First = "James" }, new { Last = "Bond" });
+        Assert.Equal("any #First #Last -- [#First='James', #Last='Bond']", builder.ToString());
+
+        var done = builder.Add(" other {first}", new Parameter("First", "Mary"));
+        Assert.True(done);
+        Assert.True(builder.IsConsistent);
+        Assert.Equal(
+            "any #First #Last other #2 -- [#First='James', #Last='Bond', #2='Mary']",
+            builder.ToString());
+
+        done = builder.ReplaceText("none");
+        Assert.True(done);
+        Assert.False(builder.IsConsistent);
+        Assert.Equal(
+            "none -- [#First='James', #Last='Bond', #2='Mary']",
+            builder.ToString());
+
+        done = builder.ReplaceValues([null, null]);
+        Assert.False(builder.IsConsistent);
+        Assert.Equal("none -- [#0=NULL, #1=NULL]", builder.ToString());
+
+        done = builder.ReplaceValues();
+        Assert.True(builder.IsConsistent);
+        Assert.Equal("none", builder.ToString());
     }
 }
