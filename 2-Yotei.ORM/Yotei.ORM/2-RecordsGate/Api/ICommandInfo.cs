@@ -39,6 +39,7 @@ public partial interface ICommandInfo
     /// <summary>
     /// Returns a copy of this instance where the contents of the given source command, using its
     /// default iterable mode, have been added to it.
+    /// <br/> This method fails it it renders an inconsistent state.
     /// </summary>
     /// <param name="source"></param>
     /// <returns></returns>
@@ -47,6 +48,7 @@ public partial interface ICommandInfo
     /// <summary>
     /// Returns a copy of this instance where the contents of the given source command, using the
     /// requested iterable mode, have been added to it.
+    /// <br/> This method fails it it renders an inconsistent state.
     /// </summary>
     /// <param name="source"></param>
     /// <param name="iterable"></param>
@@ -56,6 +58,7 @@ public partial interface ICommandInfo
     /// <summary>
     /// Returns a copy of this instance where the contents of the given source have been added to
     /// it.
+    /// <br/> This method fails it it renders an inconsistent state.
     /// </summary>
     /// <param name="source"></param>
     /// <returns></returns>
@@ -64,6 +67,7 @@ public partial interface ICommandInfo
     /// <summary>
     /// Returns a copy of this instance where the contents of the given source have been added to
     /// it.
+    /// <br/> This method fails it it renders an inconsistent state.
     /// </summary>
     /// <param name="source"></param>
     /// <returns></returns>
@@ -74,6 +78,7 @@ public partial interface ICommandInfo
     /// given range of values have been added to it. If used, the parameters shall be encoded in
     /// the given text using either a positional '{n}' specification, or a '{name}' named one. The
     /// given text and values combination must represent a consistent state.
+    /// <br/> This method fails it it renders an inconsistent state.
     /// </summary>
     /// <param name="text"></param>
     /// <param name="values"></param>
@@ -83,8 +88,8 @@ public partial interface ICommandInfo
     // ------------------------------------------------
 
     /// <summary>
-    /// Returns a copy of this instance where the given text, without validating its consistency,
-    /// has been added to it.
+    /// Returns a copy of this instance where the given text has been added to the original one.
+    /// <br/> This method fails it it renders an inconsistent state.
     /// </summary>
     /// <param name="text"></param>
     /// <returns></returns>
@@ -92,7 +97,8 @@ public partial interface ICommandInfo
 
     /// <summary>
     /// Returns a copy of this instance where the parameters obtained from the given range of
-    /// values, without validating their consistency, have been added to it.
+    /// values have been added to it.
+    /// <br/> This method fails it it renders an inconsistent state.
     /// </summary>
     /// <param name="values"></param>
     /// <returns></returns>
@@ -100,7 +106,8 @@ public partial interface ICommandInfo
 
     /// <summary>
     /// Returns a copy of this instance where the original text has been replaced by the given
-    /// one, without validating its consistency.
+    /// one.
+    /// <br/> This method fails it it renders an inconsistent state.
     /// </summary>
     /// <param name="text"></param>
     /// <returns></returns>
@@ -108,8 +115,8 @@ public partial interface ICommandInfo
 
     /// <summary>
     /// Returns a copy of this instance where the original collection of parameters has been
-    /// replaced by the one obtained from the given range of values, without validating its
-    /// consistency.
+    /// replaced by the one obtained from the given range of values.
+    /// <br/> This method fails it it renders an inconsistent state.
     /// </summary>
     /// <param name="values"></param>
     /// <returns></returns>
@@ -117,6 +124,7 @@ public partial interface ICommandInfo
 
     /// <summary>
     /// Returns a copy of this instance where all the original contents have been cleared.
+    /// <br/> This method fails it it renders an inconsistent state.
     /// </summary>
     /// <returns></returns>
     ICommandInfo Clear();

@@ -1,4 +1,6 @@
-﻿namespace Yotei.ORM.Records.Code;
+﻿using System.Runtime.ExceptionServices;
+
+namespace Yotei.ORM.Records.Code;
 
 // ========================================================
 /// <summary>
@@ -7,6 +9,7 @@
 [Cloneable(ReturnType = typeof(ICommandInfo))]
 public partial class CommandInfo : ICommandInfo
 {
+    // We must guarantee this field is always in a consistent state before using it.
     readonly Builder Items;
 
     /// <summary>
@@ -24,8 +27,14 @@ public partial class CommandInfo : ICommandInfo
     /// <param name="engine"></param>
     /// <param name="text"></param>
     /// <param name="values"></param>
-    public CommandInfo(
-        IEngine engine, string text, params object?[]? values) => Items = new(engine, text, values);
+    public CommandInfo(IEngine engine, string text, params object?[]? values)
+    {
+        Items = new(engine, text, values);
+
+        if (!Items.IsConsistent) throw new InvalidOperationException(
+            "This instance is in an inconsistent state.")
+            .WithData(this);
+    }
 
     /// <summary>
     /// Initializes a new instance using the contents of the given source, using its default
@@ -53,26 +62,31 @@ public partial class CommandInfo : ICommandInfo
     /// <param name="source"></param>
     public CommandInfo(ICommandInfo.IBuilder source)
     {
-        ArgumentNullException.ThrowIfNull(source);
-
-        if (!source.IsConsistent) throw new InvalidOperationException(
-            "The given builder is in an inconsistent state.")
-            .WithData(source);
-
         Items = new(source);
+
+        if (!Items.IsConsistent) throw new InvalidOperationException(
+            "This instance is in an inconsistent state.")
+            .WithData(this);
     }
 
     /// <summary>
     /// Copy constructor.
     /// </summary>
     /// <param name="other"></param>
-    protected CommandInfo(CommandInfo other) => Items = new(other);
+    protected CommandInfo(CommandInfo other)
+    {
+        Items = new(other);
+
+        if (!Items.IsConsistent) throw new InvalidOperationException(
+            "This instance is in an inconsistent state.")
+            .WithData(this);
+    }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => Items.ToString();
+    public override string ToString() => Items.ToString()!;
 
     /// <summary>
     /// <inheritdoc/>

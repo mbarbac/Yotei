@@ -68,7 +68,7 @@ public static partial class Test_CommandInfoBuilder
         Assert.False(builder.IsConsistent);
 
         try { _ = new Builder(engine, "any {999}", "James"); Assert.Fail(); }
-        catch (ArgumentException) { }
+        catch (InvalidOperationException) { }
     }
 
     //[Enforced]
@@ -144,7 +144,7 @@ public static partial class Test_CommandInfoBuilder
         try { _ = builder.ToInstance(); Assert.Fail(); } catch (InvalidOperationException) { }
 
         try { _ = new Builder(engine, "any {0}"); Assert.Fail(); }
-        catch (ArgumentException) { }
+        catch (InvalidOperationException) { }
 
         builder = new Builder(engine, "any", "James", "Bond");
         Assert.Equal("any -- [#0='James', #1='Bond']", builder.ToString());

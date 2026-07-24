@@ -160,7 +160,7 @@ partial class CommandInfo
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        public bool IsConsistent
+        public virtual bool IsConsistent
         {
             get
             {
@@ -174,7 +174,9 @@ partial class CommandInfo
                 foreach (var par in _Parameters)
                 {
                     index = FindSequence(text, 0, par.Name, out _);
-                    if (index < 0) return false;
+                    if (index >= 0) continue;
+
+                    return false;
                 }
 
                 // No remaing brackets...
@@ -539,7 +541,7 @@ partial class CommandInfo
 
             while ((index = FindOrdinalBracket(text, pos, out var str, out var value)) >= 0)
             {
-                if (value >= items.Length) throw new ArgumentException(
+                if (value >= items.Length) throw new InvalidOperationException(
                     "Ordinal bracket value bigger than the number of values.")
                     .WithData(value)
                     .WithData(items);
@@ -555,7 +557,7 @@ partial class CommandInfo
         /// Otherwise, returns the original one.
         /// <br/> This method assumes the range contains just one item.
         /// </summary>
-        Item[] InterceptUniqueSpecialValue(Item[] items)
+        static Item[] InterceptUniqueSpecialValue(Item[] items)
         {
             object?[]? values;
             switch (items[0].Payload) // We know the items collection contains just one item...
