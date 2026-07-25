@@ -21,6 +21,7 @@ public abstract partial class Command : ICommand
     {
         ArgumentNullException.ThrowIfNull(other);
         Connection = other.Connection;
+        Locale = other.Locale;
     }
 
     /// <summary>
