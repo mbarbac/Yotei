@@ -1,0 +1,4 @@
+En Locale:
+- Si hago que la clase sea 'sealed', saltan errores en el WithGenerator.
+- Parece que los métodos se declaran como virtual.
+- Depurar.

@@ -14,6 +14,13 @@ public partial interface ICommand
     IConnection Connection { get; }
 
     /// <summary>
+    /// Gets or sets the culture-sensitive locale to use with this command.
+    /// <br/> If the value of this property is not explicitly set, then it defaults to the current
+    /// culture at the time it was obtained for the first time.
+    /// </summary>
+    Locale Locale { get; set; }
+
+    /// <summary>
     /// Determines whether this instance is in a valid runnable state, or not.
     /// </summary>
     bool IsValid { get; }

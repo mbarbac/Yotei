@@ -76,13 +76,13 @@ public partial interface IConnection : IAsyncDisposableEx
     ITransaction? Transaction { get; internal set; }
 
     /// <summary>
-    /// Starts the active database transaction associated with this instance.
+    /// Starts a database transaction for this instance, and sets it as the active one.
     /// </summary>
     /// <returns></returns>
     ITransaction StartTransaction();
 
     /// <summary>
-    /// Starts the active database transaction associated with this instance.
+    /// Starts a database transaction for this instance, and sets it as the active one.
     /// </summary>
     /// <param name="token"></param>
     /// <returns></returns>

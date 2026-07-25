@@ -39,6 +39,15 @@ public abstract partial class Command : ICommand
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
+    public Locale Locale
+    {
+        get => field ??= new Locale();
+        set => field = value.ThrowWhenNull();
+    }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
     public abstract bool IsValid { get; }
 
     // ----------------------------------------------------
