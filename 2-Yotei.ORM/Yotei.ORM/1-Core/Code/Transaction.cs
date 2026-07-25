@@ -56,10 +56,19 @@ public abstract class Transaction : DisposableClass, ITransaction
     // ----------------------------------------------------
 
     /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public bool IsActive { get; private set; }
+
+    /// <summary>
     /// <inheritdoc cref="ITransaction.Start"/>
     /// </summary>
-    protected virtual void Start()
+    public void Start()
     {
+        if (IsActive) throw new InvalidOperationException(
+            "This transaction is already active.")
+            .WithData(this);
+
         if (Connection.Transaction != null &&
             !ReferenceEquals(Connection.Transaction, this)) throw new InvalidOperationException(
                 "The connection is already associated with other transaction.")
@@ -73,6 +82,7 @@ public abstract class Transaction : DisposableClass, ITransaction
         }
 
         OnStart();
+        IsActive = true;
     }
     void ITransaction.Start() => Start();
 
@@ -80,8 +90,12 @@ public abstract class Transaction : DisposableClass, ITransaction
     /// <inheritdoc cref="ITransaction.StartAsync(CancellationToken)"/>
     /// </summary>
     /// <param name="token"></param>
-    protected virtual async ValueTask StartAsync(CancellationToken token)
+    public async ValueTask StartAsync(CancellationToken token)
     {
+        if (IsActive) throw new InvalidOperationException(
+            "This transaction is already active.")
+            .WithData(this);
+
         if (Connection.Transaction != null &&
             !ReferenceEquals(Connection.Transaction, this)) throw new InvalidOperationException(
                 "The connection is already associated with other transaction.")
@@ -95,6 +109,7 @@ public abstract class Transaction : DisposableClass, ITransaction
         }
 
         await OnStartAsync(token);
+        IsActive = true;
     }
     ValueTask ITransaction.StartAsync(CancellationToken token) => StartAsync(token);
 
@@ -108,7 +123,12 @@ public abstract class Transaction : DisposableClass, ITransaction
         ThrowIfDisposed();
         ThrowOnDisposing();
 
+        if (!IsActive) throw new InvalidOperationException(
+            "This transaction is not active.")
+            .WithData(this);
+
         OnCommit();
+        IsActive = false;
 
         if (ReferenceEquals(this, Connection.Transaction)) Connection.Transaction = null;
         if (HasOpenedConnection) { Connection.Close(); HasOpenedConnection = false; }
@@ -123,7 +143,12 @@ public abstract class Transaction : DisposableClass, ITransaction
         ThrowIfDisposed();
         ThrowOnDisposing();
 
+        if (!IsActive) throw new InvalidOperationException(
+            "This transaction is not active.")
+            .WithData(this);
+
         await OnCommitAsync(token).ConfigureAwait(false);
+        IsActive = false;
 
         if (ReferenceEquals(this, Connection.Transaction)) Connection.Transaction = null;
         if (HasOpenedConnection)
@@ -140,7 +165,8 @@ public abstract class Transaction : DisposableClass, ITransaction
     {
         if (IsDisposed) return;
 
-        OnAbort();
+        if (IsActive) OnAbort();
+        IsActive = false;
 
         if (ReferenceEquals(this, Connection.Transaction)) Connection.Transaction = null;
         if (HasOpenedConnection)
@@ -157,7 +183,8 @@ public abstract class Transaction : DisposableClass, ITransaction
     {
         if (IsDisposed) return;
 
-        await OnAbortAsync().ConfigureAwait(false);
+        if (IsActive) await OnAbortAsync().ConfigureAwait(false);
+        IsActive = false;
 
         if (ReferenceEquals(this, Connection.Transaction)) Connection.Transaction = null;
         if (HasOpenedConnection)

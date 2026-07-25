@@ -109,7 +109,7 @@ public static partial class Test_CommandInfo
     public static void Test_Create_From_Command()
     {
         var engine = new FakeEngine() { IgnoreCase = true };
-        var connection = new FakeConnection(engine);
+        using var connection = new FakeConnection(engine);
         var command = new FakeCommand(connection);
 
         var info = new CommandInfo(command);
@@ -177,7 +177,7 @@ public static partial class Test_CommandInfo
         var engine = new FakeEngine() { IgnoreCase = true };
         var source = new CommandInfo(engine, "any {0} {1}", "James", "Bond");
 
-        var connection = new FakeConnection(engine);
+        using var connection = new FakeConnection(engine);
         var command = new FakeCommand(connection, " other {0} {1}", "UK", 50);
         var target = source.Add(command);
         Assert.NotSame(source, target);

@@ -14,11 +14,16 @@ public interface ITransaction : IDisposableEx
     // ----------------------------------------------------
 
     /// <summary>
+    /// Deermines if this instance is an active one, or not.
+    /// </summary>
+    bool IsActive { get; }
+
+    /// <summary>
     /// Invoked to start this transaction.
     /// <br/> This method is INFRASTRUCTURE only, not intended for application usage.
     /// <br/> Inheritors must invoke their base method first.
     /// </summary>
-    internal void Start();
+    void Start();
 
     /// <summary>
     /// Invoked to start this transaction.
@@ -26,7 +31,7 @@ public interface ITransaction : IDisposableEx
     /// <br/> Inheritors must invoke their base method first.
     /// </summary>
     /// <param name="token"></param>
-    internal ValueTask StartAsync(CancellationToken token);
+    ValueTask StartAsync(CancellationToken token);
 
     /// <summary>
     /// Commits this transaction.

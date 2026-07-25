@@ -165,7 +165,7 @@ public static partial class Test_CommandInfoBuilder
     public static void Test_Create_From_Command()
     {
         var engine = new FakeEngine() { IgnoreCase = true };
-        var connection = new FakeConnection(engine);
+        using var connection = new FakeConnection(engine);
         var command = new FakeCommand(connection);
 
         var builder = new Builder(command);
@@ -190,7 +190,7 @@ public static partial class Test_CommandInfoBuilder
     public static void Test_Create_From_CommandInfo()
     {   
         var engine = new FakeEngine() { IgnoreCase = true };
-        var connection = new FakeConnection(engine);
+        using var connection = new FakeConnection(engine);
         
         var command = new FakeCommand(connection);
         var info = command.GetCommandInfo();
@@ -235,7 +235,7 @@ public static partial class Test_CommandInfoBuilder
     public static void Test_Add_Command()
     {
         var engine = new FakeEngine() { IgnoreCase = true };
-        var connection = new FakeConnection(engine);
+        using var connection = new FakeConnection(engine);
 
         var builder = new Builder(engine, "any {0} {1}", "James", "Bond");
         Assert.Equal("any #0 #1 -- [#0='James', #1='Bond']", builder.ToString());
@@ -290,7 +290,7 @@ public static partial class Test_CommandInfoBuilder
         var builder = new Builder(engine, "any {0} {1}", "James", "Bond");
         Assert.Equal("any #0 #1 -- [#0='James', #1='Bond']", builder.ToString());
 
-        var connection = new FakeConnection(engine);
+        using var connection = new FakeConnection(engine);
         var command = new FakeCommand(connection);
         var info = command.GetCommandInfo();
 

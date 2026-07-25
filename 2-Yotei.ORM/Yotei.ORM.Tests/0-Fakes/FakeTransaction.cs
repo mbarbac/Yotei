@@ -1,4 +1,6 @@
-﻿namespace Yotei.ORM.Tests;
+﻿#pragma warning disable IDE0290
+
+namespace Yotei.ORM.Tests;
 
 // ========================================================
 public class FakeTransaction : Transaction
