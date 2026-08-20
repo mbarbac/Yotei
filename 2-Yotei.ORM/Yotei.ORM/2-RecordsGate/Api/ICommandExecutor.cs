@@ -5,7 +5,7 @@
 /// Represents an object that can execute its associated command and return an integer as the
 /// result of that execution.
 /// </summary>
-public interface ICommandExecutor : IDisposableEx
+public interface ICommandExecutor
 {
     /// <summary>
     /// The command this instance is associated with.

@@ -2,11 +2,11 @@
 
 // ========================================================
 /// <summary>
-/// Represents an object that can execute its associated command, enumerating the records produced
+/// Represents an object that can execute its associated command, enumerating the results produced
 /// by that execution.
 /// </summary>
 public interface ICommandEnumerator
-    : IEnumerator<IRecord?>, IAsyncEnumerator<IRecord?>
+    : IEnumerator<object?>, IAsyncEnumerator<object?>
     , IDisposableEx
 {
     /// <summary>
@@ -21,9 +21,9 @@ public interface ICommandEnumerator
 
     /// <summary>
     /// The element at the current position of this enumerator, or <see langword="null"/> if it
-    /// has not been yet executed, or if there are no more records available.
+    /// has not been yet executed, or if there are no more results available.
     /// </summary>
-    new IRecord? Current { get; }
+    new object? Current { get; }
 
     /// <summary>
     /// The schema that describes the records produced by this instance, or <see langword="null"/>

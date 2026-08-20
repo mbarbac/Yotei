@@ -3,12 +3,13 @@
 // ========================================================
 /// <summary>
 /// Represents a records-oriented database command that, when executed against its associated
-/// connection, enumerates the records produced by that execution.
+/// connection, enumerates the results produced by that execution (which may be records or any
+/// other arbitrary result).
 /// </summary>
 [Cloneable]
 public partial interface IEnumerableCommand
     : ICommand
-    , IEnumerable<IRecord?>, IAsyncEnumerable<IRecord?>
+    , IEnumerable<object?>, IAsyncEnumerable<object?>
 {
     /// <summary>
     /// Returns an object that can execute this command and enumerate the records produced by

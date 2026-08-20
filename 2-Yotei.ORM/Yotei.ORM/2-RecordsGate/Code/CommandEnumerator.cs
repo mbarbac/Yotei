@@ -13,6 +13,7 @@ public abstract class CommandEnumerator : DisposableClass, ICommandEnumerator
     /// </summary>
     /// <param name="command"></param>
     /// <param name="token"></param>
+    [SuppressMessage("", "IDE0290")]
     public CommandEnumerator(IEnumerableCommand command, CancellationToken token = default)
     {
         Command = command.ThrowWhenNull();
@@ -47,7 +48,7 @@ public abstract class CommandEnumerator : DisposableClass, ICommandEnumerator
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public IRecord? Current { get; private set; }
+    public object? Current { get; private set; }
     object IEnumerator.Current => Current!;
 
     /// <summary>
