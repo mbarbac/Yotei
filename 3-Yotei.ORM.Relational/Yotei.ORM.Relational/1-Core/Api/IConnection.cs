@@ -40,6 +40,13 @@ public partial interface IConnection : ORM.IConnection
     // ----------------------------------------------------
 
     /// <summary>
+    /// Provides access to the records-oriented capabilities of this instance.
+    /// </summary>
+    new Records.IRecordsGate Records { get; }
+
+    // ----------------------------------------------------
+
+    /// <summary>
     /// The isolation level used when starting a new database transaction.
     /// </summary>
     IsolationLevel IsolationLevel { get; set; }

@@ -205,6 +205,19 @@ public partial class Connection : ORM.Code.Connection, IConnection
 
     // ----------------------------------------------------
 
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public new Records.IRecordsGate Records => (Records.IRecordsGate)base.Records;
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
+    protected override Records.IRecordsGate CreateRecordsGate() => new Records.Code.RecordsGate(this);
+
+    // ----------------------------------------------------
+
     public const IsolationLevel ISOLATIONLEVEL = IsolationLevel.Serializable;
 
     /// <summary>
@@ -262,12 +275,4 @@ public partial class Connection : ORM.Code.Connection, IConnection
         IsolationLevel = level;
         return StartTransactionAsync(token);
     }
-
-    // ----------------------------------------------------
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <returns></returns>
-    protected override IRecordsGate CreateRecordsGate() => throw null;
 }

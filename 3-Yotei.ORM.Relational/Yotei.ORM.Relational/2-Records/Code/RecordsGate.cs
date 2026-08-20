@@ -1,22 +1,22 @@
-﻿namespace Yotei.ORM.Records.Code;
+﻿namespace Yotei.ORM.Relational.Records.Code;
 
 // ========================================================
 /// <summary>
 /// <inheritdoc cref="IRecordsGate"/>
 /// </summary>
-public abstract class RecordsGate : IRecordsGate
+public class RecordsGate : ORM.Records.Code.RecordsGate, IRecordsGate
 {
     /// <summary>
     /// Initializes a new instance.
     /// </summary>
     /// <param name="connection"></param>
     [SuppressMessage("", "IDE0290")]
-    public RecordsGate(IConnection connection) => Connection = connection.ThrowWhenNull();
+    public RecordsGate(IConnection connection) : base(connection) { }
 
     /// <summary>
-    /// <inheritdoc/>
+    /// <inheritdoc cref="IConnection"/>
     /// </summary>
-    public IConnection Connection { get; }
+    public new IConnection Connection => (IConnection)base.Connection;
 
     // ----------------------------------------------------
 
@@ -26,21 +26,13 @@ public abstract class RecordsGate : IRecordsGate
     /// <param name="command"></param>
     /// <param name="token"></param>
     /// <returns></returns>
-    public abstract ICommandEnumerator CreateEnumerator(
-        IEnumerableCommand command, CancellationToken token = default);
+    public override ICommandEnumerator CreateEnumerator(
+        IEnumerableCommand command, CancellationToken token = default) => throw null;
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="command"></param>
     /// <returns></returns>
-    public abstract ICommandExecutor CreateExecutor(IExecutableCommand command);
-
-    // ----------------------------------------------------
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <returns></returns>
-    public virtual IRawCommand Raw() => throw null;
+    public override ICommandExecutor CreateExecutor(IExecutableCommand command) => throw null;
 }

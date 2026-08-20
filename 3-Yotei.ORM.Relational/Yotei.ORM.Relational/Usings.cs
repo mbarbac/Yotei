@@ -31,3 +31,5 @@ global using Yotei.ORM.Records;
 global using Yotei.ORM.Records.Code;
 global using Yotei.ORM.Relational;
 global using Yotei.ORM.Relational.Code;
+global using Yotei.ORM.Relational.Records;
+global using Yotei.ORM.Relational.Records.Code;
