@@ -285,7 +285,7 @@ public abstract partial class Connection : DisposableClass, IConnection
     /// Invoked to create the <see cref="IRecordsGate"/> instance associated with this instance.
     /// </summary>
     /// <returns></returns>
-    protected virtual IRecordsGate CreateRecordsGate() => new RecordsGate(this);
+    protected abstract IRecordsGate CreateRecordsGate();
 
     // ----------------------------------------------------
 

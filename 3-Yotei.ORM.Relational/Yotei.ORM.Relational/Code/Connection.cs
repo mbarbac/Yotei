@@ -262,4 +262,12 @@ public partial class Connection : ORM.Code.Connection, IConnection
         IsolationLevel = level;
         return StartTransactionAsync(token);
     }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
+    protected override IRecordsGate CreateRecordsGate() => throw null;
 }
