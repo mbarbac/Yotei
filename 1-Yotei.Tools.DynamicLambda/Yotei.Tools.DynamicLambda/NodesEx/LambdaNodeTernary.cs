@@ -17,9 +17,9 @@ public class LambdaNodeTernary : LambdaNode
     /// <param name="right"></param>
     public LambdaNodeTernary(LambdaNode left, LambdaNode middle, LambdaNode right) : base()
     {
-        DLambdaLeft = left.ThrowWhenNull();
-        DLambdaMiddle = middle.ThrowWhenNull();
-        DLambdaRight = right.ThrowWhenNull();
+        LambdaLeft = left.ThrowWhenNull();
+        LambdaMiddle = middle.ThrowWhenNull();
+        LambdaRight = right.ThrowWhenNull();
         LambdaParser.ToDebug(LambdaParser.NewNodeColor, $"- NODE new: {ToDebugString()}");
     }
 
@@ -27,31 +27,31 @@ public class LambdaNodeTernary : LambdaNode
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => $"({DLambdaLeft} ? {DLambdaMiddle} : {DLambdaRight})";
+    public override string ToString() => $"({LambdaLeft} ? {LambdaMiddle} : {LambdaRight})";
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
     public override LambdaNodeArgument? GetArgument()
-        => DLambdaLeft.GetArgument()
-        ?? DLambdaMiddle.GetArgument()
-        ?? DLambdaRight.GetArgument();
+        => LambdaLeft.GetArgument()
+        ?? LambdaMiddle.GetArgument()
+        ?? LambdaRight.GetArgument();
 
     // ----------------------------------------------------
 
     /// <summary>
     /// The left operand of the dynamic operation.
     /// </summary>
-    public LambdaNode DLambdaLeft { get; }
+    public LambdaNode LambdaLeft { get; }
 
     /// <summary>
     /// The middle operand of the dynamic operation.
     /// </summary>
-    public LambdaNode DLambdaMiddle { get; }
+    public LambdaNode LambdaMiddle { get; }
 
     /// <summary>
     /// The right operand of the dynamic operation.
     /// </summary>
-    public LambdaNode DLambdaRight { get; }
+    public LambdaNode LambdaRight { get; }
 }

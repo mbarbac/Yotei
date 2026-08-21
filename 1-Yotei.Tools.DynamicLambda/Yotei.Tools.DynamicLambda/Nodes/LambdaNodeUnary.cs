@@ -15,8 +15,8 @@ public class LambdaNodeUnary : LambdaNode
     /// <param name="target"></param>
     public LambdaNodeUnary(ExpressionType operation, LambdaNode target) : base()
     {
-        DLambdaOperation = operation;
-        DLambdaTarget = target.ThrowWhenNull();
+        LambdaOperation = operation;
+        LambdaTarget = target.ThrowWhenNull();
         LambdaParser.ToDebug(LambdaParser.NewNodeColor, $"- NODE new: {ToDebugString()}");
     }
 
@@ -24,13 +24,13 @@ public class LambdaNodeUnary : LambdaNode
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => $"({DLambdaOperation} {DLambdaTarget})";
+    public override string ToString() => $"({LambdaOperation} {LambdaTarget})";
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override LambdaNodeArgument? GetArgument() => DLambdaTarget.GetArgument();
+    public override LambdaNodeArgument? GetArgument() => LambdaTarget.GetArgument();
 
     // ----------------------------------------------------
 
@@ -38,10 +38,10 @@ public class LambdaNodeUnary : LambdaNode
     /// The dynamic unary operation represented by this instance.
     /// <br/> The caller is responsable for setting an appropriate value.
     /// </summary>
-    public ExpressionType DLambdaOperation { get; }
+    public ExpressionType LambdaOperation { get; }
 
     /// <summary>
     /// The target of the dynamic operation.
     /// </summary>
-    public LambdaNode DLambdaTarget { get; }
+    public LambdaNode LambdaTarget { get; }
 }

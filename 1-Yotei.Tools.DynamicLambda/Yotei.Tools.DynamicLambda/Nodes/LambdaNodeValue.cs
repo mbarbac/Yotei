@@ -20,7 +20,7 @@ public class LambdaNodeValue : LambdaNode
             "Cannot use a lambda node as the value carried by this instance.")
             .WithData(value);
         
-        DLambdaValue = value;
+        LambdaValue = value;
         LambdaParser.ToDebug(LambdaParser.NewNodeColor, $"- NODE new: {ToDebugString()}");
     }
 
@@ -28,7 +28,7 @@ public class LambdaNodeValue : LambdaNode
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => $"'{DLambdaValue.Sketch()}'";
+    public override string ToString() => $"'{LambdaValue.Sketch()}'";
 
     /// <summary>
     /// <inheritdoc/>
@@ -41,5 +41,5 @@ public class LambdaNodeValue : LambdaNode
     /// <summary>
     /// The actual value carried by this instance.
     /// </summary>
-    public object? DLambdaValue { get; }
+    public object? LambdaValue { get; }
 }

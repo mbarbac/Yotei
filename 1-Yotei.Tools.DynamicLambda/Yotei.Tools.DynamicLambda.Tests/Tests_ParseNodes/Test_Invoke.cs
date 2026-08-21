@@ -87,11 +87,11 @@ public static class Test_Invoke
         node = LambdaParser.Parse(func).Result;
         Debug.WriteLine($"> Result: {node}");
         var invoke = Assert.IsType<LambdaNodeInvoke>(node);
-        Assert.Single(invoke.DLambdaArguments);
-        invoke = Assert.IsType<LambdaNodeInvoke>(invoke.DLambdaArguments[0]);
-        Assert.Single(invoke.DLambdaArguments);
-        var value = Assert.IsType<LambdaNodeValue>(invoke.DLambdaArguments[0]);
-        Assert.Equal("007", value.DLambdaValue);
+        Assert.Single(invoke.LambdaArguments);
+        invoke = Assert.IsType<LambdaNodeInvoke>(invoke.LambdaArguments[0]);
+        Assert.Single(invoke.LambdaArguments);
+        var value = Assert.IsType<LambdaNodeValue>(invoke.LambdaArguments[0]);
+        Assert.Equal("007", value.LambdaValue);
     }
 
     // ----------------------------------------------------

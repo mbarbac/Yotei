@@ -15,8 +15,8 @@ public class LambdaNodeConvert : LambdaNode
     /// <param name="target"></param>
     public LambdaNodeConvert(Type type, LambdaNode target) : base()
     {
-        DLambdaType = type.ThrowWhenNull();
-        DLambdaTarget = target.ThrowWhenNull();
+        LambdaType = type.ThrowWhenNull();
+        LambdaTarget = target.ThrowWhenNull();
         LambdaParser.ToDebug(LambdaParser.NewNodeColor, $"- NODE new: {ToDebugString()}");
     }
 
@@ -24,23 +24,23 @@ public class LambdaNodeConvert : LambdaNode
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => $"(({DLambdaType.EasyName()}) {DLambdaTarget})";
+    public override string ToString() => $"(({LambdaType.EasyName()}) {LambdaTarget})";
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override LambdaNodeArgument? GetArgument() => DLambdaTarget.GetArgument();
+    public override LambdaNodeArgument? GetArgument() => LambdaTarget.GetArgument();
 
     // ----------------------------------------------------
 
     /// <summary>
     /// The type to convert the target to.
     /// </summary>
-    public Type DLambdaType { get; }
+    public Type LambdaType { get; }
 
     /// <summary>
     /// The target operand of the dynamic operation.
     /// </summary>
-    public LambdaNode DLambdaTarget { get; }
+    public LambdaNode LambdaTarget { get; }
 }

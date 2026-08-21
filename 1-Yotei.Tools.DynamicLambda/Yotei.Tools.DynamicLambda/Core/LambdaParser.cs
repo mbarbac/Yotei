@@ -3,7 +3,7 @@
 // ========================================================
 /// <summary>
 /// Represents the ability of parsing dynamic lambda expressions, defined as lambda-alike ones at
-/// least one of their arguments is a <see langword="dynamic"/> one. Instances of this type contain
+/// least one of their arguments is a <see langword="dynamic"/> one. Instances of this type contains
 /// the result of that parsing along with the dynamic arguments used to invoke that expression.
 /// <br/> Instances of this type are immutable ones.
 /// </summary>

@@ -14,7 +14,7 @@ public class LambdaNodeArgument : LambdaNode
     /// <param name="name"></param>
     public LambdaNodeArgument(string name)
     {
-        DLambdaName = LambdaParser.ValidateName(name);
+        LambdaName = LambdaParser.ValidateName(name);
         LambdaParser.ToDebug(LambdaParser.NewNodeColor, $"- NODE new: {ToDebugString()}");
     }
 
@@ -22,7 +22,7 @@ public class LambdaNodeArgument : LambdaNode
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => DLambdaName;
+    public override string ToString() => LambdaName;
 
     /// <summary>
     /// <inheritdoc/>
@@ -35,5 +35,5 @@ public class LambdaNodeArgument : LambdaNode
     /// <summary>
     /// The name of this dynamic argument.
     /// </summary>
-    public string DLambdaName { get; }
+    public string LambdaName { get; }
 }

@@ -15,8 +15,8 @@ public class LambdaNodeCoalesce : LambdaNode
     /// <param name="right"></param>
     public LambdaNodeCoalesce(LambdaNode left, LambdaNode right) : base()
     {
-        DLambdaLeft = left.ThrowWhenNull();
-        DLambdaRight = right.ThrowWhenNull();
+        LambdaLeft = left.ThrowWhenNull();
+        LambdaRight = right.ThrowWhenNull();
         LambdaParser.ToDebug(LambdaParser.NewNodeColor, $"- NODE new: {ToDebugString()}");
     }
 
@@ -24,25 +24,25 @@ public class LambdaNodeCoalesce : LambdaNode
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => $"({DLambdaLeft} ?? {DLambdaRight})";
+    public override string ToString() => $"({LambdaLeft} ?? {LambdaRight})";
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
     public override LambdaNodeArgument? GetArgument()
-        => DLambdaLeft.GetArgument()
-        ?? DLambdaRight.GetArgument();
+        => LambdaLeft.GetArgument()
+        ?? LambdaRight.GetArgument();
 
     // ----------------------------------------------------
 
     /// <summary>
     /// The left operand of the dynamic operation.
     /// </summary>
-    public LambdaNode DLambdaLeft { get; }
+    public LambdaNode LambdaLeft { get; }
 
     /// <summary>
     /// The right operand of the dynamic operation.
     /// </summary>
-    public LambdaNode DLambdaRight { get; }
+    public LambdaNode LambdaRight { get; }
 }

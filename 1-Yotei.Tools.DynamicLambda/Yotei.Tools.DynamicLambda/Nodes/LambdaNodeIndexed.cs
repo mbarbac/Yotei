@@ -15,7 +15,7 @@ public class LambdaNodeIndexed : LambdaNodeHosted
     /// <param name="indexes"></param>
     public LambdaNodeIndexed(LambdaNode host, IEnumerable<LambdaNode> indexes) : base(host)
     {
-        DLambdaIndexes = LambdaParser.ValidateArguments(indexes, canBeEmpty: false);
+        LambdaIndexes = LambdaParser.ValidateArguments(indexes, canBeEmpty: false);
         LambdaParser.ToDebug(LambdaParser.NewNodeColor, $"- NODE new: {ToDebugString()}");
     }
 
@@ -24,12 +24,12 @@ public class LambdaNodeIndexed : LambdaNodeHosted
     /// </summary>
     /// <returns></returns>
     public override string ToString()
-        => $"{DLambdaHost}[{string.Join(", ", DLambdaIndexes.Select(static x => x.ToString()))}]";
+        => $"{LambdaHost}[{string.Join(", ", LambdaIndexes.Select(static x => x.ToString()))}]";
 
     // ----------------------------------------------------
 
     /// <summary>
     /// The collection of indexes of the indexed get operation, which cannot be an empty one.
     /// </summary>
-    public ImmutableArray<LambdaNode> DLambdaIndexes { get; }
+    public ImmutableArray<LambdaNode> LambdaIndexes { get; }
 }

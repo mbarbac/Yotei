@@ -15,8 +15,8 @@ public abstract class LambdaNode : DynamicObject
     /// </summary>
     public LambdaNode()
     {
-        DLambdaId = NextDLambdaId();
-        DLambdaVersion = NextDLambdaVersion();
+        LambdaId = NextDLambdaId();
+        LambdaVersion = NextDLambdaVersion();
     }
 
     /// <summary>
@@ -26,7 +26,7 @@ public abstract class LambdaNode : DynamicObject
     public string ToDebugString()
     {
         var type = GetType().EasyName();
-        return $"[{type}]#{DLambdaId}/{DLambdaVersion}({ToString()})";
+        return $"[{type}]#{LambdaId}/{LambdaVersion}({ToString()})";
     }
 
     /// <summary>
@@ -41,19 +41,19 @@ public abstract class LambdaNode : DynamicObject
     /// <summary>
     /// The unique ID of this instance.
     /// </summary>
-    public ulong DLambdaId { get; }
-    static ulong DLastLambdaId = 0;
+    public ulong LambdaId { get; }
+    static ulong LastLambdaId = 0;
 
-    internal static ulong NextDLambdaId() => Interlocked.Increment(ref DLastLambdaId);
+    internal static ulong NextDLambdaId() => Interlocked.Increment(ref LastLambdaId);
 
     /// <summary>
     /// Maintains the current version of this instance, which is used to prevent the DLR to cache
     /// old instances instead of generatic new ones for new bindings.
     /// </summary>
-    internal ulong DLambdaVersion { get; set; }
-    static ulong DLastLambdaVersion = 0;
+    internal ulong LambdaVersion { get; set; }
+    static ulong LastLambdaVersion = 0;
 
-    internal static ulong NextDLambdaVersion() => Interlocked.Increment(ref DLastLambdaVersion);
+    internal static ulong NextDLambdaVersion() => Interlocked.Increment(ref LastLambdaVersion);
 
     /// <summary>
     /// <inheritdoc/>
@@ -97,11 +97,11 @@ public abstract class LambdaNode : DynamicObject
                 Expression.IsFalse(
                     Expression.Call(
                         Expression.Convert(argExpr, typeof(LambdaNode)),
-                        ValidateDLambdaVersionInfo)),
+                        ValidateLambdaVersionInfo)),
                 Expression.Block(
                     Expression.Call(
                         Expression.Convert(argExpr, typeof(LambdaNode)),
-                        UpdateDLambdaVersionInfo),
+                        UpdateLambdaVersionInfo),
                     updateExpr),
                 Expression.Constant(true)));
 
@@ -120,9 +120,9 @@ public abstract class LambdaNode : DynamicObject
     /// used to signal the DLR to use a fresh new instance to bind the current operation, instead
     /// of using a cached one.
     /// </summary>
-    internal bool ValidateDLambdaVersion()
+    internal bool ValidateLambdaVersion()
     {
-        var result = DLambdaVersion == DLastLambdaVersion;
+        var result = LambdaVersion == LastLambdaVersion;
         var valid = result ? "Valid" : "Invalid";
 
         LambdaParser.ToDebug(
@@ -132,8 +132,8 @@ public abstract class LambdaNode : DynamicObject
         return result;
     }
 
-    static MethodInfo ValidateDLambdaVersionInfo
-        => typeof(LambdaNode).GetMethod(nameof(ValidateDLambdaVersion), DLAMBDA_FLAGS)!;
+    static MethodInfo ValidateLambdaVersionInfo
+        => typeof(LambdaNode).GetMethod(nameof(ValidateLambdaVersion), DLAMBDA_FLAGS)!;
 
     /// <summary>
     /// Updates the version of this instance to the latest one, which is also incremented along
@@ -141,10 +141,10 @@ public abstract class LambdaNode : DynamicObject
     /// dynamic binding is not invoked - for instance: it happens the 2nd time a conversion is
     /// invoked.
     /// </summary>
-    void UpdateDLambdaVersion()
+    void UpdateLambdaVersion()
     {
-        var old = DLambdaVersion;
-        var neo = DLambdaVersion = NextDLambdaVersion();
+        var old = LambdaVersion;
+        var neo = LambdaVersion = NextDLambdaVersion();
 
         LambdaParser.ToDebug(
             LambdaParser.UpdateLambdaColor,
@@ -153,8 +153,8 @@ public abstract class LambdaNode : DynamicObject
         LambdaParser.Instance.LastNode = this;
     }
 
-    static MethodInfo UpdateDLambdaVersionInfo
-        => typeof(LambdaNode).GetMethod(nameof(UpdateDLambdaVersion), DLAMBDA_FLAGS)!;
+    static MethodInfo UpdateLambdaVersionInfo
+        => typeof(LambdaNode).GetMethod(nameof(UpdateLambdaVersion), DLAMBDA_FLAGS)!;
 
     // ---------------------------------------------------- Overriden
 

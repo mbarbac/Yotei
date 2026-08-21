@@ -16,7 +16,7 @@ public static class Test_ManyArguments
         node = LambdaParser.Parse(func, 1).Result;
         Debug.WriteLine($"> Result: {node}");
         item = Assert.IsType<LambdaNodeValue>(node);
-        Assert.Equal(2, item.DLambdaValue);
+        Assert.Equal(2, item.LambdaValue);
 
         try { node = LambdaParser.Parse(func).Result; Assert.Fail(); }
         catch (NotFoundException) { }

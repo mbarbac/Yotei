@@ -16,8 +16,8 @@ internal class LambdaMetaNode : DynamicMetaObject
         LambdaNode node)
         : base(expression, restrictions, node)
     {
-        DLambdaMetaMaster = master.ThrowWhenNull();
-        DLambdaId = NextDLambdaId();
+        LambdaMetaMaster = master.ThrowWhenNull();
+        LambdaId = NextDLambdaId();
         LambdaParser.ToDebug(LambdaParser.NewMetaColor, $"- META new: {this}");
     }
 
@@ -25,22 +25,22 @@ internal class LambdaMetaNode : DynamicMetaObject
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => $"[Meta]#{DLambdaId}({ValueAsNode.ToDebugString()})";
+    public override string ToString() => $"[Meta]#{LambdaId}({ValueAsNode.ToDebugString()})";
 
     // ----------------------------------------------------
 
     /// <summary>
     /// The unique ID of this instance.
     /// </summary>
-    public ulong DLambdaId { get; }
-    static ulong DLastLambdaId = 0;
+    public ulong LambdaId { get; }
+    static ulong LastLambdaId = 0;
 
-    internal static ulong NextDLambdaId() => Interlocked.Increment(ref DLastLambdaId);
+    internal static ulong NextDLambdaId() => Interlocked.Increment(ref LastLambdaId);
 
     /// <summary>
     /// The default meta object associated with this instance.
     /// </summary>
-    public DynamicMetaObject DLambdaMetaMaster { get; }
+    public DynamicMetaObject LambdaMetaMaster { get; }
 
     /// <summary>
     /// The actual lambda node carried by this instance.
@@ -290,7 +290,7 @@ internal class LambdaMetaNode : DynamicMetaObject
         }
 
         LambdaParser.ToDebug(LambdaParser.MetaBindedColor, $"- Delegated...");
-        var meta = DLambdaMetaMaster.BindGetIndex(binder, indexes);
+        var meta = LambdaMetaMaster.BindGetIndex(binder, indexes);
         return meta;
     }
 
@@ -306,7 +306,7 @@ internal class LambdaMetaNode : DynamicMetaObject
         LambdaParser.ToDebug(LambdaParser.MetaBindedColor, $"- Member: {binder.Name}");
 
         LambdaParser.ToDebug(LambdaParser.MetaBindedColor, $"- Delegated...");
-        var meta = DLambdaMetaMaster.BindGetMember(binder);
+        var meta = LambdaMetaMaster.BindGetMember(binder);
         return meta;
     }
 
@@ -328,7 +328,7 @@ internal class LambdaMetaNode : DynamicMetaObject
         }
 
         LambdaParser.ToDebug(LambdaParser.MetaBindedColor, $"- Delegated...");
-        var meta = DLambdaMetaMaster.BindInvoke(binder, args);
+        var meta = LambdaMetaMaster.BindInvoke(binder, args);
         return meta;
     }
 
@@ -353,7 +353,7 @@ internal class LambdaMetaNode : DynamicMetaObject
         LambdaParser.ToDebug(LambdaParser.MetaBindedColor, $"- Name: {binder.Name}");
 
         LambdaParser.ToDebug(LambdaParser.MetaBindedColor, $"- Delegated...");
-        var meta = DLambdaMetaMaster.BindInvokeMember(binder, args);
+        var meta = LambdaMetaMaster.BindInvokeMember(binder, args);
         return meta;
     }
 

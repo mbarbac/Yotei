@@ -16,7 +16,7 @@ public class LambdaNodeInvoke : LambdaNodeHosted
     /// <param name="arguments"></param>
     public LambdaNodeInvoke(LambdaNode host, IEnumerable<LambdaNode> arguments) : base(host)
     {
-        DLambdaArguments = LambdaParser.ValidateArguments(arguments, canBeEmpty: true);
+        LambdaArguments = LambdaParser.ValidateArguments(arguments, canBeEmpty: true);
         LambdaParser.ToDebug(LambdaParser.NewNodeColor, $"- NODE new: {ToDebugString()}");
     }
 
@@ -25,7 +25,7 @@ public class LambdaNodeInvoke : LambdaNodeHosted
     /// </summary>
     /// <returns></returns>
     public override string ToString()
-        => $"{DLambdaHost}({string.Join(", ", DLambdaArguments.Select(x => x.ToString()))})";
+        => $"{LambdaHost}({string.Join(", ", LambdaArguments.Select(x => x.ToString()))})";
 
     // ----------------------------------------------------
 
@@ -33,5 +33,5 @@ public class LambdaNodeInvoke : LambdaNodeHosted
     /// The collection of arguments used for the host invocation operation, which can be an empty
     /// one when needed.
     /// </summary>
-    public ImmutableArray<LambdaNode> DLambdaArguments { get; }
+    public ImmutableArray<LambdaNode> LambdaArguments { get; }
 }

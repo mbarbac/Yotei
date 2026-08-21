@@ -13,7 +13,7 @@ public static class Test_NameParser
 
         Assert.Empty(name);
         Assert.Empty(parts);
-        Assert.Equal("x", arg.DLambdaName);
+        Assert.Equal("x", arg.LambdaName);
     }
 
     //[Enforced]

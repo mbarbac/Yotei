@@ -16,9 +16,9 @@ public class LambdaNodeBinary : LambdaNode
     /// <param name="right"></param>
     public LambdaNodeBinary(LambdaNode left, ExpressionType operation, LambdaNode right) : base()
     {
-        DLambdaLeft = left.ThrowWhenNull();
-        DLambdaOperation = operation;
-        DLambdaRight = right.ThrowWhenNull();
+        LambdaLeft = left.ThrowWhenNull();
+        LambdaOperation = operation;
+        LambdaRight = right.ThrowWhenNull();
         LambdaParser.ToDebug(LambdaParser.NewNodeColor, $"- NODE new: {ToDebugString()}");
     }
 
@@ -26,31 +26,31 @@ public class LambdaNodeBinary : LambdaNode
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => $"({DLambdaLeft} {DLambdaOperation} {DLambdaRight})";
+    public override string ToString() => $"({LambdaLeft} {LambdaOperation} {LambdaRight})";
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
     public override LambdaNodeArgument? GetArgument()
-        => DLambdaLeft.GetArgument()
-        ?? DLambdaRight.GetArgument();
+        => LambdaLeft.GetArgument()
+        ?? LambdaRight.GetArgument();
 
     // ----------------------------------------------------
 
     /// <summary>
     /// The left operand of the dynamic operation.
     /// </summary>
-    public LambdaNode DLambdaLeft { get; }
+    public LambdaNode LambdaLeft { get; }
 
     /// <summary>
     /// The dynamic binary operation represented by this instance.
     /// <br/> The caller is responsable for setting an appropriate value.
     /// </summary>
-    public ExpressionType DLambdaOperation { get; }
+    public ExpressionType LambdaOperation { get; }
 
     /// <summary>
     /// The right operand of the dynamic operation.
     /// </summary>
-    public LambdaNode DLambdaRight { get; }
+    public LambdaNode LambdaRight { get; }
 }

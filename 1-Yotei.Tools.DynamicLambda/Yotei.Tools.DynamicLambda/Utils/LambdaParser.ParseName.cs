@@ -106,12 +106,12 @@ public partial class LambdaParser
     /// <param name="parser"></param>
     static void OnParseNameMember(LambdaNodeMember node, List<string> items, LambdaParser parser)
     {
-        OnParseName(node.DLambdaHost, items, parser);
+        OnParseName(node.LambdaHost, items, parser);
 
         var arg = parser.DynamicArguments[0];
-        var name = node.DLambdaName == arg.DLambdaName
+        var name = node.LambdaName == arg.LambdaName
             ? string.Empty
-            : node.DLambdaName;
+            : node.LambdaName;
 
         items.Add(name);
     }
@@ -124,16 +124,16 @@ public partial class LambdaParser
     /// <param name="parser"></param>
     static void OnParseNameIndexed(LambdaNodeIndexed node, List<string> items, LambdaParser parser)
     {
-        if (node.DLambdaIndexes.Length != 1)
+        if (node.LambdaIndexes.Length != 1)
             throw new ArgumentException(
                 "Indexed parts require one and only one index.")
                 .WithData(node)
                 .WithData(parser, "expression");
 
-        OnParseName(node.DLambdaHost, items, parser);
+        OnParseName(node.LambdaHost, items, parser);
 
         var temps = new List<string>();
-        OnParseName(node.DLambdaIndexes[0], temps, parser);
+        OnParseName(node.LambdaIndexes[0], temps, parser);
 
         if (items.Count > 0) items[^1] += temps[0];
         else items.Add(temps[0]);
@@ -149,16 +149,16 @@ public partial class LambdaParser
     /// <param name="parser"></param>
     static void OnParseNameInvoke(LambdaNodeInvoke node, List<string> items, LambdaParser parser)
     {
-        if (node.DLambdaArguments.Length != 1)
+        if (node.LambdaArguments.Length != 1)
             throw new ArgumentException(
                 "Invoke parts require one and only one argument.")
                 .WithData(node)
                 .WithData(parser, "expression");
 
-        OnParseName(node.DLambdaHost, items, parser);
+        OnParseName(node.LambdaHost, items, parser);
 
         var temps = new List<string>();
-        OnParseName(node.DLambdaArguments[0], temps, parser);
+        OnParseName(node.LambdaArguments[0], temps, parser);
 
         if (items.Count > 0) items[^1] += temps[0];
         else items.Add(temps[0]);
@@ -174,11 +174,11 @@ public partial class LambdaParser
     /// <param name="parser"></param>
     static void OnParseNameValue(LambdaNodeValue node, List<string> items, LambdaParser parser)
     {
-        if (node.DLambdaValue == null)
+        if (node.LambdaValue == null)
         {
             items.Add(string.Empty);
         }
-        else if (node.DLambdaValue is string str)
+        else if (node.LambdaValue is string str)
         {
             var names = str.Split('.');
             for (int i = 0; i < names.Length; i++)
@@ -187,9 +187,9 @@ public partial class LambdaParser
                 items.Add(name);
             }
         }
-        else if (node.DLambdaValue.GetType().IsPrimitive)
+        else if (node.LambdaValue.GetType().IsPrimitive)
         {
-            var name = node.DLambdaValue.ToString() ?? string.Empty;
+            var name = node.LambdaValue.ToString() ?? string.Empty;
             items.Add(name);
         }
         else

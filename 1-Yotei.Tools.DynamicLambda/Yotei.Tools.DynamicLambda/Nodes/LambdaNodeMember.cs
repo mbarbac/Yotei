@@ -15,7 +15,7 @@ public class LambdaNodeMember : LambdaNodeHosted
     /// <param name="name"></param>
     public LambdaNodeMember(LambdaNode host, string name) : base(host)
     {
-        DLambdaName = LambdaParser.ValidateName(name);
+        LambdaName = LambdaParser.ValidateName(name);
         LambdaParser.ToDebug(LambdaParser.NewNodeColor, $"- NODE new: {ToDebugString()}");
     }
 
@@ -23,12 +23,12 @@ public class LambdaNodeMember : LambdaNodeHosted
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => $"{DLambdaHost}.{DLambdaName}";
+    public override string ToString() => $"{LambdaHost}.{LambdaName}";
 
     // ----------------------------------------------------
 
     /// <summary>
     /// The name of the dynamic member.
     /// </summary>
-    public string DLambdaName { get; }
+    public string LambdaName { get; }
 }

@@ -15,8 +15,8 @@ public class LambdaNodeSetter : LambdaNode
     /// <param name="value"></param>
     public LambdaNodeSetter(LambdaNode target, LambdaNode value) : base()
     {
-        DLambdaTarget = target.ThrowWhenNull();
-        DLambdaValue = value.ThrowWhenNull();
+        LambdaTarget = target.ThrowWhenNull();
+        LambdaValue = value.ThrowWhenNull();
         LambdaParser.ToDebug(LambdaParser.NewNodeColor, $"- NODE new: {ToDebugString()}");
     }
 
@@ -24,25 +24,25 @@ public class LambdaNodeSetter : LambdaNode
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => $"({DLambdaTarget} = {DLambdaValue})";
+    public override string ToString() => $"({LambdaTarget} = {LambdaValue})";
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
     public override LambdaNodeArgument? GetArgument()
-        => DLambdaTarget.GetArgument()
-        ?? DLambdaValue.GetArgument();
+        => LambdaTarget.GetArgument()
+        ?? LambdaValue.GetArgument();
 
     // ----------------------------------------------------
 
     /// <summary>
     /// The target operand of the dynamic operation.
     /// </summary>
-    public LambdaNode DLambdaTarget { get; }
+    public LambdaNode LambdaTarget { get; }
 
     /// <summary>
     /// The value to set the target to.
     /// </summary>
-    public LambdaNode DLambdaValue { get; }
+    public LambdaNode LambdaValue { get; }
 }
