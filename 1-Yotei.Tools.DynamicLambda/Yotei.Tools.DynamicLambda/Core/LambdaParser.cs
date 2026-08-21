@@ -7,7 +7,7 @@
 /// the result of that parsing along with the dynamic arguments used to invoke that expression.
 /// <br/> Instances of this type are immutable ones.
 /// </summary>
-public partial class DLambdaParser
+public partial class LambdaParser
 {
     /// <summary>
     /// Parses the given dynamic lambda expression and returns an instance that contains the result
@@ -16,7 +16,7 @@ public partial class DLambdaParser
     /// <param name="expression"></param>
     /// <param name="concretes"></param>
     /// <returns></returns>
-    public static DLambdaParser Parse(Delegate expression, params object?[]? concretes)
+    public static LambdaParser Parse(Delegate expression, params object?[]? concretes)
     {
         expression.ThrowWhenNull();
 
@@ -33,7 +33,7 @@ public partial class DLambdaParser
         concretes ??= [null!];
 
         var items = new List<object?>();
-        var args = new List<DLambdaNodeArgument>();
+        var args = new List<LambdaNodeArgument>();
         var pars = method.GetParameters();
         var index = 0;
 
@@ -47,7 +47,7 @@ public partial class DLambdaParser
                     "A dynamic argument in the lambda expression has no name.")
                     .WithData(par);
 
-                var dyn = new DLambdaNodeArgument(name);
+                var dyn = new LambdaNodeArgument(name);
                 args.Add(dyn);
                 items.Add(dyn);
             }
@@ -84,27 +84,27 @@ public partial class DLambdaParser
 
                 if (type.IsAnonymous) // Anonymous types...
                 {
-                    Instance.Result = new DLambdaNodeValue(obj);
+                    Instance.Result = new LambdaNodeValue(obj);
                     goto FINISH;
                 }
                 else if (type.IsArray) // Arrays...
                 {
                     var array = (Array)obj;
-                    var nodes = new DLambdaNode[array.Length];
+                    var nodes = new LambdaNode[array.Length];
                     for (int i = 0; i < array.Length; i++)
                     {
                         nodes[i] = Instance.ToLambdaNode(array.GetValue(i));
                     }
 
-                    Instance.Result = new DLambdaNodeValue(nodes);
+                    Instance.Result = new LambdaNodeValue(nodes);
                     goto FINISH;
                 }
                 else if (obj is ICollection list) // Lists and alike...
                 {
-                    var ret = new List<DLambdaNode>();
+                    var ret = new List<LambdaNode>();
                     foreach (var item in list) ret.Add(Instance.ToLambdaNode(item));
 
-                    Instance.Result = new DLambdaNodeValue(ret);
+                    Instance.Result = new LambdaNodeValue(ret);
                     goto FINISH;
                 }
             }
@@ -162,9 +162,9 @@ public partial class DLambdaParser
     /// </summary>
     /// <param name="source"></param>
     /// <returns></returns>
-    static DLambdaParser Clone(DLambdaParser source)
+    static LambdaParser Clone(LambdaParser source)
     {
-        var target = new DLambdaParser();
+        var target = new LambdaParser();
 
         foreach (var arg in source._DynamicArguments) target._DynamicArguments.Add(arg);
         target.Result = source.Result;
@@ -179,7 +179,7 @@ public partial class DLambdaParser
     /// Again, we only need to actuate on the relevant properties.
     /// </summary>
     /// <param name="parser"></param>
-    static void Clear(DLambdaParser parser)
+    static void Clear(LambdaParser parser)
     {
         parser._DynamicArguments.Clear();
         parser.Result = null!;
@@ -190,7 +190,7 @@ public partial class DLambdaParser
     // ----------------------------------------------------
 
     // Private constructor to prevent direct creation.
-    private DLambdaParser() { }
+    private LambdaParser() { }
 
     /// <summary>
     /// <inheritdoc/>
@@ -205,15 +205,15 @@ public partial class DLambdaParser
     /// <summary>
     /// The collection of dynamic arguments used to invoke the dynamic lambda expression.
     /// </summary>
-    public ImmutableArray<DLambdaNodeArgument> DynamicArguments => [.. _DynamicArguments];
-    readonly List<DLambdaNodeArgument> _DynamicArguments = [];
+    public ImmutableArray<LambdaNodeArgument> DynamicArguments => [.. _DynamicArguments];
+    readonly List<LambdaNodeArgument> _DynamicArguments = [];
 
     /// <summary>
     /// Represents the chain of dynamic operations obtained from parsing the given dynamic lambda
     /// expression. This property contains the last binded operation, from whose parents the full
     /// chain can be explored.
     /// </summary>
-    public DLambdaNode Result { get; private set; } = default!;
+    public LambdaNode Result { get; private set; } = default!;
 
     // ----------------------------------------------------
 
@@ -222,12 +222,12 @@ public partial class DLambdaParser
     /// way the DLR operates as, for instance, when some bindings are just swallowed as if they are
     /// not needed (which might be true, but it is not what we need).
     /// </summary>
-    internal DLambdaNode? LastNode { get; set; }
+    internal LambdaNode? LastNode { get; set; }
 
     /// <summary>
     /// The internal instance used to actually parse dynamic lambda expressions.
     /// </summary>
-    internal static DLambdaParser Instance { get; } = new();
+    internal static LambdaParser Instance { get; } = new();
 
     /// <summary>
     /// For the purposes of the dynamic lambda expression parser, the DLR acts as a unique shared
@@ -241,26 +241,26 @@ public partial class DLambdaParser
     /// <summary>
     /// Maintains the surrogates that shall stand-up for the given objects.
     /// </summary>
-    internal Dictionary<object, DLambdaNode> Surrogates = [];
+    internal Dictionary<object, LambdaNode> Surrogates = [];
 
     /// <summary>
     /// Returns the dynamic lambda node surrogate associated with the given value.
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
-    internal DLambdaNode ToLambdaNode(object? value)
+    internal LambdaNode ToLambdaNode(object? value)
     {
-        if (value == null) return new DLambdaNodeValue(null);
+        if (value == null) return new LambdaNodeValue(null);
 
         if (Surrogates.TryGetValue(value, out var node)) return node;
 
         node = value switch
         {
-            DLambdaNode item => item,
-            DLambdaMetaNode item => item.ValueAsNode,
+            LambdaNode item => item,
+            LambdaMetaNode item => item.ValueAsNode,
             DynamicMetaObject item => ToLambdaNode(item.Value),
 
-            _ => Surrogates[value] = new DLambdaNodeValue(value)
+            _ => Surrogates[value] = new LambdaNodeValue(value)
         };
 
         return node;
@@ -272,11 +272,11 @@ public partial class DLambdaParser
     /// </summary>
     /// <param name="values"></param>
     /// <returns></returns>
-    internal DLambdaNode[] ToLambdaNodes(object?[]? values)
+    internal LambdaNode[] ToLambdaNodes(object?[]? values)
     {
         if (values == null) return [];
 
-        var items = new DLambdaNode[values.Length];
+        var items = new LambdaNode[values.Length];
         for (int i = 0; i < values.Length; i++) items[i] = ToLambdaNode(values[i]);
         return items;
     }
@@ -317,13 +317,13 @@ public partial class DLambdaParser
     /// <param name="args"></param>
     /// <param name="canBeEmpty"></param>
     /// <returns></returns>
-    internal static ImmutableArray<DLambdaNode> ValidateArguments(
-        IEnumerable<DLambdaNode> args,
+    internal static ImmutableArray<LambdaNode> ValidateArguments(
+        IEnumerable<LambdaNode> args,
         bool canBeEmpty)
     {
         ArgumentNullException.ThrowIfNull(args);
 
-        var list = args is ImmutableArray<DLambdaNode> temp ? temp : [.. args];
+        var list = args is ImmutableArray<LambdaNode> temp ? temp : [.. args];
 
         if (list.Length == 0 && !canBeEmpty) throw new ArgumentException(
             "Collection of arguments cannot be empty.");

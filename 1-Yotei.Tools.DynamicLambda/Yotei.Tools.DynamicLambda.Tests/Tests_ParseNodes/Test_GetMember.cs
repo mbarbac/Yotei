@@ -9,14 +9,14 @@ public static class Test_GetMember
     public static void Parse_Dynamic_Member()
     {
         Func<dynamic, object> func;
-        DLambdaNode node;
-        DLambdaNodeMember item;
+        LambdaNode node;
+        LambdaNodeMember item;
 
         Debug.WriteLine("");
         func = x => x.Alpha;
-        node = DLambdaParser.Parse(func).Result;
+        node = LambdaParser.Parse(func).Result;
         Debug.WriteLine($"> Result: {node}");
-        item = Assert.IsType<DLambdaNodeMember>(node);
+        item = Assert.IsType<LambdaNodeMember>(node);
         Assert.Equal("x.Alpha", node.ToString());
     }
 
@@ -25,14 +25,14 @@ public static class Test_GetMember
     public static void Parse_Member_Chained()
     {
         Func<dynamic, object> func;
-        DLambdaNode node;
-        DLambdaNodeMember item;
+        LambdaNode node;
+        LambdaNodeMember item;
 
         Debug.WriteLine("");
         func = x => x.Alpha.Beta;
-        node = DLambdaParser.Parse(func).Result;
+        node = LambdaParser.Parse(func).Result;
         Debug.WriteLine($"> Result: {node}");
-        item = Assert.IsType<DLambdaNodeMember>(node);
+        item = Assert.IsType<LambdaNodeMember>(node);
         Assert.Equal("x.Alpha.Beta", node.ToString());
     }
 }

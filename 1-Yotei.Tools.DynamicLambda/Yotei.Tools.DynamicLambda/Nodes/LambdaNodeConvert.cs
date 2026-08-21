@@ -6,18 +6,18 @@
 /// <br/> Instances of this type are immutable ones.
 /// </summary>
 [DebuggerDisplay("{ToDebugString()}")]
-public class DLambdaNodeConvert : DLambdaNode
+public class LambdaNodeConvert : LambdaNode
 {
     /// <summary>
     /// Initializes a new instance.
     /// </summary>
     /// <param name="type"></param>
     /// <param name="target"></param>
-    public DLambdaNodeConvert(Type type, DLambdaNode target) : base()
+    public LambdaNodeConvert(Type type, LambdaNode target) : base()
     {
         DLambdaType = type.ThrowWhenNull();
         DLambdaTarget = target.ThrowWhenNull();
-        DLambdaParser.ToDebug(DLambdaParser.NewNodeColor, $"- NODE new: {ToDebugString()}");
+        LambdaParser.ToDebug(LambdaParser.NewNodeColor, $"- NODE new: {ToDebugString()}");
     }
 
     /// <summary>
@@ -30,7 +30,7 @@ public class DLambdaNodeConvert : DLambdaNode
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override DLambdaNodeArgument? GetArgument() => DLambdaTarget.GetArgument();
+    public override LambdaNodeArgument? GetArgument() => DLambdaTarget.GetArgument();
 
     // ----------------------------------------------------
 
@@ -42,5 +42,5 @@ public class DLambdaNodeConvert : DLambdaNode
     /// <summary>
     /// The target operand of the dynamic operation.
     /// </summary>
-    public DLambdaNode DLambdaTarget { get; }
+    public LambdaNode DLambdaTarget { get; }
 }

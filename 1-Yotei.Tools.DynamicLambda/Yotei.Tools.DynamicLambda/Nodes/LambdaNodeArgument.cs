@@ -6,16 +6,16 @@
 /// <br/> Instances of this type are immutable ones.
 /// </summary>
 [DebuggerDisplay("{ToDebugString()}")]
-public class DLambdaNodeArgument : DLambdaNode
+public class LambdaNodeArgument : LambdaNode
 {
     /// <summary>
     /// Initializes a new instance.
     /// </summary>
     /// <param name="name"></param>
-    public DLambdaNodeArgument(string name)
+    public LambdaNodeArgument(string name)
     {
-        DLambdaName = DLambdaParser.ValidateName(name);
-        DLambdaParser.ToDebug(DLambdaParser.NewNodeColor, $"- NODE new: {ToDebugString()}");
+        DLambdaName = LambdaParser.ValidateName(name);
+        LambdaParser.ToDebug(LambdaParser.NewNodeColor, $"- NODE new: {ToDebugString()}");
     }
 
     /// <summary>
@@ -28,7 +28,7 @@ public class DLambdaNodeArgument : DLambdaNode
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override DLambdaNodeArgument? GetArgument() => this;
+    public override LambdaNodeArgument? GetArgument() => this;
 
     // ----------------------------------------------------
 

@@ -6,7 +6,7 @@
 /// <br/> Instances of this type are immutable ones.
 /// </summary>
 [DebuggerDisplay("{ToDebugString()}")]
-public class DLambdaNodeMethod : DLambdaNodeHosted
+public class LambdaNodeMethod : LambdaNodeHosted
 {
     /// <summary>
     /// Initializes a new instance.
@@ -14,14 +14,14 @@ public class DLambdaNodeMethod : DLambdaNodeHosted
     /// <param name="host"></param>
     /// <param name="name"></param>
     /// <param name="arguments"></param>
-    public DLambdaNodeMethod(DLambdaNode host,
+    public LambdaNodeMethod(LambdaNode host,
         string name,
-        IEnumerable<DLambdaNode> arguments) : base(host)
+        IEnumerable<LambdaNode> arguments) : base(host)
     {
-        DLambdaName = DLambdaParser.ValidateName(name);
-        DLambdaArguments = DLambdaParser.ValidateArguments(arguments, canBeEmpty: true);
+        DLambdaName = LambdaParser.ValidateName(name);
+        DLambdaArguments = LambdaParser.ValidateArguments(arguments, canBeEmpty: true);
         DLambdaTypeArguments = [];
-        DLambdaParser.ToDebug(DLambdaParser.NewNodeColor, $"- NODE new: {ToDebugString()}");
+        LambdaParser.ToDebug(LambdaParser.NewNodeColor, $"- NODE new: {ToDebugString()}");
     }
 
     /// <summary>
@@ -31,16 +31,16 @@ public class DLambdaNodeMethod : DLambdaNodeHosted
     /// <param name="name"></param>
     /// <param name="types"></param>
     /// <param name="arguments"></param>
-    public DLambdaNodeMethod(
-        DLambdaNode host,
+    public LambdaNodeMethod(
+        LambdaNode host,
         string name,
         IEnumerable<Type> types,
-        IEnumerable<DLambdaNode> arguments) : base(host)
+        IEnumerable<LambdaNode> arguments) : base(host)
     {
-        DLambdaName = DLambdaParser.ValidateName(name);
-        DLambdaArguments = DLambdaParser.ValidateArguments(arguments, canBeEmpty: true);
-        DLambdaTypeArguments = DLambdaParser.ValidateTypeArguments(types);
-        DLambdaParser.ToDebug(DLambdaParser.NewNodeColor, $"- NODE new: {ToDebugString()}");
+        DLambdaName = LambdaParser.ValidateName(name);
+        DLambdaArguments = LambdaParser.ValidateArguments(arguments, canBeEmpty: true);
+        DLambdaTypeArguments = LambdaParser.ValidateTypeArguments(types);
+        LambdaParser.ToDebug(LambdaParser.NewNodeColor, $"- NODE new: {ToDebugString()}");
     }
 
     /// <summary>
@@ -82,5 +82,5 @@ public class DLambdaNodeMethod : DLambdaNodeHosted
     /// The collection of arguments used for the method invocation operation, which can be an
     /// empty one when needed.
     /// </summary>
-    public ImmutableArray<DLambdaNode> DLambdaArguments { get; }
+    public ImmutableArray<LambdaNode> DLambdaArguments { get; }
 }

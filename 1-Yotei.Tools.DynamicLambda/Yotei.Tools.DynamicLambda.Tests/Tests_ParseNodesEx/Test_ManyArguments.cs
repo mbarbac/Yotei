@@ -9,19 +9,19 @@ public static class Test_ManyArguments
     public static void Parse_Only_Concretes()
     {
         Func<int, int> func = (x) => x + 1;
-        DLambdaNode node;
-        DLambdaNodeValue item;
+        LambdaNode node;
+        LambdaNodeValue item;
 
         Debug.WriteLine("");
-        node = DLambdaParser.Parse(func, 1).Result;
+        node = LambdaParser.Parse(func, 1).Result;
         Debug.WriteLine($"> Result: {node}");
-        item = Assert.IsType<DLambdaNodeValue>(node);
+        item = Assert.IsType<LambdaNodeValue>(node);
         Assert.Equal(2, item.DLambdaValue);
 
-        try { node = DLambdaParser.Parse(func).Result; Assert.Fail(); }
+        try { node = LambdaParser.Parse(func).Result; Assert.Fail(); }
         catch (NotFoundException) { }
 
-        try { node = DLambdaParser.Parse(func, 1, 1).Result; Assert.Fail(); }
+        try { node = LambdaParser.Parse(func, 1, 1).Result; Assert.Fail(); }
         catch (InvalidOperationException) { }
     }
 
@@ -30,13 +30,13 @@ public static class Test_ManyArguments
     public static void Parse_Several_Arguments_Equality()
     {
         Func<dynamic, dynamic, object> func = (x, y) => x == y;
-        DLambdaNode node;
-        DLambdaNodeBinary item;
+        LambdaNode node;
+        LambdaNodeBinary item;
 
         Debug.WriteLine("");
-        node = DLambdaParser.Parse(func).Result;
+        node = LambdaParser.Parse(func).Result;
         Debug.WriteLine($"> Result: {node}");
-        item = Assert.IsType<DLambdaNodeBinary>(node);
+        item = Assert.IsType<LambdaNodeBinary>(node);
         Assert.Equal("(x Equal y)", node.ToString());
     }
 
@@ -45,13 +45,13 @@ public static class Test_ManyArguments
     public static void Parse_Several_Arguments_Indexes()
     {
         Func<dynamic, dynamic, object> func = (x, y) => x.Alpha[y.Apha] = y.Alpha[x.Alpha];
-        DLambdaNode node;
-        DLambdaNodeSetter item;
+        LambdaNode node;
+        LambdaNodeSetter item;
 
         Debug.WriteLine("");
-        node = DLambdaParser.Parse(func).Result;
+        node = LambdaParser.Parse(func).Result;
         Debug.WriteLine($"> Result: {node}");
-        item = Assert.IsType<DLambdaNodeSetter>(node);
+        item = Assert.IsType<LambdaNodeSetter>(node);
         Assert.Equal("(x.Alpha[y.Apha] = y.Alpha[x.Alpha])", node.ToString());
     }
 
@@ -62,13 +62,13 @@ public static class Test_ManyArguments
         Func<dynamic, dynamic, object>
             func = (x, y) => x.Alpha[(int)y.Apha] = (int)y.Alpha[(DateTime)x.Alpha];
 
-        DLambdaNode node;
-        DLambdaNodeSetter item;
+        LambdaNode node;
+        LambdaNodeSetter item;
 
         Debug.WriteLine("");
-        node = DLambdaParser.Parse(func).Result;
+        node = LambdaParser.Parse(func).Result;
         Debug.WriteLine($"> Result: {node}");
-        item = Assert.IsType<DLambdaNodeSetter>(node);
+        item = Assert.IsType<LambdaNodeSetter>(node);
         Assert.Equal(
             "(x.Alpha[((int) y.Alpha[((DateTime) x.Alpha)])] = ((int) y.Alpha[((DateTime) x.Alpha)]))",
             node.ToString());

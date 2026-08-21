@@ -11,7 +11,7 @@ public static class Test_Action
         try
         {
             var action = () => { Debug.WriteLine("From no arguments action..."); };
-            var node = DLambdaParser.Parse(action).Result;
+            var node = LambdaParser.Parse(action).Result;
             Assert.Fail();
         }
         catch (NotSupportedException) { }

@@ -2,40 +2,38 @@
 
 // ========================================================
 /// <summary>
-/// Represents a dynamic ternary operation (x.Alpha ? x.Beta : x.Delta) in a chain of dynamic
-/// operations.
+/// Represents a dynamic binary operation in a chain of dynamic operations.
 /// <br/> Instances of this type are immutable ones.
 /// </summary>
 [DebuggerDisplay("{ToDebugString()}")]
-public class DLambdaNodeTernary : DLambdaNode
+public class LambdaNodeBinary : LambdaNode
 {
     /// <summary>
     /// Initializes a new instance.
     /// </summary>
     /// <param name="left"></param>
-    /// <param name="middle"></param>
+    /// <param name="operation"></param>
     /// <param name="right"></param>
-    public DLambdaNodeTernary(DLambdaNode left, DLambdaNode middle, DLambdaNode right) : base()
+    public LambdaNodeBinary(LambdaNode left, ExpressionType operation, LambdaNode right) : base()
     {
         DLambdaLeft = left.ThrowWhenNull();
-        DLambdaMiddle = middle.ThrowWhenNull();
+        DLambdaOperation = operation;
         DLambdaRight = right.ThrowWhenNull();
-        DLambdaParser.ToDebug(DLambdaParser.NewNodeColor, $"- NODE new: {ToDebugString()}");
+        LambdaParser.ToDebug(LambdaParser.NewNodeColor, $"- NODE new: {ToDebugString()}");
     }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => $"({DLambdaLeft} ? {DLambdaMiddle} : {DLambdaRight})";
+    public override string ToString() => $"({DLambdaLeft} {DLambdaOperation} {DLambdaRight})";
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override DLambdaNodeArgument? GetArgument()
+    public override LambdaNodeArgument? GetArgument()
         => DLambdaLeft.GetArgument()
-        ?? DLambdaMiddle.GetArgument()
         ?? DLambdaRight.GetArgument();
 
     // ----------------------------------------------------
@@ -43,15 +41,16 @@ public class DLambdaNodeTernary : DLambdaNode
     /// <summary>
     /// The left operand of the dynamic operation.
     /// </summary>
-    public DLambdaNode DLambdaLeft { get; }
+    public LambdaNode DLambdaLeft { get; }
 
     /// <summary>
-    /// The middle operand of the dynamic operation.
+    /// The dynamic binary operation represented by this instance.
+    /// <br/> The caller is responsable for setting an appropriate value.
     /// </summary>
-    public DLambdaNode DLambdaMiddle { get; }
+    public ExpressionType DLambdaOperation { get; }
 
     /// <summary>
     /// The right operand of the dynamic operation.
     /// </summary>
-    public DLambdaNode DLambdaRight { get; }
+    public LambdaNode DLambdaRight { get; }
 }

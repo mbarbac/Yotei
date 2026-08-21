@@ -8,12 +8,12 @@
 /// <br/> Instances of this type are immutable ones.
 /// </summary>
 [DebuggerDisplay("{ToDebugString()}")]
-public abstract class DLambdaNode : DynamicObject
+public abstract class LambdaNode : DynamicObject
 {
     /// <summary>
     /// Initializes a new instance.
     /// </summary>
-    public DLambdaNode()
+    public LambdaNode()
     {
         DLambdaId = NextDLambdaId();
         DLambdaVersion = NextDLambdaVersion();
@@ -34,7 +34,7 @@ public abstract class DLambdaNode : DynamicObject
     /// if it cannot be determined.
     /// </summary>
     /// <returns></returns>
-    public abstract DLambdaNodeArgument? GetArgument();
+    public abstract LambdaNodeArgument? GetArgument();
 
     // ----------------------------------------------------
 
@@ -64,7 +64,7 @@ public abstract class DLambdaNode : DynamicObject
     {
         var master = base.GetMetaObject(expression);
         var rest = BindingRestrictions.GetInstanceRestriction(expression, this);
-        var meta = new DLambdaMetaNode(master, expression, rest, this);
+        var meta = new LambdaMetaNode(master, expression, rest, this);
 
         return meta;
     }
@@ -74,7 +74,7 @@ public abstract class DLambdaNode : DynamicObject
     /// the latest one and, if not, update it.
     /// <para>
     /// For performance reasons, the DLR caches the results of the bindings using both the type of
-    /// the call site and the type of the arguments used. For <see cref="DLambdaParser"/> purposes,
+    /// the call site and the type of the arguments used. For <see cref="LambdaParser"/> purposes,
     /// this mechanism will produce the same nodes over and over again, instead of producing new
     /// ones each binding, which is what we one.
     /// <br/> So, this method is a hack that intercepts the DLR mechanism by using a custom binding
@@ -96,11 +96,11 @@ public abstract class DLambdaNode : DynamicObject
             Expression.Condition(
                 Expression.IsFalse(
                     Expression.Call(
-                        Expression.Convert(argExpr, typeof(DLambdaNode)),
+                        Expression.Convert(argExpr, typeof(LambdaNode)),
                         ValidateDLambdaVersionInfo)),
                 Expression.Block(
                     Expression.Call(
-                        Expression.Convert(argExpr, typeof(DLambdaNode)),
+                        Expression.Convert(argExpr, typeof(LambdaNode)),
                         UpdateDLambdaVersionInfo),
                     updateExpr),
                 Expression.Constant(true)));
@@ -125,15 +125,15 @@ public abstract class DLambdaNode : DynamicObject
         var result = DLambdaVersion == DLastLambdaVersion;
         var valid = result ? "Valid" : "Invalid";
 
-        DLambdaParser.ToDebug(
-            DLambdaParser.ValidateLambdaColor,
+        LambdaParser.ToDebug(
+            LambdaParser.ValidateLambdaColor,
             $"- VERSION {valid}: {ToDebugString()}");
 
         return result;
     }
 
     static MethodInfo ValidateDLambdaVersionInfo
-        => typeof(DLambdaNode).GetMethod(nameof(ValidateDLambdaVersion), DLAMBDA_FLAGS)!;
+        => typeof(LambdaNode).GetMethod(nameof(ValidateDLambdaVersion), DLAMBDA_FLAGS)!;
 
     /// <summary>
     /// Updates the version of this instance to the latest one, which is also incremented along
@@ -146,15 +146,15 @@ public abstract class DLambdaNode : DynamicObject
         var old = DLambdaVersion;
         var neo = DLambdaVersion = NextDLambdaVersion();
 
-        DLambdaParser.ToDebug(
-            DLambdaParser.UpdateLambdaColor,
+        LambdaParser.ToDebug(
+            LambdaParser.UpdateLambdaColor,
             $"- VERSION Updating: {old} to {neo}, {ToDebugString()}");
 
-        DLambdaParser.Instance.LastNode = this;
+        LambdaParser.Instance.LastNode = this;
     }
 
     static MethodInfo UpdateDLambdaVersionInfo
-        => typeof(DLambdaNode).GetMethod(nameof(UpdateDLambdaVersion), DLAMBDA_FLAGS)!;
+        => typeof(LambdaNode).GetMethod(nameof(UpdateDLambdaVersion), DLAMBDA_FLAGS)!;
 
     // ---------------------------------------------------- Overriden
 
@@ -167,18 +167,18 @@ public abstract class DLambdaNode : DynamicObject
     /// <returns><inheritdoc/></returns>
     public override bool TryGetIndex(GetIndexBinder binder, object[] indexes, out object? result)
     {
-        DLambdaParser.ToDebug(DLambdaParser.NodeBindedColor, $"* GetIndex:");
-        DLambdaParser.ToDebug(DLambdaParser.NodeBindedColor, $"- This: {ToDebugString()}");
+        LambdaParser.ToDebug(LambdaParser.NodeBindedColor, $"* GetIndex:");
+        LambdaParser.ToDebug(LambdaParser.NodeBindedColor, $"- This: {ToDebugString()}");
 
-        var list = DLambdaParser.Instance.ToLambdaNodes(indexes);
+        var list = LambdaParser.Instance.ToLambdaNodes(indexes);
         foreach (var temp in list)
-            DLambdaParser.ToDebug(DLambdaParser.NodeBindedColor, $"- Index: {temp.ToDebugString()}");
+            LambdaParser.ToDebug(LambdaParser.NodeBindedColor, $"- Index: {temp.ToDebugString()}");
 
-        var node = new DLambdaNodeIndexed(this, list);
-        DLambdaParser.Instance.LastNode = node;
+        var node = new LambdaNodeIndexed(this, list);
+        LambdaParser.Instance.LastNode = node;
         result = node;
 
-        DLambdaParser.ToDebug(DLambdaParser.NodeBindedColor, $"- Result: {node.ToDebugString()}");
+        LambdaParser.ToDebug(LambdaParser.NodeBindedColor, $"- Result: {node.ToDebugString()}");
         return true;
     }
 
@@ -190,15 +190,15 @@ public abstract class DLambdaNode : DynamicObject
     /// <returns><inheritdoc/></returns>
     public override bool TryGetMember(GetMemberBinder binder, out object? result)
     {
-        DLambdaParser.ToDebug(DLambdaParser.NodeBindedColor, $"* GetMember:");
-        DLambdaParser.ToDebug(DLambdaParser.NodeBindedColor, $"- This: {ToDebugString()}");
-        DLambdaParser.ToDebug(DLambdaParser.NodeBindedColor, $"- Name: {binder.Name}");
+        LambdaParser.ToDebug(LambdaParser.NodeBindedColor, $"* GetMember:");
+        LambdaParser.ToDebug(LambdaParser.NodeBindedColor, $"- This: {ToDebugString()}");
+        LambdaParser.ToDebug(LambdaParser.NodeBindedColor, $"- Name: {binder.Name}");
 
-        var node = new DLambdaNodeMember(this, binder.Name);
-        DLambdaParser.Instance.LastNode = node;
+        var node = new LambdaNodeMember(this, binder.Name);
+        LambdaParser.Instance.LastNode = node;
         result = node;
 
-        DLambdaParser.ToDebug(DLambdaParser.NodeBindedColor, $"- Result: {node.ToDebugString()}");
+        LambdaParser.ToDebug(LambdaParser.NodeBindedColor, $"- Result: {node.ToDebugString()}");
         return true;
     }
 
@@ -211,18 +211,18 @@ public abstract class DLambdaNode : DynamicObject
     /// <returns><inheritdoc/></returns>
     public override bool TryInvoke(InvokeBinder binder, object?[]? args, out object? result)
     {
-        DLambdaParser.ToDebug(DLambdaParser.NodeBindedColor, $"* Invoke:");
-        DLambdaParser.ToDebug(DLambdaParser.NodeBindedColor, $"- This: {ToDebugString()}");
+        LambdaParser.ToDebug(LambdaParser.NodeBindedColor, $"* Invoke:");
+        LambdaParser.ToDebug(LambdaParser.NodeBindedColor, $"- This: {ToDebugString()}");
 
-        var list = DLambdaParser.Instance.ToLambdaNodes(args);
+        var list = LambdaParser.Instance.ToLambdaNodes(args);
         foreach (var temp in list)
-            DLambdaParser.ToDebug(DLambdaParser.NodeBindedColor, $"- Argument: {temp.ToDebugString()}");
+            LambdaParser.ToDebug(LambdaParser.NodeBindedColor, $"- Argument: {temp.ToDebugString()}");
 
-        var node = new DLambdaNodeInvoke(this, list);
-        DLambdaParser.Instance.LastNode = node;
+        var node = new LambdaNodeInvoke(this, list);
+        LambdaParser.Instance.LastNode = node;
         result = node;
 
-        DLambdaParser.ToDebug(DLambdaParser.NodeBindedColor, $"- Result: {node.ToDebugString()}");
+        LambdaParser.ToDebug(LambdaParser.NodeBindedColor, $"- Result: {node.ToDebugString()}");
         return true;
     }
 
@@ -236,33 +236,33 @@ public abstract class DLambdaNode : DynamicObject
     public override bool TryInvokeMember(
         InvokeMemberBinder binder, object?[]? args, out object? result)
     {
-        DLambdaParser.ToDebug(DLambdaParser.NodeBindedColor, $"* Method:");
-        DLambdaParser.ToDebug(DLambdaParser.NodeBindedColor, $"- This: {ToDebugString()}");
-        DLambdaParser.ToDebug(DLambdaParser.NodeBindedColor, $"- Name: {binder.Name}");
+        LambdaParser.ToDebug(LambdaParser.NodeBindedColor, $"* Method:");
+        LambdaParser.ToDebug(LambdaParser.NodeBindedColor, $"- This: {ToDebugString()}");
+        LambdaParser.ToDebug(LambdaParser.NodeBindedColor, $"- Name: {binder.Name}");
 
-        var list = DLambdaParser.Instance.ToLambdaNodes(args);
+        var list = LambdaParser.Instance.ToLambdaNodes(args);
         foreach (var temp in list)
-            DLambdaParser.ToDebug(DLambdaParser.NodeBindedColor, $"- Argument: {temp.ToDebugString()}");
+            LambdaParser.ToDebug(LambdaParser.NodeBindedColor, $"- Argument: {temp.ToDebugString()}");
 
-        DLambdaNode node;
+        LambdaNode node;
 
         // Intercepting 'Coalesce' methods...
-        if (this is DLambdaNodeArgument && binder.Name == "Coalesce" && list.Length == 2)
+        if (this is LambdaNodeArgument && binder.Name == "Coalesce" && list.Length == 2)
         {
-            DLambdaParser.ToDebug(DLambdaParser.NodeBindedColor, $"* Intercepting 'Coalesce' method...");
+            LambdaParser.ToDebug(LambdaParser.NodeBindedColor, $"* Intercepting 'Coalesce' method...");
 
-            node = new DLambdaNodeCoalesce(list[0], list[1]);
-            DLambdaParser.Instance.LastNode = node;
+            node = new LambdaNodeCoalesce(list[0], list[1]);
+            LambdaParser.Instance.LastNode = node;
             result = node;
         }
 
         // Intercepting 'Ternary' methods...
-        else if (this is DLambdaNodeArgument && binder.Name == "Ternary" && list.Length == 3)
+        else if (this is LambdaNodeArgument && binder.Name == "Ternary" && list.Length == 3)
         {
-            DLambdaParser.ToDebug(DLambdaParser.NodeBindedColor, $"* Intercepting 'Ternary' method...");
+            LambdaParser.ToDebug(LambdaParser.NodeBindedColor, $"* Intercepting 'Ternary' method...");
 
-            node = new DLambdaNodeTernary(list[0], list[1], list[2]);
-            DLambdaParser.Instance.LastNode = node;
+            node = new LambdaNodeTernary(list[0], list[1], list[2]);
+            LambdaParser.Instance.LastNode = node;
             result = node;
         }
 
@@ -279,15 +279,15 @@ public abstract class DLambdaNode : DynamicObject
             }
 
             node = types.Length == 0
-                ? new DLambdaNodeMethod(this, binder.Name, list)
-                : new DLambdaNodeMethod(this, binder.Name, types, list);
+                ? new LambdaNodeMethod(this, binder.Name, list)
+                : new LambdaNodeMethod(this, binder.Name, types, list);
 
-            DLambdaParser.Instance.LastNode = node;
+            LambdaParser.Instance.LastNode = node;
             result = node;
         }
 
         // Finishing...
-        DLambdaParser.ToDebug(DLambdaParser.NodeBindedColor, $"- Result: {node.ToDebugString()}");
+        LambdaParser.ToDebug(LambdaParser.NodeBindedColor, $"- Result: {node.ToDebugString()}");
         return true;
     }
 

@@ -8,20 +8,20 @@
 /// <br/> Instances of this type are immutable ones.
 /// </summary>
 [DebuggerDisplay("{ToDebugString()}")]
-public class DLambdaNodeValue : DLambdaNode
+public class LambdaNodeValue : LambdaNode
 {
     /// <summary>
     /// Initializes a new instance.
     /// </summary>
     /// <param name="value"></param>
-    public DLambdaNodeValue(object? value)
+    public LambdaNodeValue(object? value)
     {
-        if (value is DLambdaNode) throw new ArgumentException(
+        if (value is LambdaNode) throw new ArgumentException(
             "Cannot use a lambda node as the value carried by this instance.")
             .WithData(value);
         
         DLambdaValue = value;
-        DLambdaParser.ToDebug(DLambdaParser.NewNodeColor, $"- NODE new: {ToDebugString()}");
+        LambdaParser.ToDebug(LambdaParser.NewNodeColor, $"- NODE new: {ToDebugString()}");
     }
 
     /// <summary>
@@ -34,7 +34,7 @@ public class DLambdaNodeValue : DLambdaNode
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override DLambdaNodeArgument? GetArgument() => null;
+    public override LambdaNodeArgument? GetArgument() => null;
 
     // ----------------------------------------------------
 

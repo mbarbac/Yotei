@@ -6,17 +6,17 @@
 /// <br/> Instances of this type are immutable ones.
 /// </summary>
 [DebuggerDisplay("{ToDebugString()}")]
-public class DLambdaNodeMember : DLambdaNodeHosted
+public class LambdaNodeMember : LambdaNodeHosted
 {
     /// <summary>
     /// Initializes a new instance.
     /// </summary>
     /// <param name="host"></param>
     /// <param name="name"></param>
-    public DLambdaNodeMember(DLambdaNode host, string name) : base(host)
+    public LambdaNodeMember(LambdaNode host, string name) : base(host)
     {
-        DLambdaName = DLambdaParser.ValidateName(name);
-        DLambdaParser.ToDebug(DLambdaParser.NewNodeColor, $"- NODE new: {ToDebugString()}");
+        DLambdaName = LambdaParser.ValidateName(name);
+        LambdaParser.ToDebug(LambdaParser.NewNodeColor, $"- NODE new: {ToDebugString()}");
     }
 
     /// <summary>

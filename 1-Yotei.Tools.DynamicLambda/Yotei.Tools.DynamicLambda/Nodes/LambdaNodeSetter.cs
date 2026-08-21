@@ -6,18 +6,18 @@
 /// <br/> Instances of this type are immutable ones.
 /// </summary>
 [DebuggerDisplay("{ToDebugString()}")]
-public class DLambdaNodeSetter : DLambdaNode
+public class LambdaNodeSetter : LambdaNode
 {
     /// <summary>
     /// Initializes a new instance.
     /// </summary>
     /// <param name="target"></param>
     /// <param name="value"></param>
-    public DLambdaNodeSetter(DLambdaNode target, DLambdaNode value) : base()
+    public LambdaNodeSetter(LambdaNode target, LambdaNode value) : base()
     {
         DLambdaTarget = target.ThrowWhenNull();
         DLambdaValue = value.ThrowWhenNull();
-        DLambdaParser.ToDebug(DLambdaParser.NewNodeColor, $"- NODE new: {ToDebugString()}");
+        LambdaParser.ToDebug(LambdaParser.NewNodeColor, $"- NODE new: {ToDebugString()}");
     }
 
     /// <summary>
@@ -30,7 +30,7 @@ public class DLambdaNodeSetter : DLambdaNode
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override DLambdaNodeArgument? GetArgument()
+    public override LambdaNodeArgument? GetArgument()
         => DLambdaTarget.GetArgument()
         ?? DLambdaValue.GetArgument();
 
@@ -39,10 +39,10 @@ public class DLambdaNodeSetter : DLambdaNode
     /// <summary>
     /// The target operand of the dynamic operation.
     /// </summary>
-    public DLambdaNode DLambdaTarget { get; }
+    public LambdaNode DLambdaTarget { get; }
 
     /// <summary>
     /// The value to set the target to.
     /// </summary>
-    public DLambdaNode DLambdaValue { get; }
+    public LambdaNode DLambdaValue { get; }
 }

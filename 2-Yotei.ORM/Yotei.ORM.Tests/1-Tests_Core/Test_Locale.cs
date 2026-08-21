@@ -9,7 +9,7 @@ public static class Test_Locale
     public static void Test_Create()
     {
         var locale = new Locale();
-        Assert.Equal(CultureInfo.InvariantCulture, locale.CultureInfo);
+        Assert.Equal(CultureInfo.CurrentCulture, locale.CultureInfo);
         Assert.Equal(CompareOptions.None, locale.CompareOptions);
         Assert.False(locale.CompareOptions.HasFlag(CompareOptions.OrdinalIgnoreCase));
 
@@ -25,7 +25,7 @@ public static class Test_Locale
     public static void Test_With()
     {
         var locale = new Locale();
-        Assert.Equal(CultureInfo.InvariantCulture, locale.CultureInfo);
+        Assert.Equal(CultureInfo.CurrentCulture, locale.CultureInfo);
         Assert.Equal(CompareOptions.None, locale.CompareOptions);
         Assert.False(locale.CompareOptions.HasFlag(CompareOptions.OrdinalIgnoreCase));
 

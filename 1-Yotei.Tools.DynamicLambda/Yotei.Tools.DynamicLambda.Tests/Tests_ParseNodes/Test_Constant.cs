@@ -9,14 +9,14 @@ public static class Test_Constant
     public static void Parse_Null()
     {
         Func<dynamic, object> func;
-        DLambdaNode node;
-        DLambdaNodeValue item;
+        LambdaNode node;
+        LambdaNodeValue item;
 
         Debug.WriteLine("");
         func = x => null!; // Returns the value without invoking the dynamic argument...
-        node = DLambdaParser.Parse(func).Result;
+        node = LambdaParser.Parse(func).Result;
         Debug.WriteLine($"> Result: {node}");
-        item = Assert.IsType<DLambdaNodeValue>(node);
+        item = Assert.IsType<LambdaNodeValue>(node);
         Assert.Equal("'NULL'", node.ToString());
     }
 
@@ -25,21 +25,21 @@ public static class Test_Constant
     public static void Parse_Arbitrary()
     {
         Func<dynamic, object> func;
-        DLambdaNode node;
-        DLambdaNodeValue item;
+        LambdaNode node;
+        LambdaNodeValue item;
 
         Debug.WriteLine("");
         func = x => 7; // Returns the value without invoking the dynamic argument...
-        node = DLambdaParser.Parse(func).Result;
+        node = LambdaParser.Parse(func).Result;
         Debug.WriteLine($"> Result: {node}");
-        item = Assert.IsType<DLambdaNodeValue>(node);
+        item = Assert.IsType<LambdaNodeValue>(node);
         Assert.Equal("'7'", node.ToString());
 
         Debug.WriteLine("");
         func = x => "any"; // Returns the value without invoking the dynamic argument...
-        node = DLambdaParser.Parse(func).Result;
+        node = LambdaParser.Parse(func).Result;
         Debug.WriteLine($"> Result: {node}");
-        item = Assert.IsType<DLambdaNodeValue>(node);
+        item = Assert.IsType<LambdaNodeValue>(node);
         Assert.Equal("'any'", node.ToString());
     }
 
@@ -50,21 +50,21 @@ public static class Test_Constant
     public static void Parse_With_Cast_Constant()
     {
         Func<dynamic, object> func;
-        DLambdaNode node;
-        DLambdaNodeValue item;
+        LambdaNode node;
+        LambdaNodeValue item;
 
         Debug.WriteLine("");
         func = x => (string?)null!;
-        node = DLambdaParser.Parse(func).Result;
+        node = LambdaParser.Parse(func).Result;
         Debug.WriteLine($"> Result: {node}");
-        item = Assert.IsType<DLambdaNodeValue>(node);
+        item = Assert.IsType<LambdaNodeValue>(node);
         Assert.Equal("'NULL'", node.ToString());
 
         Debug.WriteLine("");
         func = x => (int)10.5!;
-        node = DLambdaParser.Parse(func).Result;
+        node = LambdaParser.Parse(func).Result;
         Debug.WriteLine($"> Result: {node}");
-        item = Assert.IsType<DLambdaNodeValue>(node);
+        item = Assert.IsType<LambdaNodeValue>(node);
         Assert.Equal("'10'", node.ToString());
     }
 
@@ -73,21 +73,21 @@ public static class Test_Constant
     public static void Parse_With_Cast_Dynamic()
     {
         Func<dynamic, object> func;
-        DLambdaNode node;
-        DLambdaNodeConvert item;
+        LambdaNode node;
+        LambdaNodeConvert item;
 
         Debug.WriteLine("");
         func = x => (string?)x!;
-        node = DLambdaParser.Parse(func).Result;
+        node = LambdaParser.Parse(func).Result;
         Debug.WriteLine($"> Result: {node}");
-        item = Assert.IsType<DLambdaNodeConvert>(node);
+        item = Assert.IsType<LambdaNodeConvert>(node);
         Assert.Equal("((string) x)", node.ToString());
 
         Debug.WriteLine("");
         func = x => (int)x.Delta.Beta.Alpha;
-        node = DLambdaParser.Parse(func).Result;
+        node = LambdaParser.Parse(func).Result;
         Debug.WriteLine($"> Result: {node}");
-        item = Assert.IsType<DLambdaNodeConvert>(node);
+        item = Assert.IsType<LambdaNodeConvert>(node);
         Assert.Equal("((int) x.Delta.Beta.Alpha)", node.ToString());
     }
 }

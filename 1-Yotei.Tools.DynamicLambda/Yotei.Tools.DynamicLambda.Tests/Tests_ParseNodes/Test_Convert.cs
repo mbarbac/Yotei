@@ -18,28 +18,28 @@ public static class Test_Convert
     public static void Parse_Convert_Argument()
     {
         Func<dynamic, object> func;
-        DLambdaNode node;
-        DLambdaNodeConvert item;
+        LambdaNode node;
+        LambdaNodeConvert item;
 
         Debug.WriteLine("");
         func = x => (int)x;
-        node = DLambdaParser.Parse(func).Result;
+        node = LambdaParser.Parse(func).Result;
         Debug.WriteLine($"> Result: {node}");
-        item = Assert.IsType<DLambdaNodeConvert>(node);
+        item = Assert.IsType<LambdaNodeConvert>(node);
         Assert.Equal("((int) x)", node.ToString());
 
         Debug.WriteLine("");
         func = x => (string)x;
-        node = DLambdaParser.Parse(func).Result;
+        node = LambdaParser.Parse(func).Result;
         Debug.WriteLine($"> Result: {node}");
-        item = Assert.IsType<DLambdaNodeConvert>(node);
+        item = Assert.IsType<LambdaNodeConvert>(node);
         Assert.Equal("((string) x)", node.ToString());
 
         Debug.WriteLine("");
         func = x => (Person)x;
-        node = DLambdaParser.Parse(func).Result;
+        node = LambdaParser.Parse(func).Result;
         Debug.WriteLine($"> Result: {node}");
-        item = Assert.IsType<DLambdaNodeConvert>(node);
+        item = Assert.IsType<LambdaNodeConvert>(node);
         Assert.Equal("((Person) x)", node.ToString());
     }
 
@@ -50,21 +50,21 @@ public static class Test_Convert
     public static void Parse_Convert_Member()
     {
         Func<dynamic, object> func;
-        DLambdaNode node;
-        DLambdaNodeConvert item;
+        LambdaNode node;
+        LambdaNodeConvert item;
 
         Debug.WriteLine("");
         func = x => (int)x.Alpha;
-        node = DLambdaParser.Parse(func).Result;
+        node = LambdaParser.Parse(func).Result;
         Debug.WriteLine($"> Result: {node}");
-        item = Assert.IsType<DLambdaNodeConvert>(node);
+        item = Assert.IsType<LambdaNodeConvert>(node);
         Assert.Equal("((int) x.Alpha)", node.ToString());
 
         Debug.WriteLine("");
         func = x => (Person)x.Alpha;
-        node = DLambdaParser.Parse(func).Result;
+        node = LambdaParser.Parse(func).Result;
         Debug.WriteLine($"> Result: {node}");
-        item = Assert.IsType<DLambdaNodeConvert>(node);
+        item = Assert.IsType<LambdaNodeConvert>(node);
         Assert.Equal("((Person) x.Alpha)", node.ToString());
     }
 
@@ -73,21 +73,21 @@ public static class Test_Convert
     public static void Parse_Convert_Member_And_Assign()
     {
         Func<dynamic, object> func;
-        DLambdaNode node;
-        DLambdaNodeSetter item;
+        LambdaNode node;
+        LambdaNodeSetter item;
 
         Debug.WriteLine("");
         func = x => x.Beta = (int)x.Alpha;
-        node = DLambdaParser.Parse(func).Result;
+        node = LambdaParser.Parse(func).Result;
         Debug.WriteLine($"> Result: {node}");
-        item = Assert.IsType<DLambdaNodeSetter>(node);
+        item = Assert.IsType<LambdaNodeSetter>(node);
         Assert.Equal("(x.Beta = ((int) x.Alpha))", node.ToString());
 
         Debug.WriteLine("");
         func = x => x.Alpha = (Person)x.Alpha;
-        node = DLambdaParser.Parse(func).Result;
+        node = LambdaParser.Parse(func).Result;
         Debug.WriteLine($"> Result: {node}");
-        item = Assert.IsType<DLambdaNodeSetter>(node);
+        item = Assert.IsType<LambdaNodeSetter>(node);
         Assert.Equal("(x.Alpha = ((Person) x.Alpha))", node.ToString());
     }
 
@@ -96,14 +96,14 @@ public static class Test_Convert
     public static void Parse_Convert_IndexedArgument()
     {
         Func<dynamic, object> func;
-        DLambdaNode node;
-        DLambdaNodeIndexed item;
+        LambdaNode node;
+        LambdaNodeIndexed item;
 
         Debug.WriteLine("");
         func = x => x[(Person)x.Alpha, (string)x.Beta];
-        node = DLambdaParser.Parse(func).Result;
+        node = LambdaParser.Parse(func).Result;
         Debug.WriteLine($"> Result: {node}");
-        item = Assert.IsType<DLambdaNodeIndexed>(node);
+        item = Assert.IsType<LambdaNodeIndexed>(node);
         Assert.Equal("x[((Person) x.Alpha), ((string) x.Beta)]", node.ToString());
     }
 
@@ -114,21 +114,21 @@ public static class Test_Convert
     public static void Parse_Conversions_As_Indexes()
     {
         Func<dynamic, object> func;
-        DLambdaNode node;
-        DLambdaNodeIndexed item;
+        LambdaNode node;
+        LambdaNodeIndexed item;
 
         Debug.WriteLine("");
         func = x => x[(Person)x.Alpha, x.Alpha = (string)x.Beta];
-        node = DLambdaParser.Parse(func).Result;
+        node = LambdaParser.Parse(func).Result;
         Debug.WriteLine($"> Result: {node}");
-        item = Assert.IsType<DLambdaNodeIndexed>(node);
+        item = Assert.IsType<LambdaNodeIndexed>(node);
         Assert.Equal("x[((Person) x.Alpha), (x.Alpha = ((string) x.Beta))]", node.ToString());
 
         Debug.WriteLine("");
         func = x => x[(Person)x.Alpha, x.Alpha = (float)x.Alpha];
-        node = DLambdaParser.Parse(func).Result;
+        node = LambdaParser.Parse(func).Result;
         Debug.WriteLine($"> Result: {node}");
-        item = Assert.IsType<DLambdaNodeIndexed>(node);
+        item = Assert.IsType<LambdaNodeIndexed>(node);
         Assert.Equal("x[((Person) x.Alpha), (x.Alpha = ((float) x.Alpha))]", node.ToString());
     }
 
@@ -137,14 +137,14 @@ public static class Test_Convert
     public static void Parse_Conversions_As_Arguments()
     {
         Func<dynamic, object> func;
-        DLambdaNode node;
-        DLambdaNodeSetter item;
+        LambdaNode node;
+        LambdaNodeSetter item;
 
         Debug.WriteLine("");
         func = x => x.Alpha = x.Alpha(null, x.Alpha = (int)x.Alpha);
-        node = DLambdaParser.Parse(func).Result;
+        node = LambdaParser.Parse(func).Result;
         Debug.WriteLine($"> Result: {node}");
-        item = Assert.IsType<DLambdaNodeSetter>(node);
+        item = Assert.IsType<LambdaNodeSetter>(node);
         Assert.Equal("(x.Alpha = x.Alpha('NULL', (x.Alpha = ((int) x.Alpha))))", node.ToString());
     }
 }

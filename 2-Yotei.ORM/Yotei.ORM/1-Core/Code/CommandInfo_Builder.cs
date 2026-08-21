@@ -1,8 +1,8 @@
-﻿namespace Yotei.ORM.Records.Code;
+﻿namespace Yotei.ORM.Code;
 
 partial class CommandInfo
 {
-    // ====================================================
+    // ========================================================
     /// <summary>
     /// <inheritdoc cref="ICommandInfo.IBuilder"/>
     /// </summary>

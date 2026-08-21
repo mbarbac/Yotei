@@ -7,17 +7,17 @@
 /// <br/> Instances of this type are immutable ones.
 /// </summary>
 [DebuggerDisplay("{ToDebugString()}")]
-public class DLambdaNodeInvoke : DLambdaNodeHosted
+public class LambdaNodeInvoke : LambdaNodeHosted
 {
     /// <summary>
     /// Initializes a new instance.
     /// </summary>
     /// <param name="host"></param>
     /// <param name="arguments"></param>
-    public DLambdaNodeInvoke(DLambdaNode host, IEnumerable<DLambdaNode> arguments) : base(host)
+    public LambdaNodeInvoke(LambdaNode host, IEnumerable<LambdaNode> arguments) : base(host)
     {
-        DLambdaArguments = DLambdaParser.ValidateArguments(arguments, canBeEmpty: true);
-        DLambdaParser.ToDebug(DLambdaParser.NewNodeColor, $"- NODE new: {ToDebugString()}");
+        DLambdaArguments = LambdaParser.ValidateArguments(arguments, canBeEmpty: true);
+        LambdaParser.ToDebug(LambdaParser.NewNodeColor, $"- NODE new: {ToDebugString()}");
     }
 
     /// <summary>
@@ -33,5 +33,5 @@ public class DLambdaNodeInvoke : DLambdaNodeHosted
     /// The collection of arguments used for the host invocation operation, which can be an empty
     /// one when needed.
     /// </summary>
-    public ImmutableArray<DLambdaNode> DLambdaArguments { get; }
+    public ImmutableArray<LambdaNode> DLambdaArguments { get; }
 }

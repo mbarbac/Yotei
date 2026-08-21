@@ -9,14 +9,14 @@ public static class Test_Caveats
     public static void SetMember_Parse_Assign_Assigment_To_Itself_Dynamic()
     {
         Func<dynamic, object> func;
-        DLambdaNode node;
-        DLambdaNodeSetter item;
+        LambdaNode node;
+        LambdaNodeSetter item;
 
         Debug.WriteLine("");
         func = x => x.Alpha = (x.Alpha = x.Beta);
-        node = DLambdaParser.Parse(func).Result;
+        node = LambdaParser.Parse(func).Result;
         Debug.WriteLine($"> Result: {node}");
-        item = Assert.IsType<DLambdaNodeSetter>(node);
+        item = Assert.IsType<LambdaNodeSetter>(node);
 
         // For unknown reasons the DLR understands both are equivalent and prefers the second,
         // but not always (!!??), and there is no consistency among test runs (in particular,

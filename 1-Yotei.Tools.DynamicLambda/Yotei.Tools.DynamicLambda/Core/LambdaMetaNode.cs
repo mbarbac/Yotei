@@ -4,21 +4,21 @@
 /// <summary>
 /// <inheritdoc cref="DynamicMetaObject"/>
 /// </summary>
-internal class DLambdaMetaNode : DynamicMetaObject
+internal class LambdaMetaNode : DynamicMetaObject
 {
     /// <summary>
     /// Initializes a new instance.
     /// </summary>
-    public DLambdaMetaNode(
+    public LambdaMetaNode(
         DynamicMetaObject master,
         Expression expression,
         BindingRestrictions restrictions,
-        DLambdaNode node)
+        LambdaNode node)
         : base(expression, restrictions, node)
     {
         DLambdaMetaMaster = master.ThrowWhenNull();
         DLambdaId = NextDLambdaId();
-        DLambdaParser.ToDebug(DLambdaParser.NewMetaColor, $"- META new: {this}");
+        LambdaParser.ToDebug(LambdaParser.NewMetaColor, $"- META new: {this}");
     }
 
     /// <summary>
@@ -45,7 +45,7 @@ internal class DLambdaMetaNode : DynamicMetaObject
     /// <summary>
     /// The actual lambda node carried by this instance.
     /// </summary>
-    public DLambdaNode ValueAsNode => Value is DLambdaNode node
+    public LambdaNode ValueAsNode => Value is LambdaNode node
         ? node
         : throw new InvalidOperationException(
             "This meta object carries no valid dynamic lambda node.")
@@ -63,28 +63,28 @@ internal class DLambdaMetaNode : DynamicMetaObject
         BinaryOperationBinder binder,
         DynamicMetaObject arg)
     {
-        DLambdaParser.ToDebug(DLambdaParser.MetaBindedColor, $"* META BindBinary:");
-        DLambdaParser.ToDebug(DLambdaParser.MetaBindedColor, $"- This: {this}");
-        DLambdaParser.ToDebug(DLambdaParser.MetaBindedColor, $"- Operation: {binder.Operation}");
+        LambdaParser.ToDebug(LambdaParser.MetaBindedColor, $"* META BindBinary:");
+        LambdaParser.ToDebug(LambdaParser.MetaBindedColor, $"- This: {this}");
+        LambdaParser.ToDebug(LambdaParser.MetaBindedColor, $"- Operation: {binder.Operation}");
 
-        var item = DLambdaParser.Instance.ToLambdaNode(arg);
-        DLambdaParser.ToDebug(DLambdaParser.MetaBindedColor, $"- Target: {item.ToDebugString()}");
+        var item = LambdaParser.Instance.ToLambdaNode(arg);
+        LambdaParser.ToDebug(LambdaParser.MetaBindedColor, $"- Target: {item.ToDebugString()}");
 
-        var node = new DLambdaNodeBinary(ValueAsNode, binder.Operation, item);
-        DLambdaParser.Instance.LastNode = node;
+        var node = new LambdaNodeBinary(ValueAsNode, binder.Operation, item);
+        LambdaParser.Instance.LastNode = node;
 
         binder.FallbackBinaryOperation(this, arg);
         var updateExpr = binder.GetUpdateExpression(typeof(bool));
 
         var nodeExpr = Expression.Constant(node);
         var rest = node.GetDBindingRestrictions(updateExpr);
-        var meta = new DLambdaMetaNode(
+        var meta = new LambdaMetaNode(
             new DynamicMetaObject(nodeExpr, rest, node),
             nodeExpr, rest, node);
 
         binder.FallbackBinaryOperation(this, arg, meta);
 
-        DLambdaParser.ToDebug(DLambdaParser.MetaBindedColor, $"- Result: {meta}");
+        LambdaParser.ToDebug(LambdaParser.MetaBindedColor, $"- Result: {meta}");
         return meta;
     }
 
@@ -96,12 +96,12 @@ internal class DLambdaMetaNode : DynamicMetaObject
     [SuppressMessage("", "IDE0300")]
     public override DynamicMetaObject BindConvert(ConvertBinder binder)
     {
-        DLambdaParser.ToDebug(DLambdaParser.MetaBindedColor, $"* META BindConvert:");
-        DLambdaParser.ToDebug(DLambdaParser.MetaBindedColor, $"- This: {this}");
-        DLambdaParser.ToDebug(DLambdaParser.MetaBindedColor, $"- Type: {binder.Type.EasyName()}");
+        LambdaParser.ToDebug(LambdaParser.MetaBindedColor, $"* META BindConvert:");
+        LambdaParser.ToDebug(LambdaParser.MetaBindedColor, $"- This: {this}");
+        LambdaParser.ToDebug(LambdaParser.MetaBindedColor, $"- Type: {binder.Type.EasyName()}");
 
-        var node = new DLambdaNodeConvert(binder.Type, ValueAsNode);
-        DLambdaParser.Instance.LastNode = node;
+        var node = new LambdaNodeConvert(binder.Type, ValueAsNode);
+        LambdaParser.Instance.LastNode = node;
 
         binder.FallbackConvert(this);
         var updateExpr = binder.GetUpdateExpression(typeof(bool));
@@ -111,7 +111,7 @@ internal class DLambdaMetaNode : DynamicMetaObject
         // arguments received by other methods will just be the plain values, and not the convert
         // nodes...
         var ret = CreateCompatible(binder.ReturnType);
-        if (ret != null) DLambdaParser.Instance.Surrogates[ret] = node;
+        if (ret != null) LambdaParser.Instance.Surrogates[ret] = node;
 
         var par = Expression.Variable(binder.ReturnType, "ret");
         var exp = Expression.Block(
@@ -119,13 +119,13 @@ internal class DLambdaMetaNode : DynamicMetaObject
             Expression.Assign(par, Expression.Constant(ret, binder.ReturnType)));
 
         var rest = node.GetDBindingRestrictions(updateExpr);
-        var meta = new DLambdaMetaNode(
+        var meta = new LambdaMetaNode(
             new DynamicMetaObject(exp, rest, ret!),
             exp, rest, node);
 
         binder.FallbackConvert(this, meta);
 
-        DLambdaParser.ToDebug(DLambdaParser.MetaBindedColor, $"- Result: {meta}");
+        LambdaParser.ToDebug(LambdaParser.MetaBindedColor, $"- Result: {meta}");
         return meta;
 
         // Invoked to create an object compatible with the given type. We have to intercept the
@@ -134,7 +134,7 @@ internal class DLambdaMetaNode : DynamicMetaObject
         // purpose'. Whatever.
         object? CreateCompatible(Type type)
         {
-            if (type.IsAssignableTo(typeof(DLambdaNode))) return ValueAsNode;
+            if (type.IsAssignableTo(typeof(LambdaNode))) return ValueAsNode;
             if (type == typeof(string)) return Guid.NewGuid().ToString();
             try
             {
@@ -156,32 +156,32 @@ internal class DLambdaMetaNode : DynamicMetaObject
     public override DynamicMetaObject BindSetIndex(
         SetIndexBinder binder, DynamicMetaObject[] indexes, DynamicMetaObject value)
     {
-        DLambdaParser.ToDebug(DLambdaParser.MetaBindedColor, $"* META BindSetIndex:");
-        DLambdaParser.ToDebug(DLambdaParser.MetaBindedColor, $"- This: {this}");
+        LambdaParser.ToDebug(LambdaParser.MetaBindedColor, $"* META BindSetIndex:");
+        LambdaParser.ToDebug(LambdaParser.MetaBindedColor, $"- This: {this}");
 
-        var list = DLambdaParser.Instance.ToLambdaNodes(indexes);
+        var list = LambdaParser.Instance.ToLambdaNodes(indexes);
         foreach (var temp in list)
-            DLambdaParser.ToDebug(DLambdaParser.MetaBindedColor, $"- Index: {temp.ToDebugString()}");
+            LambdaParser.ToDebug(LambdaParser.MetaBindedColor, $"- Index: {temp.ToDebugString()}");
 
-        var item = DLambdaParser.Instance.ToLambdaNode(value);
-        DLambdaParser.ToDebug(DLambdaParser.MetaBindedColor, $"- Value: {item.ToDebugString()}");
+        var item = LambdaParser.Instance.ToLambdaNode(value);
+        LambdaParser.ToDebug(LambdaParser.MetaBindedColor, $"- Value: {item.ToDebugString()}");
 
-        var member = new DLambdaNodeIndexed(ValueAsNode, list);
-        var node = new DLambdaNodeSetter(member, item);
-        DLambdaParser.Instance.LastNode = node;
+        var member = new LambdaNodeIndexed(ValueAsNode, list);
+        var node = new LambdaNodeSetter(member, item);
+        LambdaParser.Instance.LastNode = node;
 
         binder.FallbackSetIndex(this, indexes, value);
         var updateExpr = binder.GetUpdateExpression(typeof(bool));
 
         var nodeExpr = Expression.Constant(node);
         var rest = node.GetDBindingRestrictions(updateExpr);
-        var meta = new DLambdaMetaNode(
+        var meta = new LambdaMetaNode(
             new DynamicMetaObject(nodeExpr, rest, node),
             nodeExpr, rest, node);
 
         binder.FallbackSetIndex(this, indexes, value, meta);
 
-        DLambdaParser.ToDebug(DLambdaParser.MetaBindedColor, $"- Result: {meta}");
+        LambdaParser.ToDebug(LambdaParser.MetaBindedColor, $"- Result: {meta}");
         return meta;
     }
 
@@ -193,29 +193,29 @@ internal class DLambdaMetaNode : DynamicMetaObject
     /// <returns><inheritdoc/></returns>
     public override DynamicMetaObject BindSetMember(SetMemberBinder binder, DynamicMetaObject value)
     {
-        DLambdaParser.ToDebug(DLambdaParser.MetaBindedColor, $"* META BindSetMember:");
-        DLambdaParser.ToDebug(DLambdaParser.MetaBindedColor, $"- This: {this}");
-        DLambdaParser.ToDebug(DLambdaParser.MetaBindedColor, $"- Name: {binder.Name}");
+        LambdaParser.ToDebug(LambdaParser.MetaBindedColor, $"* META BindSetMember:");
+        LambdaParser.ToDebug(LambdaParser.MetaBindedColor, $"- This: {this}");
+        LambdaParser.ToDebug(LambdaParser.MetaBindedColor, $"- Name: {binder.Name}");
 
-        var item = DLambdaParser.Instance.ToLambdaNode(value);
-        DLambdaParser.ToDebug(DLambdaParser.MetaBindedColor, $"- Value: {item.ToDebugString()}");
+        var item = LambdaParser.Instance.ToLambdaNode(value);
+        LambdaParser.ToDebug(LambdaParser.MetaBindedColor, $"- Value: {item.ToDebugString()}");
 
-        var member = new DLambdaNodeMember(ValueAsNode, binder.Name);
-        var node = new DLambdaNodeSetter(member, item);
-        DLambdaParser.Instance.LastNode = node;
+        var member = new LambdaNodeMember(ValueAsNode, binder.Name);
+        var node = new LambdaNodeSetter(member, item);
+        LambdaParser.Instance.LastNode = node;
 
         binder.FallbackSetMember(this, value);
         var updateExpr = binder.GetUpdateExpression(typeof(bool));
 
         var nodeExpr = Expression.Constant(node);
         var rest = node.GetDBindingRestrictions(updateExpr);
-        var meta = new DLambdaMetaNode(
+        var meta = new LambdaMetaNode(
             new DynamicMetaObject(nodeExpr, rest, node),
             nodeExpr, rest, node);
 
         binder.FallbackSetMember(this, value, meta);
 
-        DLambdaParser.ToDebug(DLambdaParser.MetaBindedColor, $"- Result: {meta}");
+        LambdaParser.ToDebug(LambdaParser.MetaBindedColor, $"- Result: {meta}");
         return meta;
     }
 
@@ -226,12 +226,12 @@ internal class DLambdaMetaNode : DynamicMetaObject
     /// <returns><inheritdoc/></returns>
     public override DynamicMetaObject BindUnaryOperation(UnaryOperationBinder binder)
     {
-        DLambdaParser.ToDebug(DLambdaParser.MetaBindedColor, $"* META BindUnary:");
-        DLambdaParser.ToDebug(DLambdaParser.MetaBindedColor, $"- This: {this}");
-        DLambdaParser.ToDebug(DLambdaParser.MetaBindedColor, $"- Operation: {binder.Operation}");
+        LambdaParser.ToDebug(LambdaParser.MetaBindedColor, $"* META BindUnary:");
+        LambdaParser.ToDebug(LambdaParser.MetaBindedColor, $"- This: {this}");
+        LambdaParser.ToDebug(LambdaParser.MetaBindedColor, $"- Operation: {binder.Operation}");
 
-        var node = new DLambdaNodeUnary(binder.Operation, ValueAsNode);
-        DLambdaParser.Instance.LastNode = node;
+        var node = new LambdaNodeUnary(binder.Operation, ValueAsNode);
+        LambdaParser.Instance.LastNode = node;
 
         binder.FallbackUnaryOperation(this);
         var updateExpr = binder.GetUpdateExpression(typeof(bool));
@@ -239,7 +239,7 @@ internal class DLambdaMetaNode : DynamicMetaObject
         var nodeExpr = Expression.Constant(node);
         var rest = node.GetDBindingRestrictions(updateExpr);
 
-        DLambdaMetaNode meta;
+        LambdaMetaNode meta;
 
         // Binding artifacts...
         if (binder.Operation is ExpressionType.IsTrue or ExpressionType.IsFalse)
@@ -249,7 +249,7 @@ internal class DLambdaMetaNode : DynamicMetaObject
             var obj = false;
             var objExpr = Expression.Constant(obj);
 
-            meta = new DLambdaMetaNode(
+            meta = new LambdaMetaNode(
                 new DynamicMetaObject(nodeExpr, rest, node),
                 objExpr, rest, node);
 
@@ -259,14 +259,14 @@ internal class DLambdaMetaNode : DynamicMetaObject
         // Standard case...
         else
         {
-            meta = new DLambdaMetaNode(
+            meta = new LambdaMetaNode(
                 new DynamicMetaObject(nodeExpr, rest, node),
                 nodeExpr, rest, node);
 
             binder.FallbackUnaryOperation(this, meta);
         }
 
-        DLambdaParser.ToDebug(DLambdaParser.MetaBindedColor, $"- Result: {meta}");
+        LambdaParser.ToDebug(LambdaParser.MetaBindedColor, $"- Result: {meta}");
         return meta;
     }
 
@@ -280,16 +280,16 @@ internal class DLambdaMetaNode : DynamicMetaObject
     /// <returns><inheritdoc/></returns>
     public override DynamicMetaObject BindGetIndex(GetIndexBinder binder, DynamicMetaObject[] indexes)
     {
-        DLambdaParser.ToDebug(DLambdaParser.MetaBindedColor, $"* META BindGetIndex:");
-        DLambdaParser.ToDebug(DLambdaParser.MetaBindedColor, $"- This: {this}");
+        LambdaParser.ToDebug(LambdaParser.MetaBindedColor, $"* META BindGetIndex:");
+        LambdaParser.ToDebug(LambdaParser.MetaBindedColor, $"- This: {this}");
 
         foreach (var index in indexes)
         {
-            var item = DLambdaParser.Instance.ToLambdaNode(index);
-            DLambdaParser.ToDebug(DLambdaParser.MetaBindedColor, $"- Index: {item.ToDebugString()}");
+            var item = LambdaParser.Instance.ToLambdaNode(index);
+            LambdaParser.ToDebug(LambdaParser.MetaBindedColor, $"- Index: {item.ToDebugString()}");
         }
 
-        DLambdaParser.ToDebug(DLambdaParser.MetaBindedColor, $"- Delegated...");
+        LambdaParser.ToDebug(LambdaParser.MetaBindedColor, $"- Delegated...");
         var meta = DLambdaMetaMaster.BindGetIndex(binder, indexes);
         return meta;
     }
@@ -301,11 +301,11 @@ internal class DLambdaMetaNode : DynamicMetaObject
     /// <returns><inheritdoc/></returns>
     public override DynamicMetaObject BindGetMember(GetMemberBinder binder)
     {
-        DLambdaParser.ToDebug(DLambdaParser.MetaBindedColor, $"* META BindGetMember:");
-        DLambdaParser.ToDebug(DLambdaParser.MetaBindedColor, $"- This: {this}");
-        DLambdaParser.ToDebug(DLambdaParser.MetaBindedColor, $"- Member: {binder.Name}");
+        LambdaParser.ToDebug(LambdaParser.MetaBindedColor, $"* META BindGetMember:");
+        LambdaParser.ToDebug(LambdaParser.MetaBindedColor, $"- This: {this}");
+        LambdaParser.ToDebug(LambdaParser.MetaBindedColor, $"- Member: {binder.Name}");
 
-        DLambdaParser.ToDebug(DLambdaParser.MetaBindedColor, $"- Delegated...");
+        LambdaParser.ToDebug(LambdaParser.MetaBindedColor, $"- Delegated...");
         var meta = DLambdaMetaMaster.BindGetMember(binder);
         return meta;
     }
@@ -318,16 +318,16 @@ internal class DLambdaMetaNode : DynamicMetaObject
     /// <returns><inheritdoc/></returns>
     public override DynamicMetaObject BindInvoke(InvokeBinder binder, DynamicMetaObject[] args)
     {
-        DLambdaParser.ToDebug(DLambdaParser.MetaBindedColor, $"* META BindInvoke:");
-        DLambdaParser.ToDebug(DLambdaParser.MetaBindedColor, $"- This: {this}");
+        LambdaParser.ToDebug(LambdaParser.MetaBindedColor, $"* META BindInvoke:");
+        LambdaParser.ToDebug(LambdaParser.MetaBindedColor, $"- This: {this}");
 
         foreach (var arg in args)
         {
-            var item = DLambdaParser.Instance.ToLambdaNode(arg);
-            DLambdaParser.ToDebug(DLambdaParser.MetaBindedColor, $"- Argument: {item.ToDebugString()}");
+            var item = LambdaParser.Instance.ToLambdaNode(arg);
+            LambdaParser.ToDebug(LambdaParser.MetaBindedColor, $"- Argument: {item.ToDebugString()}");
         }
 
-        DLambdaParser.ToDebug(DLambdaParser.MetaBindedColor, $"- Delegated...");
+        LambdaParser.ToDebug(LambdaParser.MetaBindedColor, $"- Delegated...");
         var meta = DLambdaMetaMaster.BindInvoke(binder, args);
         return meta;
     }
@@ -342,17 +342,17 @@ internal class DLambdaMetaNode : DynamicMetaObject
         InvokeMemberBinder binder,
         DynamicMetaObject[] args)
     {
-        DLambdaParser.ToDebug(DLambdaParser.MetaBindedColor, $"* META BindMethod:");
-        DLambdaParser.ToDebug(DLambdaParser.MetaBindedColor, $"- This: {this}");
+        LambdaParser.ToDebug(LambdaParser.MetaBindedColor, $"* META BindMethod:");
+        LambdaParser.ToDebug(LambdaParser.MetaBindedColor, $"- This: {this}");
 
         foreach (var arg in args)
         {
-            var item = DLambdaParser.Instance.ToLambdaNode(arg);
-            DLambdaParser.ToDebug(DLambdaParser.MetaBindedColor, $"- Argument: {item.ToDebugString()}");
+            var item = LambdaParser.Instance.ToLambdaNode(arg);
+            LambdaParser.ToDebug(LambdaParser.MetaBindedColor, $"- Argument: {item.ToDebugString()}");
         }
-        DLambdaParser.ToDebug(DLambdaParser.MetaBindedColor, $"- Name: {binder.Name}");
+        LambdaParser.ToDebug(LambdaParser.MetaBindedColor, $"- Name: {binder.Name}");
 
-        DLambdaParser.ToDebug(DLambdaParser.MetaBindedColor, $"- Delegated...");
+        LambdaParser.ToDebug(LambdaParser.MetaBindedColor, $"- Delegated...");
         var meta = DLambdaMetaMaster.BindInvokeMember(binder, args);
         return meta;
     }
@@ -369,10 +369,10 @@ internal class DLambdaMetaNode : DynamicMetaObject
         CreateInstanceBinder binder,
         DynamicMetaObject[] args)
     {
-        DLambdaParser.ToDebug(DLambdaParser.MetaBindedColor, $"* META BindCreateInstance:");
-        DLambdaParser.ToDebug(DLambdaParser.MetaBindedColor, $"- This: {this}");
+        LambdaParser.ToDebug(LambdaParser.MetaBindedColor, $"* META BindCreateInstance:");
+        LambdaParser.ToDebug(LambdaParser.MetaBindedColor, $"- This: {this}");
         foreach (var arg in args)
-            DLambdaParser.ToDebug(DLambdaParser.MetaBindedColor, $"- Argument: {arg?.Value}");
+            LambdaParser.ToDebug(LambdaParser.MetaBindedColor, $"- Argument: {arg?.Value}");
 
         throw new NotSupportedException(
             "'BindCreateInstance' operations are not supported.")
@@ -389,10 +389,10 @@ internal class DLambdaMetaNode : DynamicMetaObject
         DeleteIndexBinder binder,
         DynamicMetaObject[] indexes)
     {
-        DLambdaParser.ToDebug(DLambdaParser.MetaBindedColor, $"* META BindDeleteIndex:");
-        DLambdaParser.ToDebug(DLambdaParser.MetaBindedColor, $"- This: {this}");
+        LambdaParser.ToDebug(LambdaParser.MetaBindedColor, $"* META BindDeleteIndex:");
+        LambdaParser.ToDebug(LambdaParser.MetaBindedColor, $"- This: {this}");
         foreach (var index in indexes)
-            DLambdaParser.ToDebug(DLambdaParser.MetaBindedColor, $"- Index: {index}");
+            LambdaParser.ToDebug(LambdaParser.MetaBindedColor, $"- Index: {index}");
 
         throw new NotSupportedException(
             "'BindDeleteIndex' operations are not supported.")
@@ -406,9 +406,9 @@ internal class DLambdaMetaNode : DynamicMetaObject
     /// <returns><inheritdoc/></returns>
     public override DynamicMetaObject BindDeleteMember(DeleteMemberBinder binder)
     {
-        DLambdaParser.ToDebug(DLambdaParser.MetaBindedColor, $"* META BindDeleteMember:");
-        DLambdaParser.ToDebug(DLambdaParser.MetaBindedColor, $"- This: {this}");
-        DLambdaParser.ToDebug(DLambdaParser.MetaBindedColor, $"- Member: {binder.Name}");
+        LambdaParser.ToDebug(LambdaParser.MetaBindedColor, $"* META BindDeleteMember:");
+        LambdaParser.ToDebug(LambdaParser.MetaBindedColor, $"- This: {this}");
+        LambdaParser.ToDebug(LambdaParser.MetaBindedColor, $"- Member: {binder.Name}");
 
         throw new NotSupportedException(
             "'BindDeleteMember' operations are not supported.")

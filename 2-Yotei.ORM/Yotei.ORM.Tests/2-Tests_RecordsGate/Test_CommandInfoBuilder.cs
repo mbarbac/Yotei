@@ -1,5 +1,5 @@
-﻿using Builder = Yotei.ORM.Records.Code.CommandInfo.Builder;
-using IBuilder = Yotei.ORM.Records.ICommandInfo.IBuilder;
+﻿using Builder = Yotei.ORM.Code.CommandInfo.Builder;
+using IBuilder = Yotei.ORM.ICommandInfo.IBuilder;
 
 namespace Yotei.ORM.Tests;
 

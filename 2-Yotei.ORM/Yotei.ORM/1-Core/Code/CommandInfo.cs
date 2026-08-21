@@ -1,6 +1,4 @@
-﻿using System.Runtime.ExceptionServices;
-
-namespace Yotei.ORM.Records.Code;
+﻿namespace Yotei.ORM.Code;
 
 // ========================================================
 /// <summary>

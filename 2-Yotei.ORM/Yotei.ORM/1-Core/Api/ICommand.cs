@@ -1,9 +1,9 @@
-﻿namespace Yotei.ORM.Records;
+﻿namespace Yotei.ORM;
 
 // ========================================================
 /// <summary>
-/// Represents a database command that can be executed by its associated connection.
-/// <br/> Instances of this type are typically mutable ones.
+/// Represents a database command that can be executed against its associated connection.
+/// <br/> Instances of this type typically are mutable ones.
 /// </summary>
 [Cloneable]
 public partial interface ICommand

@@ -1,8 +1,8 @@
-﻿namespace Yotei.ORM.Records;
+﻿namespace Yotei.ORM;
 
 partial interface ICommandInfo
 {
-    // ====================================================
+    // ========================================================
     /// <summary>
     /// Represents a builder of <see cref="ICommandInfo"/> instances. Instances of this class
     /// may become in an inconsistent state while they are being built. If a record is requested

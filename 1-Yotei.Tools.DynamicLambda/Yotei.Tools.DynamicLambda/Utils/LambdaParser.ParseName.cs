@@ -1,7 +1,7 @@
 ﻿namespace Yotei.Tools.DynamicLambda;
 
 // ========================================================
-public partial class DLambdaParser
+public partial class LambdaParser
 {
     /// <summary>
     /// Parses the given dynamic lambda expression and returns the name that expression resolves
@@ -36,7 +36,7 @@ public partial class DLambdaParser
     /// <param name="arg"></param>
     /// <returns></returns>
     public static string ParseName(
-        Func<dynamic, object> expression, out DLambdaNodeArgument arg)
+        Func<dynamic, object> expression, out LambdaNodeArgument arg)
         => ParseName(expression, out _, out arg);
 
     /// <summary>
@@ -51,7 +51,7 @@ public partial class DLambdaParser
     /// <param name="arg"></param>
     /// <returns></returns>
     public static string ParseName(
-        Func<dynamic, object> expression, out string[] parts, out DLambdaNodeArgument arg)
+        Func<dynamic, object> expression, out string[] parts, out LambdaNodeArgument arg)
     {
         expression.ThrowWhenNull();
 
@@ -79,16 +79,16 @@ public partial class DLambdaParser
     /// <param name="node"></param>
     /// <param name="items"></param>
     /// <param name="parser"></param>
-    static void OnParseName(DLambdaNode node, List<string> items, DLambdaParser parser)
+    static void OnParseName(LambdaNode node, List<string> items, LambdaParser parser)
     {
         switch (node)
         {
-            case DLambdaNodeArgument: break;
+            case LambdaNodeArgument: break;
 
-            case DLambdaNodeMember item: OnParseNameMember(item, items, parser); break;
-            case DLambdaNodeIndexed item: OnParseNameIndexed(item, items, parser); break;
-            case DLambdaNodeInvoke item: OnParseNameInvoke(item, items, parser); break;
-            case DLambdaNodeValue item: OnParseNameValue(item, items, parser); break;
+            case LambdaNodeMember item: OnParseNameMember(item, items, parser); break;
+            case LambdaNodeIndexed item: OnParseNameIndexed(item, items, parser); break;
+            case LambdaNodeInvoke item: OnParseNameInvoke(item, items, parser); break;
+            case LambdaNodeValue item: OnParseNameValue(item, items, parser); break;
 
             default:
                 throw new ArgumentException(
@@ -104,7 +104,7 @@ public partial class DLambdaParser
     /// <param name="node"></param>
     /// <param name="items"></param>
     /// <param name="parser"></param>
-    static void OnParseNameMember(DLambdaNodeMember node, List<string> items, DLambdaParser parser)
+    static void OnParseNameMember(LambdaNodeMember node, List<string> items, LambdaParser parser)
     {
         OnParseName(node.DLambdaHost, items, parser);
 
@@ -122,7 +122,7 @@ public partial class DLambdaParser
     /// <param name="node"></param>
     /// <param name="items"></param>
     /// <param name="parser"></param>
-    static void OnParseNameIndexed(DLambdaNodeIndexed node, List<string> items, DLambdaParser parser)
+    static void OnParseNameIndexed(LambdaNodeIndexed node, List<string> items, LambdaParser parser)
     {
         if (node.DLambdaIndexes.Length != 1)
             throw new ArgumentException(
@@ -147,7 +147,7 @@ public partial class DLambdaParser
     /// <param name="node"></param>
     /// <param name="items"></param>
     /// <param name="parser"></param>
-    static void OnParseNameInvoke(DLambdaNodeInvoke node, List<string> items, DLambdaParser parser)
+    static void OnParseNameInvoke(LambdaNodeInvoke node, List<string> items, LambdaParser parser)
     {
         if (node.DLambdaArguments.Length != 1)
             throw new ArgumentException(
@@ -172,7 +172,7 @@ public partial class DLambdaParser
     /// <param name="node"></param>
     /// <param name="items"></param>
     /// <param name="parser"></param>
-    static void OnParseNameValue(DLambdaNodeValue node, List<string> items, DLambdaParser parser)
+    static void OnParseNameValue(LambdaNodeValue node, List<string> items, LambdaParser parser)
     {
         if (node.DLambdaValue == null)
         {
