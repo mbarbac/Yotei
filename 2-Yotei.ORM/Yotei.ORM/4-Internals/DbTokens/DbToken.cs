@@ -1,6 +1,4 @@
-﻿using System.Runtime.InteropServices.Marshalling;
-
-namespace Yotei.ORM.Internals;
+﻿namespace Yotei.ORM.Internals;
 
 // ========================================================
 /// <summary>

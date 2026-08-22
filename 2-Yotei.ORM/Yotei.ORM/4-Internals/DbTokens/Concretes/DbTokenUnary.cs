@@ -2,42 +2,34 @@
 
 // ========================================================
 /// <summary>
-/// Represents a binary operation between two given tokens.
+/// Represents a UNARU operation against a given target.
 /// <br/> Instances of this type are intended to be immutable ones.
 /// </summary>
-public class DbTokenBinary : IDbToken
+public class DbTokenUnary : IDbToken
 {
     /// <summary>
     /// Initializes a new instance.
     /// </summary>
-    /// <param name="left"></param>
     /// <param name="operation"></param>
-    /// <param name="right"></param>
-    public DbTokenBinary(IDbToken left, ExpressionType operation, IDbToken right)
+    /// <param name="target"></param>
+    [SuppressMessage("", "IDE0290")]
+    public DbTokenUnary(ExpressionType operation, IDbToken target)
     {
-        Left = left.ThrowWhenNull();
         Operation = Validate(operation);
-        Right = right.ThrowWhenNull();
+        Target = target.ThrowWhenNull();
     }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => $"({Left} {Operation} {Right})";
+    public override string ToString() => $"({Operation} {Target})";
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public DbTokenArgument? GetArgument() =>
-        Left.GetArgument() ??
-        Right.GetArgument();
-
-    /// <summary>
-    /// The left operand of the binary operation.
-    /// </summary>
-    public IDbToken Left { get; }
+    public DbTokenArgument? GetArgument() => Target.GetArgument();
 
     /// <summary>
     /// The binary operation represented by this instance.
@@ -47,7 +39,7 @@ public class DbTokenBinary : IDbToken
     /// <summary>
     /// The right operand of the binary operation.
     /// </summary>
-    public IDbToken Right { get; }
+    public IDbToken Target { get; }
 
     // ----------------------------------------------------
 
@@ -55,23 +47,8 @@ public class DbTokenBinary : IDbToken
     /// The collection of supported binary operations.
     /// </summary>
     public static ImmutableArray<ExpressionType> Supported { get; } = [
-        ExpressionType.Equal,
-        ExpressionType.NotEqual,
-
-        ExpressionType.Add,
-        ExpressionType.Subtract,
-        ExpressionType.Multiply,
-        ExpressionType.Divide,
-        ExpressionType.Modulo,
-        ExpressionType.Power,
-
-        ExpressionType.And,
-        ExpressionType.Or,
-
-        ExpressionType.GreaterThan,
-        ExpressionType.GreaterThanOrEqual,
-        ExpressionType.LessThan,
-        ExpressionType.LessThanOrEqual,
+        ExpressionType.Not,
+        ExpressionType.Negate,
     ];
 
     /// <summary>
@@ -99,11 +76,10 @@ public class DbTokenBinary : IDbToken
     {
         if (ReferenceEquals(this, other)) return true;
         if (other is null) return false;
-        if (other is not DbTokenBinary valid) return false;
+        if (other is not DbTokenUnary valid) return false;
 
-        if (!Left.Equals(valid.Left)) return false;
         if (Operation != valid.Operation) return false;
-        if (!Right.Equals(valid.Right)) return false;
+        if (!Target.Equals(valid.Target)) return false;
         return true;
     }
 
@@ -112,16 +88,16 @@ public class DbTokenBinary : IDbToken
     /// </summary>
     /// <param name="obj"></param>
     /// <returns></returns>
-    public override bool Equals(object? obj) => Equals(obj as DbTokenBinary);
+    public override bool Equals(object? obj) => Equals(obj as DbTokenUnary);
 
-    public static bool operator ==(DbTokenBinary? host, IDbToken? item)
+    public static bool operator ==(DbTokenUnary? host, IDbToken? item)
     {
         if (host is null && item is null) return true;
         if (host is null || item is null) return false;
         return host.Equals(item);
     }
 
-    public static bool operator !=(DbTokenBinary? host, IDbToken? item) => !(host == item);
+    public static bool operator !=(DbTokenUnary? host, IDbToken? item) => !(host == item);
 
     /// <summary>
     /// <inheritdoc/>
@@ -130,9 +106,8 @@ public class DbTokenBinary : IDbToken
     public override int GetHashCode()
     {
         var code = 0;
-        code = HashCode.Combine(code, Left);
         code = HashCode.Combine(code, Operation);
-        code = HashCode.Combine(code, Right);
+        code = HashCode.Combine(code, Target);
         return code;
     }
 }

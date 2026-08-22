@@ -2,34 +2,35 @@
 
 // ========================================================
 /// <summary>
-/// Represents a dynamic argument in a dynamic lambda expression. Instances of this type are
-/// considered translation artifacts, with no text representation in a database command.
+/// Represents a token that carries a command info instance.
 /// <br/> Instances of this type are intended to be immutable ones.
 /// </summary>
-public class DbTokenArgument : IDbToken
+public class DbTokenCommandInfo : IDbToken
 {
     /// <summary>
     /// Initializes a new instance.
     /// </summary>
-    /// <param name="name"></param>
-    public DbTokenArgument(string name) => Name = DbToken.ValidateTokenName(name);
+    /// <param name="info"></param>
+    public DbTokenCommandInfo(ICommandInfo info) => CommandInfo = info.ThrowWhenNull();
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => Name;
+    public override string ToString() => CommandInfo.IsEmpty
+        ? string.Empty
+        : $"{CommandInfo.Text}";
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public DbTokenArgument? GetArgument() => this;
+    public DbTokenArgument? GetArgument() => null;
 
     /// <summary>
-    /// The name of the dynamic argument.
+    /// The command info carried by this instance.
     /// </summary>
-    public string Name { get; }
+    public ICommandInfo CommandInfo { get; }
 
     // ----------------------------------------------------
 
@@ -42,9 +43,10 @@ public class DbTokenArgument : IDbToken
     {
         if (ReferenceEquals(this, other)) return true;
         if (other is null) return false;
-        if (other is not DbTokenArgument valid) return false;
+        if (other is not DbTokenCommandInfo valid) return false;
 
-        if (Name == valid.Name) return true;
+        if (CommandInfo.Text != valid.CommandInfo.Text) return false;
+        if (!CommandInfo.Parameters.Equals(valid.CommandInfo.Parameters)) return false;
         return false;
     }
 
@@ -53,16 +55,16 @@ public class DbTokenArgument : IDbToken
     /// </summary>
     /// <param name="obj"></param>
     /// <returns></returns>
-    public override bool Equals(object? obj) => Equals(obj as DbTokenArgument);
+    public override bool Equals(object? obj) => Equals(obj as DbTokenCommandInfo);
 
-    public static bool operator ==(DbTokenArgument? host, IDbToken? item)
+    public static bool operator ==(DbTokenCommandInfo? host, IDbToken? item)
     {
         if (host is null && item is null) return true;
         if (host is null || item is null) return false;
         return host.Equals(item);
     }
 
-    public static bool operator !=(DbTokenArgument? host, IDbToken? item) => !(host == item);
+    public static bool operator !=(DbTokenCommandInfo? host, IDbToken? item) => !(host == item);
 
     /// <summary>
     /// <inheritdoc/>
@@ -71,7 +73,7 @@ public class DbTokenArgument : IDbToken
     public override int GetHashCode()
     {
         var code = 0;
-        code = HashCode.Combine(code, Name);
+        code = HashCode.Combine(code, CommandInfo);
         return code;
     }
 }

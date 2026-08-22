@@ -2,20 +2,26 @@
 
 // ========================================================
 /// <summary>
-/// Represents an arbitrary indexed getter on a given host.
+/// Represents a direct invocation of a given host.
 /// <br/> Instances of this type are intended to be immutable ones.
 /// </summary>
-public class DbTokenIndexed : DbTokenHosted
+public class DbTokenInvoke : DbTokenHosted
 {
+    /// <summary>
+    /// Initializes a new instance with empty arguments.
+    /// </summary>
+    /// <param name="host"></param>
+    /// <param name="args"></param>
+    public DbTokenInvoke(IDbToken host) : base(host) => Arguments = [];
+
     /// <summary>
     /// Initializes a new instance.
     /// </summary>
     /// <param name="host"></param>
-    /// <param name="indexes"></param>
-    [SuppressMessage("", "IDE0290")]
-    public DbTokenIndexed(IDbToken host, IEnumerable<IDbToken> indexes) : base(host)
+    /// <param name="args"></param>
+    public DbTokenInvoke(IDbToken host, IEnumerable<IDbToken> args) : base(host)
     {
-        Indexes = DbToken.ToArguments(indexes, allowEmpty: false);
+        Arguments = DbToken.ToArguments(args, allowEmpty: false);
     }
 
     /// <summary>
@@ -24,14 +30,14 @@ public class DbTokenIndexed : DbTokenHosted
     /// <returns></returns>
     public override string ToString()
     {
-        var str = Indexes.ToString("[", "]", ", ");
+        var str = Arguments.ToString("(", ")", ", ");
         return $"{Host}{str}";
     }
 
     /// <summary>
-    /// The indexes of this instance.
+    /// The arguments of this instance, if any.
     /// </summary>
-    public DbTokenChain Indexes { get; }
+    public DbTokenChain Arguments { get; }
 
     // ----------------------------------------------------
 
@@ -44,13 +50,13 @@ public class DbTokenIndexed : DbTokenHosted
     {
         if (ReferenceEquals(this, other)) return true;
         if (other is null) return false;
-        if (other is not DbTokenIndexed valid) return false;
+        if (other is not DbTokenInvoke valid) return false;
 
-        if (Indexes.Count != valid.Indexes.Count) return false;
-        for (int i = 0; i < Indexes.Count; i++)
+        if (Arguments.Count != valid.Arguments.Count) return false;
+        for (int i = 0; i < Arguments.Count; i++)
         {
-            var item = Indexes[i];
-            var temp = valid.Indexes[i];
+            var item = Arguments[i];
+            var temp = valid.Arguments[i];
             var same = item.Equals(temp);
             if (!same) return false;
         }
@@ -62,16 +68,16 @@ public class DbTokenIndexed : DbTokenHosted
     /// </summary>
     /// <param name="obj"></param>
     /// <returns></returns>
-    public override bool Equals(object? obj) => Equals(obj as DbTokenIndexed);
+    public override bool Equals(object? obj) => Equals(obj as DbTokenInvoke);
 
-    public static bool operator ==(DbTokenIndexed? host, IDbToken? item)
+    public static bool operator ==(DbTokenInvoke? host, IDbToken? item)
     {
         if (host is null && item is null) return true;
         if (host is null || item is null) return false;
         return host.Equals(item);
     }
 
-    public static bool operator !=(DbTokenIndexed? host, IDbToken? item) => !(host == item);
+    public static bool operator !=(DbTokenInvoke? host, IDbToken? item) => !(host == item);
 
     /// <summary>
     /// <inheritdoc/>
@@ -80,8 +86,8 @@ public class DbTokenIndexed : DbTokenHosted
     public override int GetHashCode()
     {
         var code = 0;
-        code = HashCode.Combine(code, Indexes);
-        for (int i = 0; i < Indexes.Count; i++) code = HashCode.Combine(code, Indexes[i]);
+        code = HashCode.Combine(code, Arguments);
+        for (int i = 0; i < Arguments.Count; i++) code = HashCode.Combine(code, Arguments[i]);
         return code;
     }
 }

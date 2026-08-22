@@ -2,34 +2,44 @@
 
 // ========================================================
 /// <summary>
-/// Represents a dynamic argument in a dynamic lambda expression. Instances of this type are
-/// considered translation artifacts, with no text representation in a database command.
+/// Represents an assignation operation on a target of a given value.
 /// <br/> Instances of this type are intended to be immutable ones.
 /// </summary>
-public class DbTokenArgument : IDbToken
+public class DbTokenSetter : IDbToken
 {
     /// <summary>
     /// Initializes a new instance.
     /// </summary>
-    /// <param name="name"></param>
-    public DbTokenArgument(string name) => Name = DbToken.ValidateTokenName(name);
+    /// <param name="value"></param>
+    public DbTokenSetter(IDbToken target, IDbToken value)
+    {
+        Target = target.ThrowWhenNull();
+        Value = value.ThrowWhenNull();
+    }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => Name;
+    public override string ToString() => $"({Target} = {Value})";
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public DbTokenArgument? GetArgument() => this;
+    public DbTokenArgument? GetArgument() =>
+        Target.GetArgument() ??
+        Value.GetArgument();
 
     /// <summary>
-    /// The name of the dynamic argument.
+    /// The target of the assignation.
     /// </summary>
-    public string Name { get; }
+    public IDbToken Target { get; }
+
+    /// <summary>
+    /// The value to assign to the target.
+    /// </summary>
+    public IDbToken Value { get; }
 
     // ----------------------------------------------------
 
@@ -42,10 +52,11 @@ public class DbTokenArgument : IDbToken
     {
         if (ReferenceEquals(this, other)) return true;
         if (other is null) return false;
-        if (other is not DbTokenArgument valid) return false;
+        if (other is not DbTokenSetter valid) return false;
 
-        if (Name == valid.Name) return true;
-        return false;
+        if (!Target.Equals(valid.Target)) return false;
+        if (!Value.Equals(valid.Value)) return false;
+        return true;
     }
 
     /// <summary>
@@ -53,16 +64,16 @@ public class DbTokenArgument : IDbToken
     /// </summary>
     /// <param name="obj"></param>
     /// <returns></returns>
-    public override bool Equals(object? obj) => Equals(obj as DbTokenArgument);
+    public override bool Equals(object? obj) => Equals(obj as DbTokenSetter);
 
-    public static bool operator ==(DbTokenArgument? host, IDbToken? item)
+    public static bool operator ==(DbTokenSetter? host, IDbToken? item)
     {
         if (host is null && item is null) return true;
         if (host is null || item is null) return false;
         return host.Equals(item);
     }
 
-    public static bool operator !=(DbTokenArgument? host, IDbToken? item) => !(host == item);
+    public static bool operator !=(DbTokenSetter? host, IDbToken? item) => !(host == item);
 
     /// <summary>
     /// <inheritdoc/>
@@ -71,7 +82,8 @@ public class DbTokenArgument : IDbToken
     public override int GetHashCode()
     {
         var code = 0;
-        code = HashCode.Combine(code, Name);
+        code = HashCode.Combine(code, Target);
+        code = HashCode.Combine(code, Value);
         return code;
     }
 }

@@ -5,7 +5,7 @@
 /// Represents an arbitrary hosted token.
 /// <br/> Instances of this type are intended to be immutable ones.
 /// </summary>
-public abstract partial class DbTokenHosted : IDbToken
+public abstract class DbTokenHosted : IDbToken
 {
     /// <summary>
     /// Initializes a new instance.
