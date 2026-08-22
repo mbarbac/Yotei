@@ -19,6 +19,7 @@ public partial class CoreBag<T> : ICoreBag<T>
         public override IEnumerable<T> FindDuplicates(T value) => Master.FindDuplicates(value);
         public override bool AllowDuplicate(
             T value, IEnumerable<T> existing) => Master.AllowDuplicate(value, existing);
+        public override bool FlattenElements => Master.FlattenElements;
     }
 
     // ----------------------------------------------------
@@ -100,6 +101,12 @@ public partial class CoreBag<T> : ICoreBag<T>
     /// <param name="existing"></param>
     /// <returns></returns>
     public virtual bool AllowDuplicate(T value, IEnumerable<T> existing) => true;
+
+    /// <summary>
+    /// Determines if elements that are themselves collections shall be flattened (using their
+    /// elements instead), or not.
+    /// </summary>
+    public virtual bool FlattenElements => true;
 
     // ----------------------------------------------------
 

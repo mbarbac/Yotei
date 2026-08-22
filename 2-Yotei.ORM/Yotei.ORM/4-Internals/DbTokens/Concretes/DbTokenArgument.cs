@@ -6,7 +6,6 @@
 /// considered translation artifacts, with no text representation in a database command.
 /// <br/> Instances of this type are intended to be immutable ones.
 /// </summary>
-[Cloneable]
 public partial class DbTokenArgument : IDbToken
 {
     /// <summary>
@@ -16,31 +15,21 @@ public partial class DbTokenArgument : IDbToken
     public DbTokenArgument(string name) => Name = DbToken.ValidateTokenName(name);
 
     /// <summary>
-    /// Copy constructor.
-    /// </summary>
-    /// <param name="other"></param>
-    protected DbTokenArgument(DbTokenArgument other)
-    {
-        ArgumentNullException.ThrowIfNull(other);
-        Name = other.Name;
-    }
-
-    /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
     public override string ToString() => Name;
 
     /// <summary>
-    /// The name of the dynamic argument.
-    /// </summary>
-    public string Name { get; }
-
-    /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
     public DbTokenArgument? GetArgument() => this;
+
+    /// <summary>
+    /// The name of the dynamic argument.
+    /// </summary>
+    public string Name { get; }
 
     // ----------------------------------------------------
 

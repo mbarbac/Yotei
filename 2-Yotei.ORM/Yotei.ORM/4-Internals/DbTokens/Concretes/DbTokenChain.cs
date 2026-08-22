@@ -24,14 +24,6 @@ public partial class DbTokenChain : IDbToken
     public DbTokenChain(IEnumerable<IDbToken> range) => Items = new(range);
 
     /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
-    /// <returns></returns>
-    [SuppressMessage("", "IDE0028")]
-    public override DbTokenChain Clone() => new(this);
-    IDbToken IDbToken.Clone() => Clone();
-
-    /// <summary>
     /// Copy constructor.
     /// </summary>
     /// <param name="other"></param>

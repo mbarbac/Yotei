@@ -5,7 +5,6 @@
 /// Represents an arbitrary token in a database expression.
 /// <br/> Instances of this type are intended to be immutable ones.
 /// </summary>
-[Cloneable]
 public partial interface IDbToken : IEquatable<IDbToken>
 {
     /// <summary>

@@ -94,49 +94,10 @@ partial class DbTokenChain
         /// </summary>
         public override bool AllowDuplicate(IDbToken _, IEnumerable<IDbToken> _2) => true;
 
-        /*
-        // ------------------------------------------------
-
         /// <summary>
         /// <inheritdoc/>
+        /// <br/> Flatten elements enforced.
         /// </summary>
-        /// <returns></returns>
-        public string NextName()
-        {
-            for (int i = Count; i < int.MaxValue; i++)
-            {
-                var name = $"{Engine.ParameterPrefix}{i}";
-                var index = IndexOf(name);
-                if (index < 0) return name;
-            }
-
-            throw new UnExpectedException("Range of integers exahusted.");
-        }
-
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
-        /// <param name="value"></param>
-        /// <param name="item"></param>
-        /// <returns></returns>
-        public virtual int AddNew(object? value, out IDbToken item)
-        {
-            item = new Parameter(NextName(), value);
-            return Add(item);
-        }
-
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
-        /// <param name="index"></param>
-        /// <param name="value"></param>
-        /// <param name="item"></param>
-        /// <returns></returns>
-        public virtual int InsertNew(int index, object? value, out IDbToken item)
-        {
-            item = new Parameter(NextName(), value);
-            return Insert(index, item);
-        }
-         */
+        public override sealed bool FlattenElements => true;
     }
 }

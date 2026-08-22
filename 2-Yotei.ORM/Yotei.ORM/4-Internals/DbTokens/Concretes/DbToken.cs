@@ -41,6 +41,31 @@ public static class DbToken
     // ----------------------------------------------------
 
     /// <summary>
+    /// Returns an immutable collection of tokens from the given arbitrary enumeration.
+    /// </summary>
+    /// <param name="tokens"></param>
+    /// <param name="allowEmpty"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentException"></exception>
+    [SuppressMessage("", "IDE0028")]
+    [SuppressMessage("", "IDE0306")]
+    public static DbTokenChain ToArguments(IEnumerable<IDbToken> tokens, bool allowEmpty)
+    {
+        ArgumentNullException.ThrowIfNull(tokens);
+
+        if (tokens is not DbTokenChain chain) chain = new DbTokenChain(tokens);
+
+        for (int i = 0; i < chain.Count; i++)
+            if (chain[i] is null) throw new ArgumentException(
+                "Collection of tokens carries null elements.").WithData(chain);
+
+        if (!allowEmpty && chain.Count == 0) throw new ArgumentException(
+            "Collection of tokens cannot be an empty one.");
+
+        return chain;
+    }
+
+    /// <summary>
     /// Returns an immutable collection of typed from the given arbitrary enumeration.
     /// </summary>
     /// <param name="types"></param>

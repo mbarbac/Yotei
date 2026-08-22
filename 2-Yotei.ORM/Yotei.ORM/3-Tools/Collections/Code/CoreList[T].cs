@@ -1,4 +1,6 @@
-﻿namespace Yotei.ORM.Tools;
+﻿using System.Runtime.InteropServices.Marshalling;
+
+namespace Yotei.ORM.Tools;
 
 // ========================================================
 /// <summary>
@@ -102,6 +104,12 @@ public partial class CoreList<T> : ICoreList<T>
     /// <returns></returns>
     public virtual bool AllowDuplicate(T value, IEnumerable<T> existing) => true;
 
+    /// <summary>
+    /// Determines if elements that are themselves collections shall be flattened (using their
+    /// elements instead), or not.
+    /// </summary>
+    public virtual bool FlattenElements => true;
+
     // ----------------------------------------------------
 
     /// <summary>
@@ -140,9 +148,7 @@ public partial class CoreList<T> : ICoreList<T>
     /// <returns></returns>
     public int IndexOf(T value)
     {
-        if (value is IEnumerable<T>) return -1;
-
-        value = ValidateElement(value);
+        if (value is not IEnumerable<T>) value = ValidateElement(value);
         return IndexOf(x => CompareElements(x, value));
     }
     int IList.IndexOf(object? value) => IndexOf((T)value!);
@@ -154,9 +160,7 @@ public partial class CoreList<T> : ICoreList<T>
     /// <returns></returns>
     public int LastIndexOf(T value)
     {
-        if (value is IEnumerable<T>) return -1;
-
-        value = ValidateElement(value);
+        if (value is not IEnumerable<T>) value = ValidateElement(value);
         return LastIndexOf(x => CompareElements(x, value));
     }
 
@@ -167,9 +171,7 @@ public partial class CoreList<T> : ICoreList<T>
     /// <returns></returns>
     public List<int> IndexesOf(T value)
     {
-        if (value is IEnumerable<T>) return [];
-
-        value = ValidateElement(value);
+        if (value is not IEnumerable<T>) value = ValidateElement(value);
         return IndexesOf(x => CompareElements(x, value));
     }
 
@@ -307,37 +309,26 @@ public partial class CoreList<T> : ICoreList<T>
     /// <returns></returns>
     public virtual int Replace(int index, T value)
     {
-        if (value is IEnumerable<T> range) // Nested case...
-        {
-            // Tentative removal...
-            var source = Items[index];
-            if (RemoveAt(index) == 0) throw new InvalidOperationException(
-                "Cannot remove element at the given index.")
-                .WithData(index)
-                .WithData(this);
+        // Tentative removal...
+        var source = Items[index];
+        Items.RemoveAt(index);
 
-            // Inserting and recovery if needed...
-            var num = InsertRange(index, range);
-            if (num == 0) Items.Insert(index, source);
-            return num;
+        // Inserting...
+        var num = 0;
+
+        if (value is IEnumerable<T> range && FlattenElements)
+        {
+            num = InsertRange(index, range);
         }
-        else // Standard case...
+        else
         {
             value = ValidateElement(value);
-            var source = Items[index];
-            if (CompareElements(source, value)) return 0;
-
-            // Tentative removal...
-            if (RemoveAt(index) == 0) throw new InvalidOperationException(
-                "Cannot remove element at the given index.")
-                .WithData(index)
-                .WithData(this);
-
-            // Insertion and recovery if needed...
-            var num = Insert(index, value);
-            if (num == 0) Items.Insert(index, source);
-            return num;
+            if (!CompareElements(source, value)) num = Insert(index, value);
         }
+
+        // Finishing...
+        if (num == 0) Items.Insert(index, source);
+        return num;
     }
 
     /// <summary>
@@ -347,7 +338,7 @@ public partial class CoreList<T> : ICoreList<T>
     /// <returns></returns>
     public virtual int Add(T value)
     {
-        if (value is IEnumerable<T> range) return AddRange(range);
+        if (value is IEnumerable<T> range && FlattenElements) return AddRange(range);
 
         value = ValidateElement(value);
         var dups = FindDuplicates(value);
@@ -380,7 +371,7 @@ public partial class CoreList<T> : ICoreList<T>
     /// <returns></returns>
     public virtual int Insert(int index, T value)
     {
-        if (value is IEnumerable<T> range) return InsertRange(index, range);
+        if (value is IEnumerable<T> range && FlattenElements) return InsertRange(index, range);
 
         value = ValidateElement(value);
         var dups = FindDuplicates(value);
@@ -452,7 +443,7 @@ public partial class CoreList<T> : ICoreList<T>
     /// <returns></returns>
     public virtual int Remove(T value)
     {
-        if (value is IEnumerable<T> range) // Nested case...
+        if (value is IEnumerable<T> range && FlattenElements) // Nested case...
         {
             var num = 0; foreach (var item in range) num += Remove(item);
             return num;
@@ -474,7 +465,7 @@ public partial class CoreList<T> : ICoreList<T>
     /// <returns></returns>
     public virtual int RemoveLast(T value)
     {
-        if (value is IEnumerable<T> range) // Nested case...
+        if (value is IEnumerable<T> range && FlattenElements) // Nested case...
         {
             var num = 0; foreach (var item in range) num += RemoveLast(item);
             return num;
@@ -494,7 +485,7 @@ public partial class CoreList<T> : ICoreList<T>
     /// <returns></returns>
     public virtual int RemoveAll(T value)
     {
-        if (value is IEnumerable<T> range) // Nested case...
+        if (value is IEnumerable<T> range && FlattenElements) // Nested case...
         {
             var num = 0; foreach (var item in range) num += RemoveAll(item);
             return num;

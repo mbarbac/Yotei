@@ -6,7 +6,6 @@
 /// captured as an argument.
 /// <br/> Instances of this type are intended to be immutable ones.
 /// </summary>
-[Cloneable]
 public partial class DbTokenLiteral : IDbToken
 {
     /// <summary>
@@ -23,31 +22,21 @@ public partial class DbTokenLiteral : IDbToken
     public DbTokenLiteral(string value) => Value = value.ThrowWhenNull();
 
     /// <summary>
-    /// Copy constructor.
-    /// </summary>
-    /// <param name="other"></param>
-    protected DbTokenLiteral(DbTokenLiteral other)
-    {
-        ArgumentNullException.ThrowIfNull(other);
-        Value = other.Value;
-    }
-
-    /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
     public override string ToString() => Value;
 
     /// <summary>
-    /// The value carried by this literal.
-    /// </summary>
-    public string Value { get; }
-
-    /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
     public DbTokenArgument? GetArgument() => null;
+
+    /// <summary>
+    /// The value carried by this literal.
+    /// </summary>
+    public string Value { get; }
 
     // ----------------------------------------------------
 
