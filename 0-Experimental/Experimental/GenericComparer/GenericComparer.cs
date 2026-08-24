@@ -1,6 +1,4 @@
-﻿using Microsoft.Win32.SafeHandles;
-
-namespace Experimental;
+﻿namespace Experimental;
 
 // ========================================================
 /// <summary>

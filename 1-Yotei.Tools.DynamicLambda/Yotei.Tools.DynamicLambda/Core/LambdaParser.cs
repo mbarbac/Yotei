@@ -3,10 +3,23 @@
 // ========================================================
 /// <summary>
 /// Represents the ability of parsing dynamic lambda expressions, defined as lambda-alike ones at
-/// least one of their arguments is a <see langword="dynamic"/> one. Instances of this type contains
-/// the result of that parsing along with the dynamic arguments used to invoke that expression.
+/// least one of their arguments is a <see langword="dynamic"/> one.
+/// <br/> Instances of this type contains the last node in the chain of dynamic operations binded
+/// against those dynamic arguments, along with that dynamic arguments and not-dynamic ones.
 /// <br/> Instances of this type are immutable ones.
 /// </summary>
+/// <remarks>
+/// This type works by actually 'executing' the given dynamic lamdba expression, capturing the
+/// dynamic operations as they are 'executed'. This way of intercepting these operations has some
+/// limitations IF the details to capture depend on whether all elements of the expression have
+/// been 'executed' or not.
+/// <br/>- For instance, coalesce operations are not parsed accurately when the first operand is
+/// not null, then it is returned straight without even 'touching' the second one. Ternary ones
+/// also exhibit this behavior.
+/// <br/>- Another well-known limitation is that the 'x => x.Alpha = (x.Alpha = x-Beta)' dynamic
+/// expression is translated by the DRL into a 'x=> x.Alpha = x.Beta' one, so loosing the actual
+/// details. In addition, this translation is not always used this way by the DLR.
+/// </remarks>
 public partial class LambdaParser
 {
     /// <summary>

@@ -1,6 +1,4 @@
-﻿using System.Data;
-
-namespace Yotei.ORM.Records.Code;
+﻿namespace Yotei.ORM.Records.Code;
 
 partial class Record
 {

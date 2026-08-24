@@ -1,7 +1,5 @@
 ﻿#pragma warning disable IDE0019
 
-using System.Runtime.ExceptionServices;
-
 namespace Yotei.Tools.Generators;
 
 // ========================================================

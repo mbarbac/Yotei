@@ -11,21 +11,27 @@ public class DbTokenIdentifier : DbTokenHosted
     /// </summary>
     /// <param name="host"></param>
     /// <param name="identifier"></param>
+    [SuppressMessage("", "IDE0290")]
     public DbTokenIdentifier(
         IDbToken host, IIdentifier identifier)
-        : base(host)
-        => Identifier = identifier.ThrowWhenNull();
+        : base(host) => Identifier = identifier.ThrowWhenNull();
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override string ToString()
+    public override string ToString() => ToStringEx(false, Identifier.Engine.UseTerminators);
+
+    /// <summary>
+    /// Returns a string representation of this instance using or not its null head parts, and
+    /// wrapping or not the remaining parts with the engine terminators, as requested.
+    /// </summary>
+    /// <param name="reduce"></param>
+    /// <param name="useTerminators"></param>
+    /// <returns></returns>
+    public string ToStringEx(bool reduce = true, bool useTerminators = true)
     {
-        var reduce = true;
-        var useTerminators = Identifier.Engine.UseTerminators;
         var str = Identifier.ToStringEx(reduce, useTerminators);
-        
         return $"{Host}.{str}";
     }
 

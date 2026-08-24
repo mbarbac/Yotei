@@ -1,5 +1,4 @@
-﻿
-namespace Experimental;
+﻿namespace Experimental;
 
 // ========================================================
 /// <summary>

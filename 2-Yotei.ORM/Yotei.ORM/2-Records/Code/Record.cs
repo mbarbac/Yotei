@@ -1,7 +1,4 @@
-﻿#pragma warning disable IDE0028
-#pragma warning disable IDE0306
-
-using System.ComponentModel;
+﻿#pragma warning disable IDE0028, IDE0306
 
 namespace Yotei.ORM.Records.Code;
 
