@@ -1,4 +1,6 @@
-﻿namespace Yotei.ORM.Internals;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Yotei.ORM.Internals;
 
 // ========================================================
 /// <summary>
@@ -44,20 +46,17 @@ public static class DbToken
     /// <param name="tokens"></param>
     /// <param name="allowEmpty"></param>
     /// <returns></returns>
-    /// <exception cref="ArgumentException"></exception>
-    [SuppressMessage("", "IDE0028")]
-    [SuppressMessage("", "IDE0306")]
-    public static DbTokenChain ToArguments(IEnumerable<IDbToken> tokens, bool allowEmpty)
+    public static ImmutableArray<IDbToken> ToArguments(IEnumerable<IDbToken> tokens, bool allowEmpty)
     {
         ArgumentNullException.ThrowIfNull(tokens);
 
-        if (tokens is not DbTokenChain chain) chain = new DbTokenChain(tokens);
+        var chain = tokens is ImmutableArray<IDbToken> temp ? temp : [.. tokens];
 
-        for (int i = 0; i < chain.Count; i++)
+        for (int i = 0; i < chain.Length; i++)
             if (chain[i] is null) throw new ArgumentException(
                 "Collection of tokens carries null elements.").WithData(chain);
 
-        if (!allowEmpty && chain.Count == 0) throw new ArgumentException(
+        if (!allowEmpty && chain.Length == 0) throw new ArgumentException(
             "Collection of tokens cannot be an empty one.");
 
         return chain;
@@ -73,7 +72,7 @@ public static class DbToken
     {
         ArgumentNullException.ThrowIfNull(types);
 
-        var items = types is ImmutableArray<Type> temps ? temps : types.ToImmutableArray();
+        var items = types is ImmutableArray<Type> temps ? temps : [.. types];
 
         for (int i = 0; i < items.Length; i++)
             if (items[i] is null) throw new ArgumentException(

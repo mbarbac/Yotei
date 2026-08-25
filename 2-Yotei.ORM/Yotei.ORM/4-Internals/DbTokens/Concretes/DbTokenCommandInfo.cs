@@ -19,7 +19,7 @@ public class DbTokenCommandInfo : IDbToken
     /// <returns></returns>
     public override string ToString() => CommandInfo.IsEmpty
         ? string.Empty
-        : $"{CommandInfo.Text}";
+        : $"({CommandInfo.Text})";
 
     /// <summary>
     /// <inheritdoc/>

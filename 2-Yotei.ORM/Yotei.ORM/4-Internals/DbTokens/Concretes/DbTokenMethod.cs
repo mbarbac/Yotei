@@ -52,6 +52,7 @@ public class DbTokenMethod : DbTokenHosted
     /// <param name="ignoreNameCase"></param>
     /// <param name="types"></param>
     /// <param name="args"></param>
+    [SuppressMessage("", "IDE0290")]
     public DbTokenMethod(
         IDbToken host,
         string name, bool ignoreNameCase,
@@ -80,7 +81,7 @@ public class DbTokenMethod : DbTokenHosted
             sb.Append(str);
         }
 
-        str = Arguments.ToString("(", ")", ", ");
+        str = $"({string.Join(", ", Arguments)})";
         sb.Append(str);
 
         return sb.ToString();
@@ -105,7 +106,7 @@ public class DbTokenMethod : DbTokenHosted
     /// <summary>
     /// The regular arguments of this instance, if any.
     /// </summary>
-    public DbTokenChain Arguments { get; }
+    public ImmutableArray<IDbToken> Arguments { get; }
 
     // ----------------------------------------------------
 
@@ -131,8 +132,8 @@ public class DbTokenMethod : DbTokenHosted
             if (item != temp) return false;
         }
 
-        if (Arguments.Count != valid.Arguments.Count) return false;
-        for (int i = 0; i < Arguments.Count; i++)
+        if (Arguments.Length != valid.Arguments.Length) return false;
+        for (int i = 0; i < Arguments.Length; i++)
         {
             var item = Arguments[i];
             var temp = valid.Arguments[i];
@@ -170,7 +171,7 @@ public class DbTokenMethod : DbTokenHosted
         code = HashCode.Combine(code, TypeArguments);
         for (int i = 0; i < TypeArguments.Length; i++) code = HashCode.Combine(code, TypeArguments[i]);
         code = HashCode.Combine(code, Arguments);
-        for (int i = 0; i < Arguments.Count; i++) code = HashCode.Combine(code, Arguments[i]);
+        for (int i = 0; i < Arguments.Length; i++) code = HashCode.Combine(code, Arguments[i]);
         return code;
     }
 }

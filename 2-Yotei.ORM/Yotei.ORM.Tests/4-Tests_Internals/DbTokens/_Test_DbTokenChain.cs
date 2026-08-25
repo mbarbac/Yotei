@@ -1,4 +1,4 @@
-﻿using Chain = Yotei.ORM.Internals.DbTokenChain;
+﻿/*using Chain = Yotei.ORM.Internals.DbTokenChain;
 using Literal = Yotei.ORM.Internals.DbTokenLiteral;
 
 namespace Yotei.ORM.Tests;
@@ -554,4 +554,4 @@ public static partial class Test_DbTokenChain
         Assert.NotSame(source, target);
         Assert.Empty(target);
     }
-}
+}*/

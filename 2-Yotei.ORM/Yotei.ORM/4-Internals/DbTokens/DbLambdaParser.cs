@@ -77,7 +77,7 @@ public record DbLambdaParser
             _ => throw new ArgumentException("Unknown node.").WithData(node)
         };
 
-        if (token is DbTokenChain chain) token = chain.Reduce();
+        //if (token is DbTokenChain chain) token = chain.Reduce(); // TODO...
         return token;
     }
 
@@ -252,7 +252,8 @@ public record DbLambdaParser
             }
 
             // x => x.Convert(spec, target):
-            if (node.LambdaTypeArguments.Length == 2 &&
+            if (node.LambdaTypeArguments.Length == 0 &&
+                node.LambdaArguments.Length == 2 &&
                 node.LambdaArguments[0] is LambdaNodeValue value)
             {
                 var target = Parse(node.LambdaArguments[1]);

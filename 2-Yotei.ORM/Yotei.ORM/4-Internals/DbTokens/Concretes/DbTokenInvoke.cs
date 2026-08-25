@@ -21,7 +21,7 @@ public class DbTokenInvoke : DbTokenHosted
     /// <param name="args"></param>
     public DbTokenInvoke(IDbToken host, IEnumerable<IDbToken> args) : base(host)
     {
-        Arguments = DbToken.ToArguments(args, allowEmpty: false);
+        Arguments = DbToken.ToArguments(args, allowEmpty: true);
     }
 
     /// <summary>
@@ -30,14 +30,14 @@ public class DbTokenInvoke : DbTokenHosted
     /// <returns></returns>
     public override string ToString()
     {
-        var str = Arguments.ToString("(", ")", ", ");
+        var str = $"({string.Join(", ", Arguments)})";
         return $"{Host}{str}";
     }
 
     /// <summary>
     /// The arguments of this instance, if any.
     /// </summary>
-    public DbTokenChain Arguments { get; }
+    public ImmutableArray<IDbToken> Arguments { get; }
 
     // ----------------------------------------------------
 
@@ -52,8 +52,8 @@ public class DbTokenInvoke : DbTokenHosted
         if (other is null) return false;
         if (other is not DbTokenInvoke valid) return false;
 
-        if (Arguments.Count != valid.Arguments.Count) return false;
-        for (int i = 0; i < Arguments.Count; i++)
+        if (Arguments.Length != valid.Arguments.Length) return false;
+        for (int i = 0; i < Arguments.Length; i++)
         {
             var item = Arguments[i];
             var temp = valid.Arguments[i];
@@ -87,7 +87,7 @@ public class DbTokenInvoke : DbTokenHosted
     {
         var code = 0;
         code = HashCode.Combine(code, Arguments);
-        for (int i = 0; i < Arguments.Count; i++) code = HashCode.Combine(code, Arguments[i]);
+        for (int i = 0; i < Arguments.Length; i++) code = HashCode.Combine(code, Arguments[i]);
         return code;
     }
 }

@@ -24,14 +24,14 @@ public class DbTokenIndexed : DbTokenHosted
     /// <returns></returns>
     public override string ToString()
     {
-        var str = Indexes.ToString("[", "]", ", ");
+        var str = $"[{string.Join(", ", Indexes)}]";
         return $"{Host}{str}";
     }
 
     /// <summary>
     /// The indexes of this instance.
     /// </summary>
-    public DbTokenChain Indexes { get; }
+    public ImmutableArray<IDbToken> Indexes { get; }
 
     // ----------------------------------------------------
 
@@ -46,8 +46,8 @@ public class DbTokenIndexed : DbTokenHosted
         if (other is null) return false;
         if (other is not DbTokenIndexed valid) return false;
 
-        if (Indexes.Count != valid.Indexes.Count) return false;
-        for (int i = 0; i < Indexes.Count; i++)
+        if (Indexes.Length != valid.Indexes.Length) return false;
+        for (int i = 0; i < Indexes.Length; i++)
         {
             var item = Indexes[i];
             var temp = valid.Indexes[i];
@@ -81,7 +81,7 @@ public class DbTokenIndexed : DbTokenHosted
     {
         var code = 0;
         code = HashCode.Combine(code, Indexes);
-        for (int i = 0; i < Indexes.Count; i++) code = HashCode.Combine(code, Indexes[i]);
+        for (int i = 0; i < Indexes.Length; i++) code = HashCode.Combine(code, Indexes[i]);
         return code;
     }
 }

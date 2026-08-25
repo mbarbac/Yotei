@@ -52,7 +52,7 @@ public abstract class DbTokenConvert : IDbToken
         /// <inheritdoc/>
         /// </summary>
         /// <returns></returns>
-        public override string ToString() => $"(({Type}) {Target})";
+        public override string ToString() => $"(({Type.EasyName()}) {Target})";
 
         /// <summary>
         /// The type to convert the given target to.

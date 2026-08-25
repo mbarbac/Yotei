@@ -1,4 +1,4 @@
-﻿namespace Yotei.ORM.Internals;
+﻿/*namespace Yotei.ORM.Internals;
 
 partial class DbTokenChain
 {
@@ -100,4 +100,4 @@ partial class DbTokenChain
         /// </summary>
         public override sealed bool FlattenElements => true;
     }
-}
+}*/

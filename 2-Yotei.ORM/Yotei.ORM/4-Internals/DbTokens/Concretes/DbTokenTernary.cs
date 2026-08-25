@@ -13,6 +13,7 @@ public class DbTokenTernary : IDbToken
     /// <param name="left"></param>
     /// <param name="middle"></param>
     /// <param name="right"></param>
+    [SuppressMessage("", "IDE0290")]
     public DbTokenTernary(IDbToken left, IDbToken middle, IDbToken right)
     {
         Left = left.ThrowWhenNull();
