@@ -17,9 +17,13 @@ public class DbTokenCommandInfo : IDbToken
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => CommandInfo.IsEmpty
-        ? string.Empty
-        : $"({CommandInfo.Text})";
+    public override string ToString()
+    {
+        if (CommandInfo.IsEmpty) return string.Empty;
+
+        var str = CommandInfo.Text.Unwrap('(', ')', trim: true);
+        return $"({str})";
+    }
 
     /// <summary>
     /// <inheritdoc/>

@@ -5,6 +5,16 @@
 /// Represents a direct invocation of a given host.
 /// <br/> Instances of this type are intended to be immutable ones.
 /// </summary>
+/// <Notes>
+/// Invoke nodes are used to modify the way other elements are emitted in a database command.
+/// - If it is a first-level one with an unique string argument, then that string in injected
+///   in the command as a literal and, by convention, it won't be captured as an argument.
+/// - When an invoke node has several arguments, then their representations are just joined in
+///   the produced database command.
+/// - The above two capabilities, combined, permit to inject any arbitrary contents in the
+///   database commands, for instance when using pre-defined command methods that, otherwise,
+///   would not accept so.
+/// </Notes>
 public class DbTokenInvoke : DbTokenHosted
 {
     /// <summary>

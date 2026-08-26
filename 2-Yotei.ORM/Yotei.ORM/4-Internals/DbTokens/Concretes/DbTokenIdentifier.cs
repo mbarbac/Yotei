@@ -41,6 +41,15 @@ public class DbTokenIdentifier : DbTokenHosted
     public IIdentifier Identifier { get; }
 
     /// <summary>
+    /// The actual value carried by the identifier of this instance, or <see langword="null"/> if
+    /// it represents an empty or missed one. The empty or null head parts are removed, and then
+    /// each part is wrapped with the engine's terminators, if any.
+    /// <br/> The <see cref="Identifier.ToStringEx(bool, bool)"/> method can be used to customize
+    /// the string representation of the value.
+    /// </summary>
+    public string? Value => Identifier.Value;
+
+    /// <summary>
     /// Determines if this instance, along with its chain of hosts, represents a pure identifier
     /// or not.
     /// </summary>

@@ -77,7 +77,7 @@ public record DbLambdaParser
             _ => throw new ArgumentException("Unknown node.").WithData(node)
         };
 
-        //if (token is DbTokenChain chain) token = chain.Reduce(); // TODO...
+        if (token is DbTokenChain chain) token = chain.Reduce();
         return token;
     }
 
@@ -153,23 +153,49 @@ public record DbLambdaParser
     /// <returns></returns>
     IDbToken ParseNode(LambdaNodeInvoke node)
     {
-        // Special cases are always firts-level ones...
-        if (node.LambdaHost is LambdaNodeArgument)
+        // Intercepts literal nodes...
+        if (!PreventSingleStringValueToLiteral &&
+            node.LambdaArguments.Length == 1 &&
+            node.LambdaArguments[0] is LambdaNodeValue strnode &&
+            strnode.LambdaValue is string strvalue)
         {
-            // Single argument...
-            if (node.LambdaArguments.Length == 1)
-            {
-                if (node.LambdaArguments[0] is LambdaNodeValue value)
-                {
-                    // Convert to literal...
-                    if (!PreventSingleStringValueToLiteral &&
-                        value.LambdaValue is string str)
-                        return new DbTokenLiteral(str);
+            var item = new DbTokenLiteral(strvalue);
 
-                    // Command-alike...
-                    if (value.LambdaValue is ICommandInfo info) return new DbTokenCommandInfo(info);
-                    if (value.LambdaValue is ICommand command)
-                        return new DbTokenCommandInfo(command.GetCommandInfo(iterable: false));
+            if (node.LambdaHost is LambdaNodeArgument) return item;
+            else
+            {
+                var builder = new DbTokenChain.Builder();
+                var hostx = Parse(node.LambdaHost);
+                builder.Add(hostx);
+                builder.Add(item);
+                return builder.ToInstance().Reduce();
+            }
+        }
+
+        // Special case: first-level carrying a command...
+        if (node.LambdaHost is LambdaNodeArgument &&
+            node.LambdaArguments.Length == 1 &&
+            node.LambdaArguments[0] is LambdaNodeValue cmdnode)
+        {
+            var info = cmdnode.LambdaValue switch
+            {
+                ICommandInfo temp => temp,
+                ICommand temp => temp.GetCommandInfo(iterable: false),
+                _ => null
+            };
+
+            if (info is not null)
+            {
+                var cmd = new DbTokenCommandInfo(info);
+
+                if (node.LambdaHost is LambdaNodeArgument) return cmd;
+                else
+                {
+                    var builder = new DbTokenChain.Builder();
+                    var hostx = Parse(node.LambdaHost);
+                    builder.Add(hostx);
+                    builder.Add(cmd);
+                    return builder.ToInstance().Reduce();
                 }
             }
         }
@@ -205,7 +231,7 @@ public record DbLambdaParser
         var darg = node.GetArgument();
         var name = node.LambdaName.NullWhenDynamicName(darg, Engine.IgnoreCase);
 
-        // Intercepts 'x => x(...)' && 'x => x.Any.x(...)':
+        // Intercepts 'x => x.Any.x(...)'...
         if (name is null)
         {
             if (node.LambdaTypeArguments.Length != 0) throw new ArgumentException(
@@ -268,7 +294,7 @@ public record DbLambdaParser
         // Standard case...
         var host = Parse(node.LambdaHost);
         var items = node.LambdaArguments.Select(x => Parse(x));
-        return new DbTokenMethod(host, name, Engine.IgnoreCase, items);
+        return new DbTokenMethod(host, name, Engine.IgnoreCase, node.LambdaTypeArguments, items);
     }
 
     /// <summary>

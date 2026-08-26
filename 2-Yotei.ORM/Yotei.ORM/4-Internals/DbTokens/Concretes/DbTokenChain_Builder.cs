@@ -1,4 +1,4 @@
-﻿/*namespace Yotei.ORM.Internals;
+﻿namespace Yotei.ORM.Internals;
 
 partial class DbTokenChain
 {
@@ -28,6 +28,12 @@ partial class DbTokenChain
         protected Builder(Builder other) => AddRange(other.ThrowWhenNull());
 
         /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <returns></returns>
+        public override string ToString() => ToString("[", "]", ", ");
+
+        /// <summary>
         /// Returns an alternate string representation of this instance.
         /// </summary>
         /// <param name="head"></param>
@@ -36,9 +42,9 @@ partial class DbTokenChain
         /// <returns></returns>
         public string ToString(string head, string tail, string separator = ", ")
         {
-            head = head.NotNullNotEmpty(trim: false);
-            tail = tail.NotNullNotEmpty(trim: false);
-            separator = separator.NotNullNotEmpty(trim: false);
+            ArgumentNullException.ThrowIfNull(head);
+            ArgumentNullException.ThrowIfNull(tail);
+            ArgumentNullException.ThrowIfNull(separator);
 
             var sb = new StringBuilder();
             sb.Append(head);
@@ -100,4 +106,4 @@ partial class DbTokenChain
         /// </summary>
         public override sealed bool FlattenElements => true;
     }
-}*/
+}

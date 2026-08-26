@@ -26,7 +26,7 @@ public static class Test_Ternary
         func = x => true ? x.Beta : x.Delta;
         node = LambdaParser.Parse(func).Result;
         Debug.WriteLine($"> Result: {node}");
-        Assert.NotEqual("x.Alpha ? x.Beta : x.Delta", node.ToString());
+        Assert.NotEqual("TRUE ? x.Beta : x.Delta", node.ToString());
         Assert.IsType<LambdaNodeMember>(node);
         Assert.Equal("x.Beta", node.ToString());
 
@@ -35,7 +35,7 @@ public static class Test_Ternary
         func = x => false ? x.Beta : x.Delta;
         node = LambdaParser.Parse(func).Result;
         Debug.WriteLine($"> Result: {node}");
-        Assert.NotEqual("x.Alpha ? x.Beta : x.Delta", node.ToString());
+        Assert.NotEqual("FALSE ? x.Beta : x.Delta", node.ToString());
         Assert.IsType<LambdaNodeMember>(node);
         Assert.Equal("x.Delta", node.ToString());
     }

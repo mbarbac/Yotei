@@ -1,4 +1,4 @@
-﻿/*namespace Yotei.ORM.Internals;
+﻿namespace Yotei.ORM.Internals;
 
 // ========================================================
 /// <summary>
@@ -129,4 +129,4 @@ public partial class DbTokenChain : IDbToken
         for (int i = 0; i < Count; i++) code = HashCode.Combine(code, Items[i]);
         return code;
     }
-}*/
+}
