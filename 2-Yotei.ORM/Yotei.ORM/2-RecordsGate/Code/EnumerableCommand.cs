@@ -28,13 +28,16 @@ public abstract partial class EnumerableCommand : Command, IEnumerableCommand
 
     // ----------------------------------------------------
 
+    // HIGH: si se ha usado un Select de proyección, el enumerador tiene que devolver un enumerador
+    // de proyección, NO un enumerador de records.
+
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
     public virtual ICommandEnumerator GetEnumerator() => Connection.Records.CreateEnumerator(this);
 
-    IEnumerator<object?> IEnumerable<object?>.GetEnumerator() => GetEnumerator();
+    IEnumerator<IRecord?> IEnumerable<IRecord?>.GetEnumerator() => GetEnumerator();
     
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
@@ -46,9 +49,26 @@ public abstract partial class EnumerableCommand : Command, IEnumerableCommand
     public virtual ICommandEnumerator GetAsyncEnumerator(
         CancellationToken token = default) => Connection.Records.CreateEnumerator(this, token);
 
-    IAsyncEnumerator<object?> IAsyncEnumerable<object?>.GetAsyncEnumerator(
+    IAsyncEnumerator<IRecord?> IAsyncEnumerable<IRecord?>.GetAsyncEnumerator(
         CancellationToken cancellationToken)
         => GetAsyncEnumerator(cancellationToken);
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="spec"></param>
+    /// <returns></returns>
+    public virtual IEnumerableCommand Select(Func<dynamic, object> spec) => throw null;
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="spec"></param>
+    /// <returns></returns>
+    public virtual IEnumerableCommand Select<T>(Func<dynamic, T> spec) => throw null;
 
     // ----------------------------------------------------
 

@@ -2,11 +2,11 @@
 
 // ========================================================
 /// <summary>
-/// Represents an object that can execute its associated command, enumerating the results produced
+/// Represents an object that can execute its associated command, enumerating the records produced
 /// by that execution.
 /// </summary>
 public interface ICommandEnumerator
-    : IEnumerator<object?>, IAsyncEnumerator<object?>
+    : IEnumerator<IRecord?>, IAsyncEnumerator<IRecord?>
     , IDisposableEx
 {
     /// <summary>
@@ -20,10 +20,10 @@ public interface ICommandEnumerator
     CancellationToken CancellationToken { get; }
 
     /// <summary>
-    /// The element at the current position of this enumerator, or <see langword="null"/> if it
+    /// The record at the current position of this enumerator, or <see langword="null"/> if it
     /// has not been yet executed, or if there are no more results available.
     /// </summary>
-    new object? Current { get; }
+    new IRecord? Current { get; }
 
     /// <summary>
     /// The schema that describes the records produced by this instance, or <see langword="null"/>
@@ -32,8 +32,8 @@ public interface ICommandEnumerator
     ISchema? Schema { get; }
 
     /// <summary>
-    /// Determines if this instance must capture the schema of the records produced by the
-    /// execution of the associated command. The default value is <see langword="false"/>.
+    /// Determines if this instance captures the schema of the records produced by the  execution
+    /// of the associated command. The default value is <see langword="false"/>.
     /// <br/> Returns a reference to itself to support a fluent syntax usage.
     /// </summary>
     /// <param name="value"></param>

@@ -519,4 +519,52 @@ public static partial class Test_Record
         Assert.Null(target.Schema);
         Assert.Empty(target);
     }
+
+    // ----------------------------------------------------
+
+    //[Enforced]
+    [Fact]
+    public static void Test_DynamicGetter()
+    {
+        var engine = new FakeEngine() { IgnoreCase = true };
+        var xid = new Entry(engine, "Emp.Id", isPrimaryKey: true);
+        var xfirst = new Entry(engine, "Emp.FirstName");
+        var xlast = new Entry(engine, "LastName");
+        var xctry = new Entry(engine, "Ctry.Id");
+        var xweapon = new Entry(engine, "Weapon.Type.Gun");
+        var schema = new Schema(engine, [xid, xfirst, xlast, xctry, xweapon]);
+        var record = new Record(["007", "James", "Bond", "UK", "Astra"], schema);
+
+        dynamic item = record;
+        Assert.Equal("007", item.emp.id);
+        Assert.Equal("James", item.EMP.FirstName);
+        Assert.Equal("Bond", item.LASTNAME);
+        Assert.Equal("UK", item.ctry.id);
+        Assert.Equal("Astra", item.weapon.type.gun);
+    }
+
+    //[Enforced]
+    [Fact]
+    public static void Test_DynamicGetter_Errors()
+    {
+        var record = new Record();
+        dynamic item = record;
+
+        // Schema is null...
+        try { _ = item.id; Assert.Fail(); }
+        catch (InvalidOperationException) { }
+
+        var engine = new FakeEngine() { IgnoreCase = true };
+        var xid = new Entry(engine, "Emp.Id", isPrimaryKey: true);
+        var xfirst = new Entry(engine, "Emp.FirstName");
+        var xlast = new Entry(engine, "LastName");
+        var schema = new Schema(engine, [xid, xfirst, xlast]);
+        
+        record = new Record(["007", "James", "Bond"], schema);
+        item = record;
+
+        // Element not found...
+        try { _ = item.Any; Assert.Fail(); } catch (NotFoundException) { }
+        try { _ = item.Emp.Any; Assert.Fail(); } catch (NotFoundException) { }
+    }
 }

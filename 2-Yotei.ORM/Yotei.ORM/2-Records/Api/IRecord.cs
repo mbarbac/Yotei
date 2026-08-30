@@ -8,7 +8,7 @@
 /// <br/> Instances of this type are intended to be immutable ones.
 /// </summary>
 [Cloneable]
-public partial interface IRecord : IEnumerable<object?>, IEquatable<IRecord>
+public partial interface IRecord : IEnumerable<object?>, IEquatable<IRecord>, IDynamicMetaObjectProvider
 {
     /// <summary>
     /// Returns a new builder based upon de contents of this record.

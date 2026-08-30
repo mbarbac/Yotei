@@ -9,7 +9,7 @@
 [Cloneable]
 public partial interface IEnumerableCommand
     : ICommand
-    , IEnumerable<object?>, IAsyncEnumerable<object?>
+    , IEnumerable<IRecord?>, IAsyncEnumerable<IRecord?>
 {
     /// <summary>
     /// Returns an object that can execute this command and enumerate the records produced by
@@ -25,6 +25,26 @@ public partial interface IEnumerableCommand
     /// <param name="token"></param>
     /// <returns></returns>
     new ICommandEnumerator GetAsyncEnumerator(CancellationToken token = default);
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Adds to the SELECT clause of this command the column specification obtained from parsing
+    /// the given dynamic lambda expresion.
+    /// <br/> 'x => x.Source.All().As(...)'
+    /// </summary>
+    /// <param name="spec"></param>
+    /// <returns></returns>
+    IEnumerableCommand Select(Func<dynamic, object> spec);
+
+    /// <summary>
+    /// Specifies the proyection to use to obtain the results of the enumeration.
+    /// <br/> 'x => new { Name = x.Name }'
+    /// <br/> 'x => new Entity(...)'
+    /// </summary>
+    /// <param name="spec"></param>
+    /// <returns></returns>
+    IEnumerableCommand Select<T>(Func<dynamic, T> spec);
 
     // ----------------------------------------------------
 

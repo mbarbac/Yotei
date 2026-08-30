@@ -2,3 +2,21 @@ En Locale:
 - Si hago que la clase sea 'sealed', saltan errores en el WithGenerator.
 - Parece que los métodos se declaran como virtual.
 - Depurar.
+
+Habrá dos tipos de .Select(...)
+- Los que contengan un 'new', fuerzan a usa un enumerador tipado.
+- Y los que no: estos simplemente se mapean con una sentencia SELECT de la base de datos.
+- Mezclar ambos debe dar un error.
+
+ICommandEnumerator:
+- Tiene que ser la clase base de dos tipos de enumerators:
+	- ICommandRecordEnumerator
+	- ICommandTypedEnumerator
+
+En ICommandEnumerator:
+- Introducir el método Select como un proyecto a objecto genérico, NO tipado.
+- Así, podemos escribir .Select(x => new {Name = x.Name});
+- O hacer lo mismo contra una entidad: .Select(x => new Customer(x.Id));
+
+==> En realidad, acabo de escribir un IEnumerableCommand<T> que debe ser el objecto a retornar
+	cuando se este usando un Select!

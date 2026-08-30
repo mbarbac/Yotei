@@ -48,7 +48,7 @@ public abstract class CommandEnumerator : DisposableClass, ICommandEnumerator
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public object? Current { get; private set; }
+    public IRecord? Current { get; private set; }
     object IEnumerator.Current => Current!;
 
     /// <summary>

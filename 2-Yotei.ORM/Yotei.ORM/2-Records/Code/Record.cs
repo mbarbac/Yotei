@@ -1,5 +1,7 @@
 ﻿#pragma warning disable IDE0028, IDE0306
 
+using System.Runtime.InteropServices.Marshalling;
+
 namespace Yotei.ORM.Records.Code;
 
 // ========================================================
@@ -9,9 +11,9 @@ namespace Yotei.ORM.Records.Code;
 [Cloneable(ReturnType = typeof(IRecord))]
 [InheritsWith(ReturnType = typeof(IRecord))]
 [DebuggerDisplay("{ToDebugString(3)}")]
-public partial class Record : IRecord
+public partial class Record : DynamicObject, IRecord
 {
-    Builder Items;
+    readonly Builder Items;
 
     /// <summary>
     /// Initializes an empty schema-less instance.
@@ -74,6 +76,87 @@ public partial class Record : IRecord
     /// </summary>
     /// <returns></returns>
     public virtual IRecord.IBuilder ToBuilder() => Items.Clone();
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="binder"></param>
+    /// <param name="result"></param>
+    /// <returns></returns>
+    public override bool TryGetMember(GetMemberBinder binder, out object? result)
+    {
+        if (Schema is null) throw new InvalidOperationException(
+            "This instance is a schema-less one.")
+            .WithData(this);
+
+        // Easy case...
+        var index = Schema.IndexOf(binder.Name);
+        if (index >= 0)
+        {
+            result = Items[index];
+            return true;
+        }
+        else
+        {
+            if (!Surrogate.AreCandidates(this, binder.Name))
+            {
+                throw new NotFoundException(
+                    "Dynamic element not found.")
+                    .WithData(binder.Name)
+                    .WithData(this);
+            }
+
+            result = new Surrogate(this, binder.Name);
+            return true;
+        }
+    }
+
+    // A surrogate for multipart specifications.
+    class Surrogate(IRecord Record, string Name) : DynamicObject
+    {
+        // Returns a string representation of this instance.
+        public override string ToString() => Name;
+
+        // Implements member getter.
+        public override bool TryGetMember(GetMemberBinder binder, out object? result)
+        {
+            var name = $"{Name}.{binder.Name}";
+            var index = Record.Schema!.IndexOf(name);
+            if (index >= 0)
+            {
+                result = Record[index];
+                return true;
+            }
+
+            if (!AreCandidates(Record, name))
+            {
+                throw new NotFoundException(
+                    "Dynamic element not found.")
+                    .WithData(name)
+                    .WithData(this);
+            }
+
+            result = new Surrogate(Record, name);
+            return true;
+        }
+
+        // Determines if there are potential candidates.
+        public static bool AreCandidates(IRecord record, string name)
+        {
+            var schema = record.Schema!;
+            var engine = schema.Engine;
+
+            foreach (var item in schema)
+            {
+                if (item.Identifier is null) continue;
+                var temp = item.Identifier.ToStringEx(reduce: true, useTerminators: false);
+                if (temp.StartsWith(name, engine.IgnoreCase)) return true;
+            }
+            return false;
+        }
+    }
 
     // ----------------------------------------------------
 
