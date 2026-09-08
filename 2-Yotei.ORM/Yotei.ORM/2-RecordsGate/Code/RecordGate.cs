@@ -20,27 +20,27 @@ public abstract class RecordsGate : IRecordsGate
 
     // ----------------------------------------------------
 
-    /// <summary>
+    /*/// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="command"></param>
     /// <param name="token"></param>
     /// <returns></returns>
     public abstract ICommandEnumerator CreateEnumerator(
-        IEnumerableCommand command, CancellationToken token = default);
+        IEnumerableCommand command, CancellationToken token = default);*/
 
-    /// <summary>
+    /*/// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="command"></param>
     /// <returns></returns>
-    public abstract ICommandExecutor CreateExecutor(IExecutableCommand command);
+    public abstract ICommandExecutor CreateExecutor(IExecutableCommand command);*/
 
     // ----------------------------------------------------
 
-    /// <summary>
+    /*/// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public virtual IRawCommand Raw() => throw null;
+    public virtual IRawCommand Raw() => throw null;*/
 }

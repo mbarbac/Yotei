@@ -13,28 +13,28 @@ public interface IRecordsGate
 
     // ----------------------------------------------------
 
-    /// <summary>
+    /*/// <summary>
     /// Returns an object that can execute the given command and enumerate through the records
     /// produced by that execution.
     /// </summary>
     /// <param name="command"></param>
     /// <param name="token"></param>
     /// <returns></returns>
-    ICommandEnumerator CreateEnumerator(IEnumerableCommand command, CancellationToken token = default);
+    ICommandEnumerator CreateEnumerator(IEnumerableCommand command, CancellationToken token = default);*/
 
-    /// <summary>
+    /*/// <summary>
     /// Returns an object that can execute the given command and return an integer as the result
     /// of that execution.
     /// </summary>
     /// <param name="command"></param>
     /// <returns></returns>
-    ICommandExecutor CreateExecutor(IExecutableCommand command);
+    ICommandExecutor CreateExecutor(IExecutableCommand command);*/
 
     // ----------------------------------------------------
 
-    /// <summary>
+    /*/// <summary>
     /// Returns a new empty RAW command.
     /// </summary>
     /// <returns></returns>
-    IRawCommand Raw();
+    IRawCommand Raw();*/
 }
