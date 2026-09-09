@@ -31,8 +31,9 @@ public partial interface IEnumerableCommand
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="converter"></param>
+    /// <param name="token"></param>
     /// <returns></returns>
-    ICommandEnumerator<T> Select<T>(Func<dynamic, T> converter);
+    ICommandEnumerator<T> Select<T>(Func<dynamic, T> converter, CancellationToken token = default);
 
     // ----------------------------------------------------
 

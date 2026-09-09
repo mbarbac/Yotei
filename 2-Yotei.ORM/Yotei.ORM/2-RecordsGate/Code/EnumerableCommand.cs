@@ -50,8 +50,11 @@ public abstract partial class EnumerableCommand : Command, IEnumerableCommand
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="converter"></param>
+    /// <param name="token"></param>
     /// <returns></returns>
-    public ICommandEnumerator<T> Select<T>(Func<dynamic, T> converter) => throw null;
+    public ICommandEnumerator<T> Select<T>(
+        Func<dynamic, T> converter,
+        CancellationToken token = default) => new CommandEnumerator<T>(this, converter, token);
 
     // ----------------------------------------------------
 

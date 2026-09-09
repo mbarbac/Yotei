@@ -7,14 +7,14 @@
 public interface IRecordsGate : ORM.Records.IRecordsGate
 {
     /// <summary>
-    /// <inheritdoc cref="Records.IRecordsGate.Connection"/>
+    /// <inheritdoc cref="ORM.Records.IRecordsGate.Connection"/>
     /// </summary>
     new IConnection Connection { get; }
 
     // ----------------------------------------------------
 
     /// <summary>
-    /// <inheritdoc cref="Records.IRecordsGate.CreateEnumerator(IEnumerableCommand, CancellationToken)"/>
+    /// <inheritdoc cref="ORM.Records.IRecordsGate.CreateEnumerator(IEnumerableCommand, CancellationToken)"/>
     /// </summary>
     /// <param name="command"></param>
     /// <param name="token"></param>
@@ -23,7 +23,7 @@ public interface IRecordsGate : ORM.Records.IRecordsGate
         IEnumerableCommand command, CancellationToken token = default);
 
     /// <summary>
-    /// <inheritdoc cref="Records.IRecordsGate.CreateExecutor(IExecutableCommand)"/>
+    /// <inheritdoc cref="ORM.Records.IRecordsGate.CreateExecutor(IExecutableCommand)"/>
     /// </summary>
     /// <param name="command"></param>
     /// <returns></returns>

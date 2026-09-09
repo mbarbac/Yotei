@@ -38,9 +38,9 @@ public abstract class RecordsGate : IRecordsGate
 
     // ----------------------------------------------------
 
-    /*/// <summary>
+    /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public virtual IRawCommand Raw() => throw null;*/
+    public virtual IRawCommand Raw() => new RawCommand(Connection);
 }

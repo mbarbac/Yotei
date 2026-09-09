@@ -33,9 +33,9 @@ public interface IRecordsGate
 
     // ----------------------------------------------------
 
-    /*/// <summary>
+    /// <summary>
     /// Returns a new empty RAW command.
     /// </summary>
     /// <returns></returns>
-    IRawCommand Raw();*/
+    IRawCommand Raw();
 }

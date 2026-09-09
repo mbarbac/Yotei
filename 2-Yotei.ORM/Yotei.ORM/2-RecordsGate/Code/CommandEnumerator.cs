@@ -131,9 +131,10 @@ public abstract class CommandEnumerator : DisposableClass, ICommandEnumerator
         ThrowIfDisposed();
         ThrowOnDisposing();
 
-        if (CancellationToken.IsCancellationRequested) Terminate();
         try
         {
+            CancellationToken.ThrowIfCancellationRequested();
+
             // Main loop...
             while (!_Terminated)
             {
@@ -294,9 +295,10 @@ public abstract class CommandEnumerator : DisposableClass, ICommandEnumerator
         ThrowIfDisposed();
         ThrowOnDisposing();
 
-        if (CancellationToken.IsCancellationRequested) await TerminateAsync().ConfigureAwait(false);
         try
         {
+            CancellationToken.ThrowIfCancellationRequested();
+
             // Main loop...
             while (!_Terminated)
             {
