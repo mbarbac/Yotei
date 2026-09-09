@@ -13,19 +13,19 @@ public interface IRecordsGate : ORM.Records.IRecordsGate
 
     // ----------------------------------------------------
 
-    /*/// <summary>
+    /// <summary>
     /// <inheritdoc cref="Records.IRecordsGate.CreateEnumerator(IEnumerableCommand, CancellationToken)"/>
     /// </summary>
     /// <param name="command"></param>
     /// <param name="token"></param>
     /// <returns></returns>
     new ICommandEnumerator CreateEnumerator(
-        IEnumerableCommand command, CancellationToken token = default);*/
+        IEnumerableCommand command, CancellationToken token = default);
 
-    /*/// <summary>
+    /// <summary>
     /// <inheritdoc cref="Records.IRecordsGate.CreateExecutor(IExecutableCommand)"/>
     /// </summary>
     /// <param name="command"></param>
     /// <returns></returns>
-    new ICommandExecutor CreateExecutor(IExecutableCommand command);*/
+    new ICommandExecutor CreateExecutor(IExecutableCommand command);
 }

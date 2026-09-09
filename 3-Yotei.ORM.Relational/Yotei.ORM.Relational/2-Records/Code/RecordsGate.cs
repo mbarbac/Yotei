@@ -20,19 +20,19 @@ public class RecordsGate : ORM.Records.Code.RecordsGate, IRecordsGate
 
     // ----------------------------------------------------
 
-    /*/// <summary>
+    /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="command"></param>
     /// <param name="token"></param>
     /// <returns></returns>
     public override ICommandEnumerator CreateEnumerator(
-        IEnumerableCommand command, CancellationToken token = default) => throw null;*/
+        IEnumerableCommand command, CancellationToken token = default) => throw null;
 
-    /*/// <summary>
+    /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="command"></param>
     /// <returns></returns>
-    public override ICommandExecutor CreateExecutor(IExecutableCommand command) => throw null;*/
+    public override ICommandExecutor CreateExecutor(IExecutableCommand command) => throw null;
 }

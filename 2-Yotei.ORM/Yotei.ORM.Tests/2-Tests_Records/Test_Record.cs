@@ -524,6 +524,27 @@ public static partial class Test_Record
 
     //[Enforced]
     [Fact]
+    public static void Test_DynamicGetter_Indexed()
+    {
+        var engine = new FakeEngine() { IgnoreCase = true };
+        var xid = new Entry(engine, "Emp.Id", isPrimaryKey: true);
+        var xfirst = new Entry(engine, "Emp.FirstName");
+        var xlast = new Entry(engine, "LastName");
+        var xctry = new Entry(engine, "Ctry.Id");
+        var xweapon = new Entry(engine, "Weapon.Type.Gun");
+        var schema = new Schema(engine, [xid, xfirst, xlast, xctry, xweapon]);
+        var record = new Record(["007", "James", "Bond", "UK", "Astra"], schema);
+
+        dynamic item = record;
+        Assert.Equal("007", item[0]);
+        Assert.Equal("James", item[1]);
+        Assert.Equal("Bond", item[2]);
+        Assert.Equal("UK", item[3]);
+        Assert.Equal("Astra", item[4]);
+    }
+
+    //[Enforced]
+    [Fact]
     public static void Test_DynamicGetter()
     {
         var engine = new FakeEngine() { IgnoreCase = true };
