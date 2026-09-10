@@ -58,12 +58,15 @@ public abstract partial class EnumerableCommand : Command, IEnumerableCommand
 
     // ----------------------------------------------------
 
-    int _Skip = -1, _Take = -1;
-
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public abstract bool SupportsNativePaging { get; }
+    public virtual bool SupportsNativePaging
+    {
+        get;
+        protected set;
+    }
+    = false;
 
     /// <summary>
     /// <inheritdoc/>
@@ -75,6 +78,7 @@ public abstract partial class EnumerableCommand : Command, IEnumerableCommand
         _Skip = value < 0 ? -1 : value;
         return this;
     }
+    int _Skip = -1;
 
     /// <summary>
     /// <inheritdoc/>
@@ -92,6 +96,7 @@ public abstract partial class EnumerableCommand : Command, IEnumerableCommand
         _Take = value < 0 ? -1 : value;
         return this;
     }
+    int _Take = -1;
 
     /// <summary>
     /// <inheritdoc/>

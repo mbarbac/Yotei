@@ -74,11 +74,6 @@ public partial class RawCommand : EnumerableCommand, IRawCommand
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public override bool SupportsNativePaging => throw null;
-
-    /// <summary>
-    /// <inheritdoc/>
-    /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
     public override IRawCommand Skip(int value) { base.Skip(value); return this; }

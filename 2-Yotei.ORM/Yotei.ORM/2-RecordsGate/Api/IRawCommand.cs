@@ -38,6 +38,8 @@ public partial interface IRawCommand : ICommand, IEnumerableCommand, IExecutable
 
     // ----------------------------------------------------
 
+
+
     /// <summary>
     /// <inheritdoc cref="IEnumerableCommand.Skip(int)"/>
     /// </summary>

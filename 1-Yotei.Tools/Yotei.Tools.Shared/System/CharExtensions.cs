@@ -1,4 +1,6 @@
-﻿namespace Yotei.Tools;
+﻿using StringSpan = System.ReadOnlySpan<char>;
+
+namespace Yotei.Tools;
 
 // ========================================================
 public static class CharExtensions
