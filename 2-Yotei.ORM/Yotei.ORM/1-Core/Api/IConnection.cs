@@ -64,6 +64,16 @@ public partial interface IConnection : IAsyncDisposableEx
     // ----------------------------------------------------
 
     /// <summary>
+    /// The collection of converters from database-level source types to application-level ones.
+    /// </summary>
+    IValueConverterList FromDbConverters { get; }
+
+    /// <summary>
+    /// The collection of converters from application-level source types to database-level ones.
+    /// </summary>
+    IValueConverterList ToDbConverters { get; }
+
+    /// <summary>
     /// Provides access to the records-oriented capabilities of this instance.
     /// </summary>
     IRecordsGate Records { get; }

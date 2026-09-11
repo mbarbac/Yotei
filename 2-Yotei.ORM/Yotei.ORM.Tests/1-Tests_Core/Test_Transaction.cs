@@ -2,7 +2,7 @@
 
 // ========================================================
 //[Enforced]
-public static partial class Test_Transaction
+public static class Test_Transaction
 {
     //[Enforced]
     [Fact]

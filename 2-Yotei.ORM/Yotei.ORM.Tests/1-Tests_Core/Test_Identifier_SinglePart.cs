@@ -4,7 +4,7 @@ namespace Yotei.ORM.Tests;
 
 // ========================================================
 //[Enforced]
-public static partial class Test_Identifier_SinglePart
+public static class Test_Identifier_SinglePart
 {
     //[Enforced]
     [Fact]

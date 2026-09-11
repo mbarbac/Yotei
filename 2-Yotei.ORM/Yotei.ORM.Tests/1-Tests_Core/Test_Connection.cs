@@ -4,7 +4,7 @@ namespace Yotei.ORM.Tests;
 
 // ========================================================
 //[Enforced]
-public static partial class Test_Connection
+public static class Test_Connection
 {
     //[Enforced]
     [Fact]

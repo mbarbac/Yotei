@@ -62,9 +62,32 @@ public partial interface IValueConverterList : IEnumerable<IValueConverter>
     bool Remove(Type sourceType);
 
     /// <summary>
+    /// <inheritdoc cref="Remove(Type)"/>
+    /// </summary>
+    /// <typeparam name="TSource"></typeparam>
+    /// <returns></returns>
+    bool Remove<TSource>();
+
+    /// <summary>
     /// Clears this instance.
     /// </summary>
     void Clear();
 
     // ----------------------------------------------------
+
+    /// <summary>
+    /// Tries to convert the given value using a converter registered into this instance for its
+    /// source type, and the given locale, if any. If such converter is not found, then the original
+    /// value is returned.
+    /// <br/> If no converter can be found in the default strict mode, and if <paramref name="relax"/>
+    /// is requested, then the first converter from whose source type the given one implements or
+    /// inherits from is used.
+    /// </summary>
+    /// <typeparam name="TSource"></typeparam>
+    /// <param name="value"></param>
+    /// <param name="locale"></param>
+    /// <param name="relax"></param>
+    /// <returns></returns>
+    object? TryConvert<TSource>(
+        [AllowNull] TSource value, Locale? locale = null, bool relax = false);
 }

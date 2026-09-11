@@ -34,6 +34,18 @@ public abstract partial class Connection : DisposableClass, IConnection
         Retries = other.Retries;
         RetryInterval = other.RetryInterval;
         LockTimeout = other.LockTimeout;
+
+        AddRange(ToDbConverters, other.ToDbConverters);
+        AddRange(FromDbConverters, other.FromDbConverters);
+    }
+
+    // Adds to the given source converters the ones from the given range.
+    static void AddRange(IValueConverterList source, IEnumerable<IValueConverter> range)
+    {
+        ArgumentNullException.ThrowIfNull(source);
+        ArgumentNullException.ThrowIfNull(range);
+
+        foreach (var item in range) source.Add(item);
     }
 
     /// <summary>
@@ -288,6 +300,16 @@ public abstract partial class Connection : DisposableClass, IConnection
     protected abstract IRecordsGate CreateRecordsGate();
 
     // ----------------------------------------------------
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public IValueConverterList FromDbConverters { get; } = new ValueConverterList();
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public IValueConverterList ToDbConverters { get; } = new ValueConverterList();
 
     /// <summary>
     /// <inheritdoc/>

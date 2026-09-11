@@ -2,7 +2,7 @@
 
 // ========================================================
 //[Enforced]
-public static partial class Test_Identifier_Extensions
+public static class Test_Identifier_Extensions
 {
     //[Enforced]
     [Fact]

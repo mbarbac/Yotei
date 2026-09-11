@@ -1,19 +1,21 @@
 ﻿#pragma warning disable CA1822, CA1859
 
-using System.Diagnostics.Contracts;
-
 namespace Yotei.ORM.Internals;
 
 // ========================================================
 /// <summary>
 /// Represents the ability of parsing dynamic lambda expressions, returning the last database
 /// alike token in the chain that contains the dynamic operations in that expression.
-/// </summary>
-/// <Notes>
+/// <para>
+/// This class is rarely used directly. Rather, the <see cref="DbTokenVisitor"/> class is used
+/// instead as its instances return the appropriate database representation.
+/// </para>
+/// <para>
 /// This class provides a fast parsing mechanism from dynamic lambda expressions to database
 /// tokens. Later, visitors can translate those token chains into the appropriate command info
 /// instances for their database engine types.
-/// </Notes>
+/// </para>
+/// </summary>
 public record DbLambdaParser
 {
     /// <summary>
