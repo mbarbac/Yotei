@@ -116,7 +116,6 @@ public partial interface ICommandInfo
     /// <summary>
     /// Returns a copy of this instance where the original collection of parameters has been
     /// replaced by the one obtained from the given range of values.
-    /// <br/> This method fails it it renders an inconsistent state.
     /// </summary>
     /// <param name="values"></param>
     /// <returns></returns>

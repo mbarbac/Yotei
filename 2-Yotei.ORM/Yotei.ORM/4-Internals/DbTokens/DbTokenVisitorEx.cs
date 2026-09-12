@@ -1,4 +1,6 @@
-﻿namespace Yotei.ORM.Internals;
+﻿using Microsoft.VisualBasic;
+
+namespace Yotei.ORM.Internals;
 
 // ========================================================
 public partial record DbTokenVisitor
@@ -162,7 +164,7 @@ public partial record DbTokenVisitor
         // Finishing...
         var right = Visit(token.Right);
 
-        left.ReplaceText($"{left.Text} {op} ");
+        left.ReplaceText($"({left.Text} {op} ");
         left.Add(right);
         left.AddText(")");
         return left;
@@ -172,13 +174,14 @@ public partial record DbTokenVisitor
 
     /// <summary>
     /// Invoked to visit the given token.
-    /// <br/> This method visits the chain elements of the chain and then joins them using the
-    /// current range separator.
+    /// <br/> This method visits the chain elements of the chain and then joins them using no
+    /// separators, to be consistent with the [...] translation syntax.
     /// </summary>
     /// <param name="token"></param>
     protected virtual ICommandInfo.IBuilder VisitToken(DbTokenChain token)
     {
-        return VisitRange(token);
+        var visitor = ToNullSeparatorVisitor();
+        return visitor.VisitRange(token);
     }
 
     // ----------------------------------------------------
@@ -335,7 +338,7 @@ public partial record DbTokenVisitor
         for (int i = 0; i < names.Count; i++)
         {
             var temp = names[i].NullWhenDynamicName(darg, Engine.IgnoreCase);
-            if (Engine.UseTerminators) 
+            if (Engine.UseTerminators)
                 temp = temp.Wrap(Engine.LeftTerminator, Engine.RightTerminator, trim: true);
 
             names[i] = temp.NullWhenEmpty(trim: true);
@@ -415,30 +418,155 @@ public partial record DbTokenVisitor
     protected virtual ICommandInfo.IBuilder VisitToken(DbTokenMethod token)
     {
         // Intercepting invoke-alike tokens...
+        var name = token.Name;
+        var darg = token.GetArgument();
 
-        // Preparing...
+        if (darg != null && darg.Name == name)
+        {
+            if (token.TypeArguments.Length != 0) throw new ArgumentException(
+                "Invoke-alike methods do not support generic type arguments.")
+                .WithData(token);
+
+            return Visit(new DbTokenInvoke(token.Host, token.Arguments));
+        }
+
+        // Others...
+        var upper = name.ToUpper();
+        ICommandInfo.IBuilder temp;
+        ICommandInfo.IBuilder other;
+        DbTokenChain chain;
 
         // Argument-level methods...
+        if (token.Host is DbTokenArgument)
+        {
+            switch (upper)
+            {
+                case "NOT":
+                    if (token.Arguments.IsEmpty) Throw(token, $"NOT(expr) requieres 1 argument.");
+                    if (token.Arguments.Length > 1) Throw(token, $"Too many NOT(expr) arguments.");
+                    temp = Visit(token.Arguments[0]);
+                    temp.ReplaceText($"(NOT {temp.Text})");
+                    return temp;
+
+                case "COUNT":
+                    if (token.Arguments.IsEmpty || IsSoleAsterisk(token.Arguments))
+                        return new CommandInfo.Builder(Engine, "COUNT(*)");
+
+                    temp = VisitRange(token.Arguments);
+                    temp.ReplaceText($"COUNT({temp.Text})");
+                    return temp;
+
+                case "CONVERT":
+                case "CAST":
+                    if (token.TypeArguments.Length == 1) // Cast<type>(expre) ...
+                    {
+                        if (token.Arguments.Length != 1) Throw(token, $"CAST<type>(expr) requieres 1 argument.");
+                        temp = Visit(token.Arguments[0]);
+                        name = token.TypeArguments[0].EasyName();
+                        temp.ReplaceText($"CAST({name} AS {temp.Text})");
+                        return temp;
+                    }
+                    if (token.TypeArguments.Length == 0) // Cast(expr, type) ...
+                    {
+                        if (token.Arguments.Length != 2) Throw(token, $"CAST(expr, type) requieres 2 arguments.");
+                        temp = Visit(token.Arguments[0]);
+                        other = ToRawVisitor().Visit(token.Arguments[1]);
+                        temp.ReplaceText($"CAST({temp.Text} AS ");
+                        temp.Add(other);
+                        temp.AddText(")");
+                        return temp;
+                    }
+                    Throw(token, "Too many CAST<...>(...) arguments.");
+                    break;
+            }
+        }
 
         // Member-level methods...
+        var host = Visit(token.Host);
+        if (token.Host is not DbTokenArgument)
+        {
+            switch (upper)
+            {
+                case "AS":
+                    if (token.Arguments.IsEmpty) Throw(token, $"AS(...) needs at least 1 argument.");
+                    name = ChainToAlias(token.Arguments);
+                    host.AddText($" AS {name}");
+                    return host;
+
+                case "IN":
+                    if (token.Arguments.IsEmpty) Throw(token, $"IN(...) needs at least 1 argument.");
+                    chain = TryExpandFirst(token.Arguments);
+                    temp = VisitRange(chain);
+                    host.AddText(" IN (");
+                    host.Add(temp);
+                    host.AddText(")");
+                    return host;
+
+                case "NOTIN":
+                    if (token.Arguments.IsEmpty) Throw(token, $"NOTIN(...) needs at least 1 argument.");
+                    chain = TryExpandFirst(token.Arguments);
+                    temp = VisitRange(chain);
+                    host.AddText(" NOT IN (");
+                    host.Add(temp);
+                    host.AddText(")");
+                    return host;
+
+                case "BETWEEN":
+                    if (token.Arguments.Length != 2) Throw(token, $"BETWEEN(expr, expr) needs 2 arguments.");
+                    temp = Visit(token.Arguments[0]);
+                    other = Visit(token.Arguments[1]);
+                    host.Add($" BETWEEN ({temp.Text} AND ", temp.Parameters);
+                    host.Add(other);
+                    host.AddText(")");
+                    return host;
+
+                case "LIKE":
+                    if (token.Arguments.Length != 1) Throw(token, $"LIKE(expr) needs 1 argument.");
+                    temp = Visit(token.Arguments[0]);
+                    host.Add($" LIKE {temp.Text}", temp.Parameters);
+                    return host;
+
+                case "NOTLIKE":
+                    if (token.Arguments.Length != 1) Throw(token, $"NOTLIKE(expr) needs 1 argument.");
+                    temp = Visit(token.Arguments[0]);
+                    host.Add($" NOT LIKE {temp.Text}", temp.Parameters);
+                    return host;
+            }
+        }
 
         // Default method invocations...
+        if (token.Host is not DbTokenArgument and not DbTokenInvoke) host.AddText(".");
+        host.Add(name);
 
-        // Finishing...
-        throw null;
+        if (token.TypeArguments.Length > 0)
+        {
+            host.AddText("<");
+            host.AddText(string.Join(", ", token.TypeArguments.Select(x => x.EasyName())));
+            host.AddText(">");
+        }
+
+        temp = VisitRange(token.Arguments);
+        host.AddText("(");
+        host.Add(temp);
+        host.AddText(")");
+        return host;
+
+        // Exception helper...
+        [DoesNotReturn]
+        static void Throw(
+            IDbToken token, string str) => throw new ArgumentException(str).WithData(token);
     }
 
     /// <summary>
-    /// Determines if the given chain consist in just one element with an asterisk-alike value.
+    /// Determines if the given collection of tokens consist in just one element with an
+    /// asterisk-alike value.
     /// </summary>
     /// <param name="chain"></param>
     /// <returns></returns>
-    public static bool IsSoleAsterisk(DbTokenChain chain)
+    public static bool IsSoleAsterisk(ImmutableArray<IDbToken> chain)
     {
-        ArgumentNullException.ThrowIfNull(chain);
-
         return
-            chain.Count == 1 &&
+            chain.Length == 1 &&
             chain[0] is DbTokenValue value && (
             (value.Value is char c && c == '*') ||
             (value.Value is string s && s == "*"));
@@ -450,11 +578,9 @@ public partial record DbTokenVisitor
     /// </summary>
     /// <param name="chain"></param>
     /// <returns></returns>
-    public DbTokenChain TryExpandFirst(DbTokenChain chain)
+    public DbTokenChain TryExpandFirst(ImmutableArray<IDbToken> chain)
     {
-        ArgumentNullException.ThrowIfNull(chain);
-
-        if (chain.Count == 1 &&
+        if (chain.Length == 1 &&
             chain[0] is DbTokenValue value &&
             value.Value is not string &&
             value.Value is IEnumerable iter)
@@ -478,10 +604,10 @@ public partial record DbTokenVisitor
                         break;
                 }
             }
-            chain = builder.ToInstance();
+            return builder.ToInstance();
         }
 
-        return chain;
+        return [.. chain];
     }
 
     /// <summary>
@@ -490,10 +616,8 @@ public partial record DbTokenVisitor
     /// </summary>
     /// <param name="chain"></param>
     /// <returns></returns>
-    public string ChainToAlias(DbTokenChain chain)
+    public string ChainToAlias(ImmutableArray<IDbToken> chain)
     {
-        ArgumentNullException.ThrowIfNull(chain);
-
         var visitor = ToRawVisitor();
         var builder = visitor.VisitRange(chain);
 
@@ -502,7 +626,7 @@ public partial record DbTokenVisitor
         {
             var name = id.Value;
             if (name is not null) return name;
-        }        
+        }
         throw new ArgumentException("Invalid alias.").WithData(chain);
     }
 

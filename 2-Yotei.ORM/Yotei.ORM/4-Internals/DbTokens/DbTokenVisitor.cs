@@ -69,6 +69,15 @@ public partial record DbTokenVisitor
         ? this
         : this with { RangeSeparator = null };
 
+    /*/// <summary>
+    /// Returns a clone of this visitor with the <see cref="RangeSeparator"/> property set to
+    /// a plain space.
+    /// </summary>
+    /// <returns></returns>
+    public DbTokenVisitor ToSpaceSeparatorVisitor() => RangeSeparator == " "
+        ? this
+        : this with { RangeSeparator = " " };*/
+
     // ----------------------------------------------------
 
     /// <summary>
