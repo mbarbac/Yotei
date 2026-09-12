@@ -45,6 +45,30 @@ public partial record DbTokenVisitor
         RangeSeparator = other.RangeSeparator;
     }
 
+    /// <summary>
+    /// Returns a clone of this visitor with all its properties set to null or false, except
+    /// the connection and locale ones, which are preserved.
+    /// </summary>
+    /// <returns></returns>
+    public DbTokenVisitor ToRawVisitor() => this with
+    {
+        UseNullString = false,
+        CaptureValues = false,
+        ConvertValues = false,
+        UseQuotes = false,
+        UseTerminators = false,
+        RangeSeparator = null,
+    };
+
+    /// <summary>
+    /// Returns a clone of this visitor with the <see cref="RangeSeparator"/> property set to
+    /// null.
+    /// </summary>
+    /// <returns></returns>
+    public DbTokenVisitor ToNullSeparatorVisitor() => RangeSeparator is null
+        ? this
+        : this with { RangeSeparator = null };
+
     // ----------------------------------------------------
 
     /// <summary>
@@ -93,23 +117,6 @@ public partial record DbTokenVisitor
     /// one. If null, then it is ignored.
     /// </summary>
     public string? RangeSeparator { get; init; } = RANGESEPARATOR;
-
-    // ----------------------------------------------------
-
-    /// <summary>
-    /// Returns a clone of this instance but with all its properties set to false or null, except
-    /// its <see cref="Locale"/> one, which is kept with its previous value.
-    /// </summary>
-    /// <returns></returns>
-    public DbTokenVisitor ToRawVisitor() => this with
-    {
-        UseNullString = false,
-        CaptureValues = false,
-        ConvertValues = false,
-        UseQuotes = false,
-        UseTerminators = false,
-        RangeSeparator = null,
-    };
 
     // ----------------------------------------------------
 

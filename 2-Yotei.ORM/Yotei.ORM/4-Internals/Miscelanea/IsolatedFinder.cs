@@ -13,7 +13,7 @@ public record IsolatedFinder
     public static readonly ImmutableArray<char> SEPARATORS = [.. " ()[]{}<>\"'`´\\|!&@#=+-*/%^"];
 
     /// <summary>
-    /// Initializes a new default instance.
+    /// Initializes a new instance.
     /// </summary>
     public IsolatedFinder() { }
 
