@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "Yotei.Tools.CloneGenerator": {
+      "commandName": "Project"
+    },
+    "CloneGenerator.Debug": {
+      "commandName": "DebugRoslynComponent",
+      "targetProject": "..\\Yotei.Tools.CloneGenerator.Tests\\Yotei.Tools.CloneGenerator.Tests.csproj"
+    }
+  }
+}

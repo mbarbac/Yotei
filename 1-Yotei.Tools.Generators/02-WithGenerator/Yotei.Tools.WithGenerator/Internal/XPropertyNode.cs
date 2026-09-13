@@ -1,0 +1,528 @@
+﻿namespace Yotei.Tools.WithGenerator;
+
+// ========================================================
+/// <summary>
+/// <inheritdoc/>
+/// </summary>
+internal class XPropertyNode : PropertyNode, IXNode<IPropertySymbol>
+{
+    AttributeData Attribute = default!;
+    INamedTypeSymbol Host => Parent!.Symbol;
+
+    readonly EasyTypeOptions ArgOptions = EasyTypeOptions.Default.WithRecursive(
+        useVariance: true,
+        namespaceStyle: EasyNamespaceStyle.Default,
+        useHost: true,
+        useSpecialNames: true,
+        nullableStyle: EasyNullableStyle.UseAnnotations);
+
+    /// <summary>
+    /// Initializes a new instance.
+    /// </summary>
+    /// <param name="symbol"></param>
+    [SuppressMessage("", "IDE0290")]
+    public XPropertyNode(IPropertySymbol symbol) : base(symbol) { }
+
+    /// <summary>
+    /// Determines if this instance was captured for an inherited member, or not.
+    /// </summary>
+    public bool Inherited { get; init; }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="context"></param>
+    /// <returns></returns>
+    protected override bool OnValidate(SourceProductionContext context)
+    {
+        var warning = DiagnosticSeverity.Warning;
+        var r = base.OnValidate(context);
+
+        // Records not supported...
+        if (Host.IsRecord)
+        { TreeError.RecordsNotSupported.Report(Symbol, context); r = false; }
+
+        // Member constrains...
+        if (Symbol.IsIndexer) TreeError.IndexerNotSupported.Report(Symbol, context, severity: warning);
+        if (!Symbol.HasGetter) TreeError.NoGetter.Report(Symbol, context, severity: warning);
+        if (!Symbol.HasSetter &&
+            !Symbol.ContainingType.IsInterface) TreeError.NoSetter.Report(Symbol, context, severity: warning);
+
+        // Finding the unique decorating attribute...
+        if (Inherited)
+        {
+            var ats = Host.GetAttributes([typeof(InheritsWithAttribute)]).ToList();
+            if (ats.Count == 0) { TreeError.NoAttributes.Report(Host, context); r = false; }
+            else if (ats.Count > 1) { TreeError.TooManyAttributes.Report(Host, context); r = false; }
+            else Attribute = ats[0];
+        }
+        else
+        {
+            if (Attributes.Count == 0) { TreeError.NoAttributes.Report(Symbol, context); r = false; }
+            else if (Attributes.Count > 1) { TreeError.TooManyAttributes.Report(Symbol, context); r = false; }
+            else Attribute = Attributes[0];
+        }
+
+        // Finishing...
+        return r;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="cb"></param>
+    /// <returns></returns>
+    protected override bool OnEmit(in TreeContext context, CodeBuilder cb)
+    {
+        // If already exist we're done...
+        if (XNode.TryFindMethod(this.MethodName, this.MemberType, Host, [], out _)) return true;
+
+        // Otherwise, dispatching...
+        if (Host.IsInterface) return EmitHostInterface(in context, cb);
+        else if (Host.IsAbstract) return EmitHostAbstract(in context, cb);
+        else return EmitHostRegular(in context, cb);
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Invoked when the host type is an interface.
+    /// </summary>
+    bool EmitHostInterface(in TreeContext _, CodeBuilder cb)
+    {
+        if (!Attribute.HasReturnType(out var rtype, out var rnull)) rtype = Host;
+        var options = rtype.GetReturnOptions(Host);
+        var stype = rtype.EasyName(options);
+        var snull = rnull ? "?" : string.Empty;
+        var mods = GetModifiers();
+        var sarg = this.MemberType.EasyName(ArgOptions);
+
+        XNode.EmitDocumentation(cb, this.MemberName);
+        cb.AppendLine($"{mods}{stype}{snull}");
+        cb.AppendLine($"{this.MethodName}({sarg} value);");
+
+        return true;
+
+        /// <summary>
+        /// Obtains the appropriate modifiers, with a space separator, or null if any.
+        /// </summary>
+        [SuppressMessage("", "IDE0075")]
+        string? GetModifiers()
+        {
+            if (!Attribute.HasUseVirtual(out var hvirt)) hvirt = true;
+            var hsealed = Symbol.IsSealed;
+            var membername = this.MemberName;
+            var methodname = this.MethodName;
+            var argtype = this.MemberType;
+
+            // Finding in base chains...
+            var found = Finder.Find(
+                [Host.AllBaseTypes, Host.AllInterfaces], out string? value,
+                (type, out value) =>
+                {
+                    // Method exists in base type...
+                    while (XNode.TryFindMethod(methodname, argtype, type, [], out var method))
+                    {
+                        var dec = method.DeclaredAccessibility; if (dec == Accessibility.Private) break;
+                        var str = dec.ToAccessibilityString(false); if (str == null) break;
+
+                        value = dec == Accessibility.Public ? "new " : $"{str} new ";
+                        return true;
+                    }
+
+                    // Member exists in base type...
+                    while (XNode.TryFindMember<IPropertySymbol>(
+                        membername, type, [], out var member, out var at))
+                    {
+                        value = $"new ";
+                        return true;
+                    }
+
+                    // Method requested in base type...
+                    while (type.HasInheritsWithAttribute(out var atts))
+                    {
+                        if (!XNode.TryFindMember<IPropertySymbol>( // It must be inherited
+                            membername, type,
+                            [type.AllInterfaces], out var _, out var _))
+                            break;
+
+                        value = $"new ";
+                        return true;
+                    }
+
+                    // Try next...
+                    value = null;
+                    return false;
+                });
+
+            // Finishing...
+            return found ? value : null;
+        }
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Invoked when the host type is an abstract one.
+    /// </summary>
+    bool EmitHostAbstract(in TreeContext _, CodeBuilder cb)
+    {
+        if (!Attribute.HasReturnType(out var rtype, out var rnull)) rtype = Host;
+        var options = rtype.GetReturnOptions(Host);
+        var stype = rtype.EasyName(options);
+        var snull = rnull ? "?" : string.Empty;
+        var mods = GetModifiers();
+        var sarg = this.MemberType.EasyName(ArgOptions);
+
+        XNode.EmitDocumentation(cb, this.MemberName);
+        cb.AppendLine($"{mods}{stype}{snull}");
+        cb.AppendLine($"{this.MethodName}({sarg} value);");
+
+        EmitExplicitInterfaces(cb);
+        return true;
+
+        /// <summary>
+        /// Obtains the appropriate modifiers, with a space separator, or null if any.
+        /// </summary>
+        [SuppressMessage("", "IDE0075")]
+        string? GetModifiers()
+        {
+            if (!Attribute.HasUseVirtual(out var hvirt)) hvirt = true;
+            var hsealed = Symbol.IsSealed;
+            var membername = this.MemberName;
+            var methodname = this.MethodName;
+            var argtype = this.MemberType;
+
+            // Finding in base chains...
+            var found = Finder.Find(
+                [Host.AllBaseTypes, Host.AllInterfaces], out string? value,
+                (type, out value) =>
+                {
+                    // Method exists in base type...
+                    while (XNode.TryFindMethod(methodname, argtype, type, [], out var method))
+                    {
+                        var dec = method.DeclaredAccessibility; if (dec == Accessibility.Private) break;
+                        var str = dec.ToAccessibilityString(false); if (str == null) break;
+
+                        if (type.IsInterface) { value = $"{str} abstract "; return true; }
+                        else if (type.IsAbstract) { value = $"{str} abstract override "; return true; }
+                        else
+                        {
+                            var mvirt = method.IsVirtual || method.IsAbstract || method.IsOverride;
+                            value = !mvirt
+                                ? $"{str} abstract new "
+                                : $"{str} abstract override ";
+                            
+                            return true;
+                        }
+                    }
+
+                    // Member exists in base type...
+                    while (XNode.TryFindMember<IPropertySymbol>(
+                        membername, type, [], out var member, out var at))
+                    {
+                        if (type.IsInterface) { value = $"public abstract "; return true; }
+                        else
+                        {
+                            var mvirt = at.HasUseVirtual(out var temp) ? temp : true;
+                            value = !mvirt
+                                ? "public abstract override " // do not use 'abstract new'
+                                : "public abstract override ";
+                            
+                            return true;
+                        }
+                    }
+
+                    // Method requested in base type...
+                    while (type.HasInheritsWithAttribute(out var atts))
+                    {
+                        if (!XNode.TryFindMember<IPropertySymbol>( // It must be inherited
+                            membername, type,
+                            [type.AllBaseTypes, type.AllInterfaces], out var _, out var _))
+                            break;
+
+                        if (type.IsInterface) { value = "public abstract "; return true; }
+                        if (type.IsAbstract) { value = "public abstract override "; return true; }
+                        else
+                        {
+                            // If appears in a base method, defer to it...
+                            if (XNode.TryFindMethod(
+                                methodname, argtype,
+                                null, [type.AllBaseTypes], out var _)) break;
+
+                            // Otherwise, use the first attribute...
+                            var at = atts.First();
+                            var mvirt = at.HasUseVirtual(out var temp) ? temp : true;
+                            value = !mvirt
+                                ? "public abstract new "
+                                : "public abstract override ";
+                            
+                            return true;
+                        }
+                    }
+
+                    // Try next...
+                    value = null;
+                    return false;
+                });
+
+            // Finishing...
+            return found ? value : "public abstract ";
+        }
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Invoked when the host type is a regular one.
+    /// </summary>
+    bool EmitHostRegular(in TreeContext context, CodeBuilder cb)
+    {
+        var ctor = Host.FindCopyConstructor(strict: false);
+        if (ctor == null) { TreeError.NoCopyConstructor.Report(Symbol, context.Context); return false; }
+
+        if (!Attribute.HasReturnType(out var rtype, out var rnull)) rtype = Host;
+        var options = rtype.GetReturnOptions(Host);
+        var stype = rtype.EasyName(options);
+        var snull = rnull ? "?" : string.Empty;
+        var mods = GetModifiers();
+        var sarg = this.MemberType.EasyName(ArgOptions);
+
+        XNode.EmitDocumentation(cb, this.MemberName);
+        cb.AppendLine($"{mods}{stype}{snull}");
+        cb.AppendLine($"{this.MethodName}({sarg} value)");
+
+        cb.AppendLine("{");
+        cb.IndentLevel++;
+        {
+            var host = Host.EasyName();
+            cb.AppendLine($"var host = new {host}(this)");
+            cb.AppendLine("{");
+            cb.IndentLevel++;
+            {
+                cb.AppendLine($"{this.MemberName} = value");
+            }
+            cb.IndentLevel--;
+            cb.AppendLine("};");
+            cb.AppendLine($"return host;");
+        }
+        cb.IndentLevel--;
+        cb.AppendLine("}");
+
+        EmitExplicitInterfaces(cb);
+        return true;
+
+        /// <summary>
+        /// Obtains the appropriate modifiers, with a space separator, or null if any.
+        /// </summary>
+        [SuppressMessage("", "IDE0075")]
+        string? GetModifiers()
+        {
+            if (!Attribute.HasUseVirtual(out var hvirt)) hvirt = true;
+            var hsealed = Symbol.IsSealed;
+            var membername = this.MemberName;
+            var methodname = this.MethodName;
+            var argtype = this.MemberType;
+
+            // Finding in base chains...
+            var found = Finder.Find(
+                [Host.AllBaseTypes, Host.AllInterfaces], out string? value,
+                (type, out value) =>
+                {
+                    // Method exists in base type...
+                    while (XNode.TryFindMethod(methodname, argtype, type, [], out var method))
+                    {
+                        var dec = method.DeclaredAccessibility; if (dec == Accessibility.Private) break;
+                        var str = dec.ToAccessibilityString(false); if (str == null) break;
+
+                        if (type.IsInterface)
+                        {
+                            value = hsealed || !hvirt ? $"{str} " : $"{str} virtual ";
+                            return true;
+                        }
+                        else
+                        {
+                            var mvirt = method.IsVirtual || method.IsAbstract || method.IsOverride;
+                            value = mvirt
+                                ? (!hvirt ? $"{str} new " : $"{str} override ")
+                                : (!hvirt ? $"{str} new " : $"{str} new virtual ");
+
+                            return true;
+                        }
+                    }
+
+                    // Member exists in base type...
+                    while (XNode.TryFindMember<IPropertySymbol>(
+                        membername, type, [], out var member, out var at))
+                    {
+                        if (type.IsInterface)
+                        {
+                            value = hsealed || !hvirt ? $"public " : $"public virtual ";
+                            return true;
+                        }
+                        else
+                        {
+                            var mvirt = at.HasUseVirtual(out var temp) ? temp : true;
+                            value = mvirt
+                                ? (!hvirt ? $"public new " : $"public override ")
+                                : (!hvirt ? $"public new " : $"public new virtual ");
+
+                            return true;
+                        }
+                    }
+
+                    // Method requested in base type...
+                    while (type.HasInheritsWithAttribute(out var atts))
+                    {
+                        if (!XNode.TryFindMember<IPropertySymbol>( // It must be inherited
+                            membername, type, 
+                            [type.AllBaseTypes, type.AllInterfaces], out var _, out var _))
+                            break;
+
+                        if (type.IsInterface)
+                        {
+                            value = hsealed || !hvirt ? $"public " : $"public virtual ";
+                            return true;
+                        }
+                        else
+                        {
+                            // If appears in a base method, defer to it...
+                            if (XNode.TryFindMethod(
+                                methodname, argtype,
+                                null, [type.AllBaseTypes], out var _)) break;
+
+                            // Otherwise, use the first attribute...
+                            var at = atts.First();
+                            var mvirt = at.HasUseVirtual(out var temp) ? temp : true;
+                            value = mvirt
+                                ? (!hvirt ? $"public new " : $"public override ")
+                                : (!hvirt ? $"public new " : $"public new virtual ");
+
+                            return true;
+                        }
+                    }
+
+                    // Try next...
+                    value = null;
+                    return false;
+                });
+
+            // Finishing...
+            return found ? value : (hsealed || !hvirt ? "public " : "public virtual ");
+        }
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Used to keep track of interfaces that need explicit implementation.
+    /// </summary>
+    record Explicit(
+        INamedTypeSymbol IFace,
+        INamedTypeSymbol RType, bool RNullable, ITypeSymbol ArgType);
+
+    /// <summary>
+    /// Invoked to emit the interfaces that need explicit implementation.
+    /// </summary>
+    /// <param name="cb"></param>
+    void EmitExplicitInterfaces(CodeBuilder cb)
+    {
+        var hoptions = EasyTypeOptions.Default.WithRecursive(
+            namespaceStyle: EasyNamespaceStyle.Default,
+            useHost: true,
+            useSpecialNames: true,
+            nullableStyle: EasyNullableStyle.UseAnnotations);
+
+        var roptions = EasyTypeOptions.Full.WithRecursive(
+            useVariance: false,
+            useAccessibility: false,
+            useModifiers: false,
+            useKind: false);
+
+        var mname = this.MethodName;
+
+        var items = GetExplicitInterfaces();
+        foreach (var item in items)
+        {
+            var iface = item.IFace.EasyName(hoptions);
+            var rtype = item.RType.EasyName(roptions);
+            if (item.RNullable && !rtype.EndsWith('?')) rtype += '?';
+            var atype = item.ArgType.EasyName(ArgOptions);
+
+            cb.AppendLine();
+            cb.AppendLine($"{rtype}");
+            cb.AppendLine($"{iface}.{mname}({atype} value)");
+            cb.AppendLine($"=> ({rtype}){mname}(value);");
+        }
+    }
+
+    /// <summary>
+    /// Obtains the list of interfaces that need explicit implementation.
+    /// </summary>
+    /// <returns></returns>
+    List<Explicit> GetExplicitInterfaces()
+    {
+        var membername = this.MemberName;
+        var methodname = this.MethodName;
+        var argtype = this.MemberType;
+
+        var comparer = SymbolEqualityComparer.Default;
+        List<Explicit> list = [];
+
+        foreach (var iface in Host.Interfaces) TryCapture(iface);
+        return list;
+
+        /// <summary>
+        /// Tries to capture the given interface.
+        /// </summary>
+        void TryCapture(INamedTypeSymbol iface)
+        {
+            // Childs first...
+            foreach (var child in iface.Interfaces) TryCapture(child);
+
+            // If already captured, we're done...
+            var temp = list.Find(x => comparer.Equals(x.IFace, iface));
+            if (temp is not null) return;
+
+            // Method already exists...
+            if (XNode.TryFindMethod(methodname, argtype, iface, [], out var method))
+            {
+                var rtype = ((INamedTypeSymbol)method.ReturnType).UnwrapNullable(out var rnull);
+                var atype = method.Parameters[0].Type;
+                var item = new Explicit(iface, rtype, rnull, atype);
+                list.Add(item);
+                return;
+            }
+
+            // Decorated member exists...
+            if (XNode.TryFindMember<IPropertySymbol>(membername, iface, [], out var member, out var at))
+            {
+                if (!at.HasReturnType(out var rtype, out var rnull)) rtype = iface;
+                var atype = member.Type;
+                var item = new Explicit(iface, rtype, rnull, atype);
+                list.Add(item);
+                return;
+            }
+
+            // Method is requested...
+            if (iface.HasInheritsWithAttribute(out var atts))
+            {
+                at = atts.First();
+                if (!at.HasReturnType(out var rtype, out var rnull)) rtype = iface;
+
+                if (XNode.TryFindMember(membername, null, [iface.AllInterfaces], out member, out at))
+                {
+                    var atype = member.Type;
+                    var item = new Explicit(iface, rtype, rnull, atype);
+                    list.Add(item);
+                    return;
+                }
+            }
+        }
+    }
+}
