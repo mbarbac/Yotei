@@ -41,16 +41,32 @@
     <Project Path="1-Yotei.Tools/Yotei.Tools.Tests/Yotei.Tools.Tests.csproj" Id="b6a1e072-9195-4e7f-961a-5f0d58fd3a5a" />
   </Folder>
   <Folder Name="/2-Yotei.ORM.Generators/">
+    <Project Path="2-Yotei.ORM.Generators/Yotei.ORM.Generators.Tests/Yotei.ORM.Generators.Tests.csproj" Id="f7de17ac-66f7-4e00-8d1d-24bb490c6eac">
+      <BuildType Solution="Local|*" Project="Debug" />
+    </Project>
     <Project Path="2-Yotei.ORM.Generators/Yotei.ORM.Generators/Yotei.ORM.Generators.csproj" Id="91e1ae56-52a9-4bec-a7c2-6e8b48e296a9">
       <BuildType Solution="Local|*" Project="Debug" />
     </Project>
   </Folder>
   <Folder Name="/2-Yotei.ORM/">
+    <Project Path="2-Yotei.ORM/Yotei.ORM.Tests/Yotei.ORM.Tests.csproj" Id="b052c47c-eab5-4cf5-84e4-857438821707">
+      <BuildType Solution="Local|*" Project="Debug" />
+    </Project>
     <Project Path="2-Yotei.ORM/Yotei.ORM/Yotei.ORM.csproj">
       <BuildType Solution="Local|*" Project="Debug" />
     </Project>
   </Folder>
-  <Folder Name="/3-Yotei.ORM.Relational/" />
+  <Folder Name="/3-Yotei.ORM.Relational/">
+    <Project Path="3-Yotei.ORM.Relational/Yotei.ORM.Relational.TestDB/Yotei.ORM.Relational.TestDB.csproj" Id="32f3eede-e7cf-48b4-b50b-e3ec79de51ba">
+      <BuildType Solution="Local|*" Project="Debug" />
+    </Project>
+    <Project Path="3-Yotei.ORM.Relational/Yotei.ORM.Relational.Tests/Yotei.ORM.Relational.Tests.csproj" Id="4fdcfb87-af3c-42c5-8dea-5e42d6be2e13">
+      <BuildType Solution="Local|*" Project="Debug" />
+    </Project>
+    <Project Path="3-Yotei.ORM.Relational/Yotei.ORM.Relational/Yotei.ORM.Relational.csproj" Id="b6d846d6-cf69-4ef3-a260-88e7233d6b89">
+      <BuildType Solution="Local|*" Project="Debug" />
+    </Project>
+  </Folder>
   <Folder Name="/Solution Items/">
     <File Path=".gitignore" />
     <File Path="LICENSE" />
