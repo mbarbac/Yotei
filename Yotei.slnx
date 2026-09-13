@@ -12,34 +12,6 @@
     <Project Path="0-Experimental/Experimental.Tests/Experimental.Tests.csproj" Id="ff045585-87c4-40f8-a349-35725c11f68c" />
     <Project Path="0-Experimental/Experimental/Experimental.csproj" Id="c040906a-d162-4f51-a187-aedeaab1a9a3" />
   </Folder>
-  <Folder Name="/1-Yotei.Tools.AsyncLock/">
-    <Project Path="1-Yotei.Tools.AsyncLock/Yotei.Tools.AsyncLock.Tests/Yotei.Tools.AsyncLock.Tests.csproj" Id="137e9248-204d-4110-902f-b03e4be21e4f" />
-    <Project Path="1-Yotei.Tools.AsyncLock/Yotei.Tools.AsyncLock/Yotei.Tools.AsyncLock.csproj" Id="2f61b58f-b41f-45b5-add0-9d44d0a5e15f" />
-  </Folder>
-  <Folder Name="/1-Yotei.Tools.DynamicLambda/">
-    <Project Path="1-Yotei.Tools.DynamicLambda/Yotei.Tools.DynamicLambda.Tests/Yotei.Tools.DynamicLambda.Tests.csproj" Id="c66a0a84-f059-4149-8942-e5d9e81da1e0" />
-    <Project Path="1-Yotei.Tools.DynamicLambda/Yotei.Tools.DynamicLambda/Yotei.Tools.DynamicLambda.csproj" Id="a2bc71d4-154d-44ee-83dd-88e7180e75e9" />
-  </Folder>
-  <Folder Name="/1-Yotei.Tools.Generators/" />
-  <Folder Name="/1-Yotei.Tools.Generators/00-TreeGenerator/">
-    <Project Path="1-Yotei.Tools.Generators/00-TreeGenerator/Yotei.Tools.TreeGenerator/Yotei.Tools.TreeGenerator.shproj" Id="d5ccca8f-1da1-45e8-aa70-b6c0f2c794d7" />
-  </Folder>
-  <Folder Name="/1-Yotei.Tools.Generators/01-CloneGenerator/">
-    <Project Path="1-Yotei.Tools.Generators/01-CloneGenerator/Yotei.Tools.CloneGenerator.Tests/Yotei.Tools.CloneGenerator.Tests.csproj" Id="518c0a27-0141-4e0f-af33-9cba1a9fb991">
-      <BuildType Solution="Local|*" Project="Debug" />
-    </Project>
-    <Project Path="1-Yotei.Tools.Generators/01-CloneGenerator/Yotei.Tools.CloneGenerator/Yotei.Tools.CloneGenerator.csproj">
-      <BuildType Solution="Local|*" Project="Debug" />
-    </Project>
-  </Folder>
-  <Folder Name="/1-Yotei.Tools.Generators/02-WithGenerator/">
-    <Project Path="1-Yotei.Tools.Generators/02-WithGenerator/Yotei.Tools.WithGenerator.Tests/Yotei.Tools.WithGenerator.Tests.csproj" Id="4173ce90-8e3a-484a-94d2-590c8257a54b">
-      <BuildType Solution="Local|*" Project="Debug" />
-    </Project>
-    <Project Path="1-Yotei.Tools.Generators/02-WithGenerator/Yotei.Tools.WithGenerator/Yotei.Tools.WithGenerator.csproj" Id="766d2b00-6f34-478c-992a-e12a1c3b7626">
-      <BuildType Solution="Local|*" Project="Debug" />
-    </Project>
-  </Folder>
   <Folder Name="/1-Yotei.Tools/" />
   <Folder Name="/1-Yotei.Tools/Code/">
     <Project Path="1-Yotei.Tools/Yotei.Tools.Shared/Yotei.Tools.Shared.shproj" Id="dd6bd0d7-fbb9-40b3-98a2-68be445abd0c" />
@@ -47,33 +19,6 @@
   </Folder>
   <Folder Name="/1-Yotei.Tools/Tests/">
     <Project Path="1-Yotei.Tools/Yotei.Tools.Tests/Yotei.Tools.Tests.csproj" Id="b6a1e072-9195-4e7f-961a-5f0d58fd3a5a" />
-  </Folder>
-  <Folder Name="/2-Yotei.ORM.Generators/">
-    <Project Path="2-Yotei.ORM.Generators/Yotei.ORM.Generators.Tests/Yotei.ORM.Generators.Tests.csproj" Id="127423a5-936c-4f8d-827b-6fbfa1a3ba4b">
-      <BuildType Solution="Local|*" Project="Debug" />
-    </Project>
-    <Project Path="2-Yotei.ORM.Generators/Yotei.ORM.Generators/Yotei.ORM.Generators.csproj" Id="482211d3-cf29-4d31-bf95-a25a3b9d7509">
-      <BuildType Solution="Local|*" Project="Debug" />
-    </Project>
-  </Folder>
-  <Folder Name="/2-Yotei.ORM/">
-    <Project Path="2-Yotei.ORM/Yotei.ORM.Tests/Yotei.ORM.Tests.csproj" Id="72ed1780-372e-43ea-a51c-c11923c393e8">
-      <BuildType Solution="Local|*" Project="Debug" />
-    </Project>
-    <Project Path="2-Yotei.ORM/Yotei.ORM/Yotei.ORM.csproj" Id="a5900777-96df-466c-8203-a5683b94873d">
-      <BuildType Solution="Local|*" Project="Debug" />
-    </Project>
-  </Folder>
-  <Folder Name="/3-Yotei.ORM.Relational/">
-    <Project Path="3-Yotei.ORM.Relational/Yotei.ORM.Relational.TestDB/Yotei.ORM.Relational.TestDB.csproj" Id="e855b43c-1d10-48c0-ab25-1a9a870abf64">
-      <BuildType Solution="Local|*" Project="Debug" />
-    </Project>
-    <Project Path="3-Yotei.ORM.Relational/Yotei.ORM.Relational.Tests/Yotei.ORM.Relational.Tests.csproj" Id="3aa37c83-dc76-4fd4-87b0-c1d32bdc4c80">
-      <BuildType Solution="Local|*" Project="Debug" />
-    </Project>
-    <Project Path="3-Yotei.ORM.Relational/Yotei.ORM.Relational/Yotei.ORM.Relational.csproj" Id="66b20e70-f39c-4d92-ae52-dc79a7bc3ba2">
-      <BuildType Solution="Local|*" Project="Debug" />
-    </Project>
   </Folder>
   <Folder Name="/Solution Items/">
     <File Path=".gitignore" />

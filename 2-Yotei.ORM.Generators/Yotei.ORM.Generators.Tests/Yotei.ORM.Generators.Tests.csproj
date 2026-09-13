@@ -65,6 +65,12 @@
 	<ItemGroup>
 		<Compile Remove="$(CompilerGeneratedFilesOutputPath)/**/**" />
 		<Compile Remove="$(CompilerGeneratedFilesOutputPath)/**" />
+		<Compile Remove="Fakes\**" />
+		<Compile Remove="Tests_InvariantGenerator\**" />
+		<EmbeddedResource Remove="Fakes\**" />
+		<EmbeddedResource Remove="Tests_InvariantGenerator\**" />
+		<None Remove="Fakes\**" />
+		<None Remove="Tests_InvariantGenerator\**" />
 	</ItemGroup>
 
 	<!-- Clear generated files each compile or build (need to be at the end of the file)-->
