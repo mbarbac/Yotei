@@ -13,9 +13,9 @@
 	</PropertyGroup>
 	<!--IDE0130: Namespace does not match folder structure-->
 
-	<!--<ItemGroup>
+	<ItemGroup>
 		<ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />
-	</ItemGroup>-->
+	</ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\0-Experimental\Experimental.Tests\Experimental.Tests.csproj" />

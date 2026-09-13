@@ -1,2 +1,0 @@
-# Yotei Tree Generator
-Yotei
