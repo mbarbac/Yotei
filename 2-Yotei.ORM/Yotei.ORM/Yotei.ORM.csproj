@@ -74,6 +74,11 @@
 		<Compile Remove="$(CompilerGeneratedFilesOutputPath)/**/**" />
 		<Compile Remove="$(CompilerGeneratedFilesOutputPath)/**" />
 	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="2_Records\" />
+	  <Folder Include="1-Core\" />
+	  <Folder Include="4-Internals\" />
+	</ItemGroup>
 
 	<!-- Clear generated files each compile or build (need to be at the end of the file)-->
 	<Target Name="CustomBeforeCompile" BeforeTargets="BeforeCompile">
