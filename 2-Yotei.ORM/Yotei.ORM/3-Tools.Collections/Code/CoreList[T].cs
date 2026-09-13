@@ -2,13 +2,12 @@
 
 // ========================================================
 /// <summary>
-/// <inheritdoc cref="ICoreList{K, T}"/>
+/// <inheritdoc cref="ICoreList{T}"/>
 /// </summary>
-/// <typeparam name="K"></typeparam>
 /// <typeparam name="T"></typeparam>
-[Cloneable(ReturnType = typeof(ICoreList<,>))]
+[Cloneable(ReturnType = typeof(ICoreList<>))]
 [DebuggerDisplay("{ToDebugString(3)}")]
-public abstract partial class CoreList<K, T> : ICoreList<K, T>
+public abstract partial class CoreList<T> : ICoreList<T>
 {
     readonly List<T> Items;
 
@@ -27,7 +26,7 @@ public abstract partial class CoreList<K, T> : ICoreList<K, T>
     /// Copy constructor.
     /// </summary>
     /// <param name="other"></param>
-    protected CoreList(CoreList<K, T> other) => Items = [.. other.ThrowWhenNull()];
+    protected CoreList(CoreList<T> other) => Items = [.. other.ThrowWhenNull()];
 
     /// <summary>
     /// <inheritdoc/>
@@ -76,20 +75,6 @@ public abstract partial class CoreList<K, T> : ICoreList<K, T>
     public abstract T ValidateElement(T value);
 
     /// <summary>
-    /// Invoked to return the key associated with the given value.
-    /// </summary>
-    /// <param name="value"></param>
-    /// <returns></returns>
-    public abstract K GetKey(T value);
-
-    /// <summary>
-    /// Invoked to validate the given key before using it in this collection.
-    /// </summary>
-    /// <param name="key"></param>
-    /// <returns></returns>
-    public abstract K ValidateKey(K key);
-
-    /// <summary>
     /// Determines if elements that are themselves collection shall be flattened, and their
     /// elements used instead of the original one, or not.
     /// <br/> The defaul value of this property is <see langword="true"/>.
@@ -110,22 +95,22 @@ public abstract partial class CoreList<K, T> : ICoreList<K, T>
     = true;
 
     /// <summary>
-    /// Invoked to determine if the given keys shall be considered the same (for the sole purposes
-    /// of this collection).
+    /// Invoked to determine if the given elements shall be considered the same (for the sole
+    /// purposes of this collection).
     /// </summary>
     /// <param name="source"></param>
     /// <param name="target"></param>
     /// <returns></returns>
-    public virtual bool CompareKeys(K source, K target)
-        => EqualityComparer<K>.Default.Equals(source, target);
+    public virtual bool CompareElements(T source, T target)
+        => EqualityComparer<T>.Default.Equals(source, target);
 
     /// <summary>
     /// Invoked to find the elements whose keys are considered the same as the given one.
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="value"></param>
     /// <returns></returns>
-    public virtual IEnumerable<T> FindDuplicates(K key)
-        => TryFindAll(x => CompareKeys(GetKey(x), key), out var items) ? items : [];
+    public virtual IEnumerable<T> FindDuplicates(T value)
+        => TryFindAll(x => CompareElements(x, value), out var items) ? items : [];
 
     /// <summary>
     /// Determines if the given value, identified as a duplicate of existing ones, can be included
@@ -148,7 +133,7 @@ public abstract partial class CoreList<K, T> : ICoreList<K, T>
     /// <returns></returns>
     public virtual bool SameElement(T source, T target)
         => ReferenceEquals(source, target)
-        || CompareKeys(GetKey(source), GetKey(target));
+        || CompareElements(source, target);
 
     // ----------------------------------------------------
 
@@ -176,45 +161,43 @@ public abstract partial class CoreList<K, T> : ICoreList<K, T>
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="value"></param>
     /// <returns></returns>
-    public bool Contains(K key) => IndexOf(key) >= 0;
-    bool IList.Contains(object? value) => Contains(GetKey((T)value!));
-    bool ICollection<T>.Contains(T value) => Contains(GetKey(value));
+    public bool Contains(T value) => IndexOf(value) >= 0;
+    bool IList.Contains(object? value) => Contains((T)value!);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="value"></param>
     /// <returns></returns>
-    public int IndexOf(K key)
+    public int IndexOf(T value)
     {
-        key = ValidateKey(key);
-        return IndexOf(x => CompareKeys(GetKey(x), key));
+        value = ValidateElement(value);
+        return IndexOf(x => CompareElements(x, value));
     }
-    int IList<T>.IndexOf(T value) => IndexOf(GetKey(value));
-    int IList.IndexOf(object? value) => IndexOf(GetKey((T)value!));
+    int IList.IndexOf(object? value) => IndexOf((T)value!);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="value"></param>
     /// <returns></returns>
-    public int LastIndexOf(K key)
+    public int LastIndexOf(T value)
     {
-        key = ValidateKey(key);
-        return LastIndexOf(x => CompareKeys(GetKey(x), key));
+        value = ValidateElement(value);
+        return LastIndexOf(x => CompareElements(x, value));
     }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="value"></param>
     /// <returns></returns>
-    public List<int> IndexesOf(K key)
+    public List<int> IndexesOf(T value)
     {
-        key = ValidateKey(key);
-        return IndexesOf(x => CompareKeys(GetKey(x), key));
+        value = ValidateElement(value);
+        return IndexesOf(x => CompareElements(x, value));
     }
 
     /// <summary>
@@ -383,15 +366,14 @@ public abstract partial class CoreList<K, T> : ICoreList<K, T>
         if (value is IEnumerable<T> range && FlattenElements) return AddRange(range);
 
         value = ValidateElement(value);
-        var key = GetKey(value);
-        var dups = FindDuplicates(key);
+        var dups = FindDuplicates(value);
         if (dups.Any() && !AllowDuplicate(value, dups)) return 0;
 
         Items.Add(value);
         return 1;
     }
     int IList.Add(object? value) => Add((T)value!) > 0 ? (Count - 1) : -1;
-    void ICollection<T>.Add(T item) => Add(item);
+    void ICollection<T>.Add(T value) => Add(value);
 
     /// <summary>
     /// <inheritdoc/>
@@ -417,8 +399,7 @@ public abstract partial class CoreList<K, T> : ICoreList<K, T>
         if (value is IEnumerable<T> range && FlattenElements) return InsertRange(index, range);
 
         value = ValidateElement(value);
-        var key = GetKey(value);
-        var dups = FindDuplicates(key);
+        var dups = FindDuplicates(value);
         if (dups.Any() && !AllowDuplicate(value, dups)) return 0;
 
         Items.Insert(index, value);
@@ -483,36 +464,67 @@ public abstract partial class CoreList<K, T> : ICoreList<K, T>
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="value"></param>
     /// <returns><inheritdoc/></returns>
-    public virtual int Remove(K key)
+    public virtual int Remove(T value)
     {
-        key = ValidateKey(key);
-        return Remove(x => CompareKeys(GetKey(x), key));
+        if (value is IEnumerable<T> range && FlattenElements) // Nested case...
+        {
+            var num = 0; foreach (var item in range) num += Remove(item);
+            return num;
+        }
+        else // Standard case...
+        {
+            var index = IndexOf(value);
+            var num = index < 0 ? 0 : RemoveAt(index);
+            return num;
+        }
     }
-    void IList.Remove(object? value) => Remove(GetKey((T)value!));
-    bool ICollection<T>.Remove(T value) => Remove(GetKey(value)) > 0;
+    void IList.Remove(object? value) => Remove((T)value!);
+    bool ICollection<T>.Remove(T value) => Remove(value) > 0;
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="value"></param>
     /// <returns><inheritdoc/></returns>
-    public virtual int RemoveLast(K key)
+    public virtual int RemoveLast(T value)
     {
-        key = ValidateKey(key);
-        return RemoveLast(x => CompareKeys(GetKey(x), key));
+        if (value is IEnumerable<T> range && FlattenElements) // Nested case...
+        {
+            var num = 0; foreach (var item in range) num += RemoveLast(item);
+            return num;
+        }
+        else // Standard case...
+        {
+            var index = LastIndexOf(value);
+            var num = index < 0 ? 0 : RemoveAt(index);
+            return num;
+        }
     }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    /// <param name="key"></param>
+    /// <param name="value"></param>
     /// <returns><inheritdoc/></returns>
-    public virtual int RemoveAll(K key)
+    public virtual int RemoveAll(T value)
     {
-        key = ValidateKey(key);
-        return RemoveAll(x => CompareKeys(GetKey(x), key));
+        if (value is IEnumerable<T> range && FlattenElements) // Nested case...
+        {
+            var num = 0; foreach (var item in range) num += RemoveAll(item);
+            return num;
+        }
+        else // Standard case...
+        {
+            var num = 0; while (true)
+            {
+                var index = IndexOf(value); if (index < 0) break;
+                var r = RemoveAt(index); if (r == 0) break;
+                num += r;
+            }
+            return num;
+        }
     }
 
     /// <summary>
