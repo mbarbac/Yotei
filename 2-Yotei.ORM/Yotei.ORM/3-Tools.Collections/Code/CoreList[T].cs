@@ -352,6 +352,7 @@ public abstract partial class CoreList<T> : ICoreList<T>
     public virtual int Replace(int index, T value)
     {
         // Tentative removal...
+        var count = Count;
         var source = Items[index];
         Items.RemoveAt(index);
 
@@ -360,6 +361,12 @@ public abstract partial class CoreList<T> : ICoreList<T>
 
         if (value is IEnumerable<T> range && FlattenElements)
         {
+            if (range.IsEmpty)
+            {
+                num = count; if (num != 0) Clear();
+                return num;
+            }
+
             num = InsertRange(index, range);
         }
         else

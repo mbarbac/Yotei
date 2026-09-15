@@ -236,11 +236,8 @@ public static partial class Test_CoreList_T
         var chain = new Chain([xone, xtwo, xthree]);
 
         var done = chain.Replace(0, new Chain());
-        Assert.Equal(0, done);
-        Assert.Equal(3, chain.Count);
-        Assert.Same(xone, chain[0]);
-        Assert.Same(xtwo, chain[1]);
-        Assert.Same(xthree, chain[2]);
+        Assert.Equal(3, done);
+        Assert.Empty(chain);
     }
 
     //[Enforced]

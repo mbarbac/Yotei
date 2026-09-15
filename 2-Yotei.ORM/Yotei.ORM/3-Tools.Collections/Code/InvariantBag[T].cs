@@ -1,0 +1,247 @@
+﻿#pragma warning disable IDE0305
+
+namespace Yotei.ORM.Tools;
+
+// ========================================================
+/// <summary>
+/// <inheritdoc cref="IInvariantBag{T}"/>
+/// </summary>
+/// <typeparam name="T"></typeparam>
+[Cloneable(ReturnType = typeof(IInvariantBag<>))]
+[DebuggerDisplay("{ToDebugString(3)}")]
+public abstract partial class InvariantBag<T> : IInvariantBag<T>
+{
+    /// <summary>
+    /// Initializes a new empty instance.
+    /// </summary>
+    public InvariantBag() => Items = CreateItems();
+
+    /// <summary>
+    /// Initializes a new instance with the elements from the given range.
+    /// </summary>
+    /// <param name="range"></param>
+    public InvariantBag(IEnumerable<T> range)
+    {
+        Items = CreateItems();
+        Items.AddRange(range.ThrowWhenNull());
+        Items.Trim();
+    }
+
+    /// <summary>
+    /// Copy constructor.
+    /// </summary>
+    /// <param name="other"></param>
+    protected InvariantBag(InvariantBag<T> other) => Items = other.ThrowWhenNull().Items.Clone();
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
+    public IEnumerator<T> GetEnumerator() => Items.GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
+    public override string ToString() => $"Count: {Count}";
+
+    /// <summary>
+    /// Returns a string representation of this instance for debug purposes that at max includes
+    /// the given number of elements.
+    /// </summary>
+    /// <param name="max"></param>
+    /// <returns></returns>
+    public virtual string ToDebugString(int max)
+    {
+        if (Count == 0) return "0:[]";
+        if (max == 0) return $"{Count}:[...]";
+
+        return Count <= max
+            ? $"{Count}:[{string.Join(", ", this.Select(ToDebugItem))}]"
+            : $"{Count}:[{string.Join(", ", this.Take(max).Select(ToDebugItem))}, ...]";
+    }
+
+    /// <summary>
+    /// Invoked to return a string representation of the given element for debug purposes.
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    protected virtual string ToDebugItem(T value) => value.Sketch();
+
+    // ----------------------------------------------------
+
+    protected ICoreBag<T> Items;
+
+    /// <summary>
+    /// Invoked to create an appropriate repository for this instance.
+    /// </summary>
+    /// <returns></returns>
+    protected abstract ICoreBag<T> CreateItems();
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
+    public virtual ICoreBag<T> ToBuilder() => Items.Clone();
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public int Count => Items.Count;
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public bool Contains(T value) => Items.Contains(value);
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="predicate"></param>
+    /// <returns></returns>
+    public bool Contains(Predicate<T> predicate) => Items.Contains(predicate);
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="predicate"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public bool TryFind(
+        Predicate<T> predicate, out T value) => Items.TryFind(predicate, out value);
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="predicate"></param>
+    /// <param name="range"></param>
+    /// <returns></returns>
+    public bool TryFindAll(
+        Predicate<T> predicate, out List<T> range) => Items.TryFindAll(predicate, out range);
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
+    public T[] ToArray() => Items.ToArray();
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns></returns>
+    public List<T> ToList() => Items.ToList();
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public void Trim() => Items.Trim();
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="array"></param>
+    /// <param name="index"></param>
+    public void CopyTo(T[] array, int index) => Items.CopyTo(array, index);
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="array"></param>
+    /// <param name="index"></param>
+    public void CopyTo(Array array, int index) => Items.CopyTo(array, index);
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns><inheritdoc/></returns>
+    public virtual IInvariantBag<T> Add(T value)
+    {
+        var clone = (InvariantBag<T>)Clone();
+        var num = clone.Items.Add(value);
+        return num > 0 ? clone : this;
+    }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="range"></param>
+    /// <returns><inheritdoc/></returns>
+    public virtual IInvariantBag<T> AddRange(IEnumerable<T> range)
+    {
+        var clone = (InvariantBag<T>)Clone();
+        var num = clone.Items.AddRange(range);
+        return num > 0 ? clone : this;
+    }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns><inheritdoc/></returns>
+    public virtual IInvariantBag<T> Remove(T value)
+    {
+        var clone = (InvariantBag<T>)Clone();
+        var num = clone.Items.Remove(value);
+        return num > 0 ? clone : this;
+    }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns><inheritdoc/></returns>
+    public virtual IInvariantBag<T> RemoveAll(T value)
+    {
+        var clone = (InvariantBag<T>)Clone();
+        var num = clone.Items.RemoveAll(value);
+        return num > 0 ? clone : this;
+    }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="predicate"></param>
+    /// <returns><inheritdoc/></returns>
+    public virtual IInvariantBag<T> Remove(Predicate<T> predicate)
+    {
+        var clone = (InvariantBag<T>)Clone();
+        var num = clone.Items.Remove(predicate);
+        return num > 0 ? clone : this;
+    }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <param name="predicate"></param>
+    /// <returns><inheritdoc/></returns>
+    public virtual IInvariantBag<T> RemoveAll(Predicate<T> predicate)
+    {
+        var clone = (InvariantBag<T>)Clone();
+        var num = clone.Items.RemoveAll(predicate);
+        return num > 0 ? clone : this;
+    }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    /// <returns><inheritdoc/></returns>
+    public virtual IInvariantBag<T> Clear()
+    {
+        var clone = (InvariantBag<T>)Clone();
+        var num = clone.Items.Clear();
+        return num > 0 ? clone : this;
+    }
+
+    // ----------------------------------------------------
+
+    object ICollection.SyncRoot => Items.SyncRoot;
+    bool ICollection.IsSynchronized => false;
+}
