@@ -27,7 +27,24 @@ public abstract partial class CoreList<K, T> : ICoreList<K, T>
     /// Copy constructor.
     /// </summary>
     /// <param name="other"></param>
-    protected CoreList(CoreList<K, T> other) => Items = [.. other.ThrowWhenNull()];
+    protected CoreList(CoreList<K, T> other)
+    {
+        ArgumentNullException.ThrowIfNull(other);
+
+        Items = [];
+        OnCreating(other);
+        Items = [.. other.ThrowWhenNull()];
+    }
+
+    /// <summary>
+    /// Provides a place to update settings BEFORE the copy constructor copies its contents.
+    /// <br/> Inherit types shall invoke this method before updating its own settings.
+    /// </summary>
+    /// <param name="other"></param>
+    protected virtual void OnCreating(CoreList<K, T> other)
+    {
+        FlattenElements = other.FlattenElements;
+    }
 
     /// <summary>
     /// <inheritdoc/>

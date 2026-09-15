@@ -1,7 +1,4 @@
-﻿#pragma warning disable IDE0028
-
-using System.ComponentModel;
-using Xunit.v3;
+﻿#pragma warning disable IDE0028, IDE0018
 
 namespace Yotei.ORM.Tools.Collections.Tests;
 
@@ -35,13 +32,12 @@ public static partial class Test_CoreList_T
             AcceptDuplicates = false;
         }
         public Chain(IEnumerable<IElement> range) : this() => AddRange(range);
-        protected Chain(Chain other) : this()
+        protected Chain(Chain other) : base(other) { }
+        protected override void OnCreating(CoreList<IElement> other)
         {
-            ArgumentNullException.ThrowIfNull(other);
-
-            IgnoreCase = other.IgnoreCase;
-            AcceptDuplicates = other.AcceptDuplicates;
-            AddRange(other);
+            base.OnCreating(other);
+            IgnoreCase = ((Chain)other).IgnoreCase;
+            AcceptDuplicates = ((Chain)other).AcceptDuplicates;
         }
 
         public override IElement ValidateElement(IElement value)
@@ -157,13 +153,19 @@ public static partial class Test_CoreList_T
         Assert.NotSame(source, target);
         Assert.Empty(target);
 
-        source = new Chain([xone, xtwo]) { AcceptDuplicates = true, IgnoreCase = true };
+        source = new Chain([xone, xtwo])
+        {
+            FlattenElements = false,
+            AcceptDuplicates = true,
+            IgnoreCase = true,
+        };
         target = source.Clone();
         Assert.NotSame(source, target);
         Assert.Equal(2, target.Count);
         Assert.Same(xone, target[0]);
         Assert.Same(xtwo, target[1]);
         Assert.IsType<Chain>(target);
+        Assert.False(((Chain)target).FlattenElements);
         Assert.True(((Chain)target).AcceptDuplicates);
         Assert.True(((Chain)target).IgnoreCase);
     }
