@@ -585,7 +585,9 @@ public static class Test_ElementList_KT
         Assert.Equal(2, target.Count);
         Assert.Same(xtwo, target[0]);
         Assert.Same(xthree, target[1]);
-    }// ----------------------------------------------------
+    }
+    
+    // ----------------------------------------------------
 
     //[Enforced]
     [Fact]

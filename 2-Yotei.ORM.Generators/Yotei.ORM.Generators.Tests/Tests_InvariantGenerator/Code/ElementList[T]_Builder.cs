@@ -1,18 +1,17 @@
-﻿using TKey = string;
-using IItem = Yotei.ORM.InvariantGenerator.Tests.IElement;
-using IHost = Yotei.ORM.InvariantGenerator.Tests.IElementList_KT;
-using THost = Yotei.ORM.InvariantGenerator.Tests.ElementList_KT;
+﻿using IItem = Yotei.ORM.InvariantGenerator.Tests.IElement;
+using IHost = Yotei.ORM.InvariantGenerator.Tests.IElementList_T;
+using THost = Yotei.ORM.InvariantGenerator.Tests.ElementList_T;
 
 namespace Yotei.ORM.InvariantGenerator.Tests;
 
-partial class ElementList_KT : IHost
+partial class ElementList_T : IHost
 {
     // ====================================================
     /// <summary>
     /// <inheritdoc cref="IHost.IBuilder"/>
     /// </summary>
     [Cloneable]
-    public partial class Builder : CoreList<TKey, IItem>, IHost.IBuilder
+    public partial class Builder : CoreList<IItem>, IHost.IBuilder
     {
         /// <summary>
         /// Initializes a new instance.
@@ -35,7 +34,7 @@ partial class ElementList_KT : IHost
         /// <param name="other"></param>
         protected Builder(Builder other) : base(other) { }
 
-        protected override void OnCreating(CoreList<TKey, IItem> other)
+        protected override void OnCreating(CoreList<IItem> other)
         {
             base.OnCreating(other);
             IgnoreCase = ((Builder)other).IgnoreCase;
@@ -54,22 +53,6 @@ partial class ElementList_KT : IHost
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public override TKey GetKey(IItem value) => value is NamedElement named
-            ? named.Name
-            : throw new ArgumentException("Element is not a named one.").WithData(value);
-
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
-        /// <param name="key"></param>
-        /// <returns></returns>
-        public override TKey ValidateKey(TKey key) => key.NotNullNotEmpty(trim: true);
-
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
         public override bool FlattenElements
         {
             get => base.FlattenElements;
@@ -82,25 +65,30 @@ partial class ElementList_KT : IHost
         /// <param name="source"></param>
         /// <param name="target"></param>
         /// <returns></returns>
-        public override bool CompareKeys(TKey source, TKey target)
+        public override bool CompareElements(IItem source, IItem target)
         {
             var comparer = new MyComparer(IgnoreCase);
             return comparer.Equals(source, target);
         }
 
         // This not needed for string comparisons...
-        readonly struct MyComparer(bool IgnoreCase) : IEqualityComparer<TKey>
+        readonly struct MyComparer(bool IgnoreCase) : IEqualityComparer<IItem>
         {
-            public bool Equals(TKey? x, TKey? y) => string.Compare(x, y, IgnoreCase) == 0;
-            public int GetHashCode(TKey _) => throw new UnExpectedException();
+            public bool Equals(IItem? x, IItem? y)
+            {
+                return x is NamedElement xnamed && y is NamedElement ynamed
+                    ? string.Compare(xnamed.Name, ynamed.Name, IgnoreCase) == 0
+                    : ReferenceEquals(x, y);
+            }
+            public int GetHashCode(IItem _) => throw new UnExpectedException();
         }
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        /// <param name="key"></param>
+        /// <param name="value"></param>
         /// <returns></returns>
-        public override IEnumerable<IItem> FindDuplicates(TKey key) => base.FindDuplicates(key);
+        public override IEnumerable<IItem> FindDuplicates(IItem value) => base.FindDuplicates(value);
 
         /// <summary>
         /// <inheritdoc/>

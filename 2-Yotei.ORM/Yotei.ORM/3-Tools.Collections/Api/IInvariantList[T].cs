@@ -1,4 +1,4 @@
-﻿/*namespace Yotei.ORM.Tools;
+﻿namespace Yotei.ORM.Tools;
 
 // ========================================================
 /// <summary>
@@ -259,4 +259,4 @@ public partial interface IInvariantList<T>
     /// </summary>
     /// <returns>A new copy, or this instance if no changes have been made.</returns>
     IInvariantList<T> Clear();
-}*/
+}

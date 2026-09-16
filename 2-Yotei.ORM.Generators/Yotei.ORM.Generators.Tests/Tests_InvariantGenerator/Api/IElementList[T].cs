@@ -1,19 +1,18 @@
-﻿using TKey = string;
-using IItem = Yotei.ORM.InvariantGenerator.Tests.IElement;
-using IHost = Yotei.ORM.InvariantGenerator.Tests.IElementList_KT;
+﻿using IItem = Yotei.ORM.InvariantGenerator.Tests.IElement;
+using IHost = Yotei.ORM.InvariantGenerator.Tests.IElementList_T;
 
 namespace Yotei.ORM.InvariantGenerator.Tests;
 
 // ========================================================
 /// <summary>
-/// Represents a list of elements identified by their names.
+/// Represents a list of elements.
 /// <br/> Instances of this type are intended to be immutable ones.
 /// </summary>
-[IInvariantList<TKey, IItem>(ReturnType = typeof(IHost))]
-public partial interface IElementList_KT : IItem
+[IInvariantList<IItem>(ReturnType = typeof(IHost))]
+public partial interface IElementList_T : IItem
 {
     /// <summary>
-    /// <inheritdoc cref="IInvariantList{K, T}.ToBuilder"/>
+    /// <inheritdoc cref="IInvariantList{T}.ToBuilder"/>
     /// </summary>
     /// <returns></returns>
     new IBuilder ToBuilder();
