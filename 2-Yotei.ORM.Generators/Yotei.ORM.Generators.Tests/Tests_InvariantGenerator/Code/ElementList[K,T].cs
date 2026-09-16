@@ -92,7 +92,7 @@ public partial class ElementList_KT : IHost
     /// </summary>
     /// <param name="other"></param>
     /// <returns><inheritdoc/></returns>
-    public bool Equals(IItem? other)
+    public virtual bool Equals(IItem? other)
     {
         if (ReferenceEquals(this, other)) return true;
         if (other is null) return false;

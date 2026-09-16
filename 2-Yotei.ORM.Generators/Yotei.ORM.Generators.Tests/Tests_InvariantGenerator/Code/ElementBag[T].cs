@@ -1,6 +1,6 @@
 ﻿using IItem = Yotei.ORM.InvariantGenerator.Tests.IElement;
-using IHost = Yotei.ORM.InvariantGenerator.Tests.IElementList_T;
-using THost = Yotei.ORM.InvariantGenerator.Tests.ElementList_T;
+using IHost = Yotei.ORM.InvariantGenerator.Tests.IElementBag_T;
+using THost = Yotei.ORM.InvariantGenerator.Tests.ElementBag_T;
 
 namespace Yotei.ORM.InvariantGenerator.Tests;
 
@@ -8,16 +8,16 @@ namespace Yotei.ORM.InvariantGenerator.Tests;
 /// <summary>
 /// <inheritdoc cref="IHost"/>
 /// </summary>
-[InvariantList<IItem>(ReturnType = typeof(IHost))]
+[InvariantBag<IItem>(ReturnType = typeof(IHost))]
 [DebuggerDisplay("{ToDebugString(3)}")]
-public partial class ElementList_T : IHost
+public partial class ElementBag_T : IHost
 {
     /// <summary>
     /// Initializes a new instance.
     /// <br/> This method completely takes over the base one.
     /// </summary>
     /// <param name="ignoreCase"></param>
-    public ElementList_T(bool ignoreCase) => IgnoreCase = ignoreCase;
+    public ElementBag_T(bool ignoreCase) => IgnoreCase = ignoreCase;
 
     /// <summary>
     /// Initializes a new instance with the elements of the given range.
@@ -25,7 +25,7 @@ public partial class ElementList_T : IHost
     /// </summary>
     /// <param name="ignoreCase"></param>
     /// <param name="range"></param>
-    public ElementList_T(bool ignoreCase, IEnumerable<IItem> range)
+    public ElementBag_T(bool ignoreCase, IEnumerable<IItem> range)
         : this(ignoreCase)
         => Items.AddRange(range.ThrowWhenNull());
 
@@ -34,7 +34,7 @@ public partial class ElementList_T : IHost
     /// <br/> This method completely takes over the base one.
     /// </summary>
     /// <param name="other"></param>
-    protected ElementList_T(THost other)
+    protected ElementBag_T(THost other)
     {
         ArgumentNullException.ThrowIfNull(other);
         IgnoreCase = other.IgnoreCase;
@@ -71,12 +71,12 @@ public partial class ElementList_T : IHost
     public bool IgnoreCase { get; init; }
 
     /// <summary>
-    /// For DEBUG purposes only.
+    /// <inheritdoc/>
     /// </summary>
     public bool AcceptDuplicates { get; init; }
 
     /// <summary>
-    /// For DEBUG purposes only.
+    /// <inheritdoc/>
     /// </summary>
     public bool FlattenElements
     {
@@ -100,18 +100,33 @@ public partial class ElementList_T : IHost
         if (IgnoreCase != valid.IgnoreCase) return false;
 
         if (Count != valid.Count) return false;
-        for (int i = 0; i < Count; i++)
+        var list = ToList();
+        foreach (var temp in valid)
         {
-            var item = this[i];
-            var temp = valid[i];
-            var same = item is NamedElement xitem && temp is NamedElement xtemp
-                ? xitem.Equals(xtemp, IgnoreCase)
-                : item.EqualsEx(temp);
-
-            if (!same) return false;
+            if (!TryFind(list, temp, out var value)) return false;
+            list.Remove(value);
         }
+        if (list.Count != 0) return false;
 
         return true;
+
+        // Determines if the list contains the given target...
+        static bool TryFind(List<IItem> list, IItem target, out IItem value)
+        {
+            for (int i = 0; i < list.Count; i++)
+            {
+                var item = list[i];
+
+                if (ReferenceEquals(item, target) || item.Equals(target))
+                {
+                    value = item;
+                    return true;
+                }
+            }
+
+            value = default!;
+            return false;
+        }
     }
 
     /// <summary>
@@ -139,7 +154,7 @@ public partial class ElementList_T : IHost
     {
         var code = IgnoreCase.GetHashCode();
         code = HashCode.Combine(code, Items);
-        for (int i = 0; i < Count; i++) code = HashCode.Combine(code, this[i]);
+        foreach (var item in Items) code = HashCode.Combine(code, item);
         return code;
     }
 }

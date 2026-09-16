@@ -1,4 +1,4 @@
-﻿/*#pragma warning disable IDE0305
+﻿#pragma warning disable IDE0305
 
 namespace Yotei.ORM.Tools;
 
@@ -14,7 +14,7 @@ public abstract partial class InvariantBag<T> : IInvariantBag<T>
     /// <summary>
     /// Initializes a new empty instance.
     /// </summary>
-    public InvariantBag() => Items = CreateItems();
+    public InvariantBag() { }
 
     /// <summary>
     /// Initializes a new instance with the elements from the given range.
@@ -22,8 +22,8 @@ public abstract partial class InvariantBag<T> : IInvariantBag<T>
     /// <param name="range"></param>
     public InvariantBag(IEnumerable<T> range)
     {
-        Items = CreateItems();
-        Items.AddRange(range.ThrowWhenNull());
+        ArgumentNullException.ThrowIfNull(range);
+        Items!.AddRange(range);
         Items.Trim();
     }
 
@@ -31,7 +31,12 @@ public abstract partial class InvariantBag<T> : IInvariantBag<T>
     /// Copy constructor.
     /// </summary>
     /// <param name="other"></param>
-    protected InvariantBag(InvariantBag<T> other) => Items = other.ThrowWhenNull().Items.Clone();
+    protected InvariantBag(InvariantBag<T> other)
+    {
+        ArgumentNullException.ThrowIfNull(other);
+        Items!.AddRange(other);
+        Items.Trim();
+    }
 
     /// <summary>
     /// <inheritdoc/>
@@ -71,10 +76,13 @@ public abstract partial class InvariantBag<T> : IInvariantBag<T>
 
     // ----------------------------------------------------
 
-    protected ICoreBag<T> Items;
+    /// <summary>
+    /// The actual contents carried by this instance.
+    /// </summary>
+    protected virtual ICoreBag<T> Items => field ??= CreateItems();
 
     /// <summary>
-    /// Invoked to create an appropriate repository for this instance.
+    /// Invoked to create the repository of contents of this instance.
     /// </summary>
     /// <returns></returns>
     protected abstract ICoreBag<T> CreateItems();
@@ -244,4 +252,4 @@ public abstract partial class InvariantBag<T> : IInvariantBag<T>
 
     object ICollection.SyncRoot => Items.SyncRoot;
     bool ICollection.IsSynchronized => false;
-}*/
+}

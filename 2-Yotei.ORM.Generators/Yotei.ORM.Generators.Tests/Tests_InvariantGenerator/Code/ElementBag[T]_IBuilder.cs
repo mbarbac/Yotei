@@ -1,17 +1,17 @@
 ﻿using IItem = Yotei.ORM.InvariantGenerator.Tests.IElement;
-using IHost = Yotei.ORM.InvariantGenerator.Tests.IElementList_T;
-using THost = Yotei.ORM.InvariantGenerator.Tests.ElementList_T;
+using IHost = Yotei.ORM.InvariantGenerator.Tests.IElementBag_T;
+using THost = Yotei.ORM.InvariantGenerator.Tests.ElementBag_T;
 
 namespace Yotei.ORM.InvariantGenerator.Tests;
 
-partial class ElementList_T : IHost
+partial class ElementBag_T
 {
     // ====================================================
     /// <summary>
     /// <inheritdoc cref="IHost.IBuilder"/>
     /// </summary>
     [Cloneable]
-    public partial class Builder : CoreList<IItem>, IHost.IBuilder
+    public partial class Builder : CoreBag<IItem>, IHost.IBuilder
     {
         /// <summary>
         /// Initializes a new instance.
@@ -34,7 +34,7 @@ partial class ElementList_T : IHost
         /// <param name="other"></param>
         protected Builder(Builder other) : base(other) { }
 
-        protected override void OnCreating(CoreList<IItem> other)
+        protected override void OnCreating(CoreBag<IItem> other)
         {
             base.OnCreating(other);
             IgnoreCase = ((Builder)other).IgnoreCase;
