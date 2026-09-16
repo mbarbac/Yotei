@@ -1,4 +1,4 @@
-﻿/*using TKey = string;
+﻿using TKey = string;
 using IItem = Yotei.ORM.InvariantGenerator.Tests.IElement;
 using IHost = Yotei.ORM.InvariantGenerator.Tests.IElementList_KT;
 
@@ -19,10 +19,21 @@ partial interface IElementList_KT : IItem
         /// <returns></returns>
         IHost ToInstance();
 
+        // ------------------------------------------------
+
         /// <summary>
         /// <inheritdoc cref="IHost.IgnoreCase"/>
         /// </summary>
-        bool IgnoreCase { get; }
+        bool IgnoreCase { get; set; }
+
+        /// <summary>
+        /// For DEBUG purposes only.
+        /// </summary>
+        public bool AcceptDuplicates { get; set; }
+
+        /// <summary>
+        /// For DEBUG purposes only.
+        /// </summary>
+        public bool FlattenElements { get; set; }
     }
 }
-*/

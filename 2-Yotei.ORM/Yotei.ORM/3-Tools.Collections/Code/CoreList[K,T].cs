@@ -10,18 +10,18 @@
 [DebuggerDisplay("{ToDebugString(3)}")]
 public abstract partial class CoreList<K, T> : ICoreList<K, T>
 {
-    readonly List<T> Items;
+    List<T> Items => field ??= [];
 
     /// <summary>
     /// Initializes a new empty instance.
     /// </summary>
-    public CoreList() => Items = [];
+    public CoreList() { }
 
     /// <summary>
     /// Initializes a new instance with the elements from the given range.
     /// </summary>
     /// <param name="range"></param>
-    public CoreList(IEnumerable<T> range) : this() => AddRange(range);
+    public CoreList(IEnumerable<T> range) => AddRange(range);
 
     /// <summary>
     /// Copy constructor.
@@ -30,8 +30,6 @@ public abstract partial class CoreList<K, T> : ICoreList<K, T>
     protected CoreList(CoreList<K, T> other)
     {
         ArgumentNullException.ThrowIfNull(other);
-
-        Items = [];
         OnCreating(other);
         AddRange(other);
     }

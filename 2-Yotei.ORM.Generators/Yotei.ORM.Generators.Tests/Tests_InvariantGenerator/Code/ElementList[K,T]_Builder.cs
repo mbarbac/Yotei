@@ -1,4 +1,4 @@
-﻿/*using TKey = string;
+﻿using TKey = string;
 using IItem = Yotei.ORM.InvariantGenerator.Tests.IElement;
 using IHost = Yotei.ORM.InvariantGenerator.Tests.IElementList_KT;
 using THost = Yotei.ORM.InvariantGenerator.Tests.ElementList_KT;
@@ -26,8 +26,9 @@ partial class ElementList_KT : IHost
         /// </summary>
         /// <param name="ignoreCase"></param>
         /// <param name="range"></param>
-        public Builder(
-            bool ignoreCase, IEnumerable<IItem> range) : this(ignoreCase) => AddRange(range);
+        public Builder(bool ignoreCase, IEnumerable<IItem> range)
+            : this(ignoreCase)
+            => AddRange(range.ThrowWhenNull());
 
         /// <summary>
         /// Copy constructor.
@@ -39,17 +40,7 @@ partial class ElementList_KT : IHost
         {
             base.OnCreating(other);
             IgnoreCase = ((Builder)other).IgnoreCase;
-        }
-
-        /// <summary>
-        /// <inheritdoc/>
-        /// </summary>
-        /// <returns></returns>
-        public virtual IHost ToInstance()
-        {
-            var host = new THost(IgnoreCase);
-            if (Count > 0) host.AddRange(this);
-            return host;
+            AcceptDuplicates = ((Builder)other).AcceptDuplicates;
         }
 
         // ------------------------------------------------
@@ -98,6 +89,7 @@ partial class ElementList_KT : IHost
             return comparer.Equals(source, target);
         }
 
+        // This not needed for string comparisons...
         readonly struct MyComparer(bool IgnoreCase) : IEqualityComparer<TKey>
         {
             public bool Equals(TKey? x, TKey? y) => string.Compare(x, y, IgnoreCase) == 0;
@@ -120,7 +112,7 @@ partial class ElementList_KT : IHost
         public override bool AllowDuplicate(IItem value, IEnumerable<IItem> _)
         {
             if (AcceptDuplicates) return true;
-            throw new DuplicateException("Duplicated value.").WithData(value);
+            throw new DuplicateException("Duplicated value").WithData(value);
         }
 
         /// <summary>
@@ -129,8 +121,22 @@ partial class ElementList_KT : IHost
         /// <param name="source"></param>
         /// <param name="target"></param>
         /// <returns></returns>
-        public override bool SameElement(            
-            IItem source, IItem target) => base.SameElement(source, target);
+        public override bool SameElement(IItem source, IItem target) => base.SameElement(source, target);
+
+        // ------------------------------------------------
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <returns><inheritdoc/></returns>
+        public virtual IHost ToInstance()
+        {
+            var host = new THost(IgnoreCase) { AcceptDuplicates = AcceptDuplicates };
+            host.Items.FlattenElements = FlattenElements;
+
+            if (Count != 0) host.AddRange(this);
+            return host;
+        }
 
         // ------------------------------------------------
 
@@ -151,7 +157,7 @@ partial class ElementList_KT : IHost
         }
 
         /// <summary>
-        /// For DEBUG purposes only.
+        /// <inh
         /// </summary>
         public bool AcceptDuplicates
         {
@@ -166,4 +172,4 @@ partial class ElementList_KT : IHost
             }
         }
     }
-}*/
+}
