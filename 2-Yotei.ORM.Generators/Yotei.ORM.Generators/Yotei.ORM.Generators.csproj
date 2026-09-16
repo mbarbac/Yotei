@@ -41,11 +41,21 @@
 		<PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="5.3.0" PrivateAssets="all" />
 	</ItemGroup>
 	<Import Project="..\..\1-Yotei.Tools\Yotei.Tools.Shared\Yotei.Tools.Shared.projitems" Label="Shared" />
-	<Import Project="..\..\1-Yotei.Tools.Generators\00-TreeGenerator\Yotei.Tools.TreeGenerator\Yotei.Tools.TreeGenerator.projitems" Label="Shared" />	
+	<Import Project="..\..\1-Yotei.Tools.Generators\00-TreeGenerator\Yotei.Tools.TreeGenerator\Yotei.Tools.TreeGenerator.projitems" Label="Shared" />
 
 	<!--Generator resources-->
 	<ItemGroup>
 		<None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+		<EmbeddedResource Include="InvariantGenerator\Public\IInvariantBagAttribute.cs" />
+		<EmbeddedResource Include="InvariantGenerator\Public\IInvariantBagAttribute[T].cs" />
+		<EmbeddedResource Include="InvariantGenerator\Public\IInvariantListAttribute.cs" />
+		<EmbeddedResource Include="InvariantGenerator\Public\IInvariantListAttribute[K,T].cs" />
+		<EmbeddedResource Include="InvariantGenerator\Public\IInvariantListAttribute[T].cs" />
+		<EmbeddedResource Include="InvariantGenerator\Public\InvariantBagAttribute.cs" />
+		<EmbeddedResource Include="InvariantGenerator\Public\InvariantBagAttribute[T].cs" />
+		<EmbeddedResource Include="InvariantGenerator\Public\InvariantListAttribute.cs" />
+		<EmbeddedResource Include="InvariantGenerator\Public\InvariantListAttribute[K,T].cs" />
+		<EmbeddedResource Include="InvariantGenerator\Public\InvariantListAttribute[T].cs" />
 	</ItemGroup>
 
 </Project>

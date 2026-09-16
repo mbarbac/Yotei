@@ -32,7 +32,7 @@ public abstract partial class CoreList<T> : ICoreList<T>
 
         Items = [];
         OnCreating(other);
-        Items = [.. other.ThrowWhenNull()];
+        AddRange(other);
     }
 
     /// <summary>

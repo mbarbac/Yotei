@@ -50,7 +50,7 @@ public abstract partial class CoreBag<T> : ICoreBag<T>
 
         Items = new(this);
         OnCreating(other);
-        Items.AddRange(other);
+        AddRange(other);
     }
 
     /// <summary>

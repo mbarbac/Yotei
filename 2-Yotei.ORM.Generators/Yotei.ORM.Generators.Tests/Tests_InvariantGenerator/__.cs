@@ -1,4 +1,4 @@
-﻿namespace Yotei.ORM.Generators.Tests;
+﻿namespace Yotei.ORM.InvariantGenerator.Tests;
 
 // ========================================================
 //[Enforced]
@@ -10,5 +10,3 @@
 //    {
 //    }
 //}
-
-public interface IFake { }
