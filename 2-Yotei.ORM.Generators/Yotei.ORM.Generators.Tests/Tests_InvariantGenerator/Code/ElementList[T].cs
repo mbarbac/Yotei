@@ -54,8 +54,11 @@ public partial class ElementList_T : IHost
     /// <inheritdoc/>
     /// </summary>
     /// <returns><inheritdoc/></returns>
-    protected override Builder CreateItems()
-        => new(IgnoreCase) { AcceptDuplicates = AcceptDuplicates };
+    protected override Builder CreateItems() => new(IgnoreCase)
+    {
+        AcceptDuplicates = AcceptDuplicates,
+        FlattenElements = FlattenElements,
+    };
 
     /// <summary>
     /// <inheritdoc/>
@@ -68,21 +71,42 @@ public partial class ElementList_T : IHost
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public bool IgnoreCase { get; init; }
+    public bool IgnoreCase
+    {
+        get => ItemsCreated ? Items.IgnoreCase : field;
+        init
+        {
+            if (ItemsCreated) Items.IgnoreCase = value;
+            else field = value;
+        }
+    }
 
     /// <summary>
     /// For DEBUG purposes only.
     /// </summary>
-    public bool AcceptDuplicates { get; init; }
+    public bool AcceptDuplicates
+    {
+        get => ItemsCreated ? Items.AcceptDuplicates : field;
+        init
+        {
+            if (ItemsCreated) Items.AcceptDuplicates = value;
+            else field = value;
+        }
+    }
 
     /// <summary>
     /// For DEBUG purposes only.
     /// </summary>
     public bool FlattenElements
     {
-        get => Items.FlattenElements;
-        init => Items.FlattenElements = value;
+        get => ItemsCreated ? Items.FlattenElements : field;
+        init
+        {
+            if (ItemsCreated) Items.FlattenElements = value;
+            else field = value;
+        }
     }
+    = true;
 
     // ----------------------------------------------------
 

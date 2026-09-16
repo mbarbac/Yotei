@@ -1,5 +1,7 @@
 ﻿#pragma warning disable IDE0305
 
+using System.Runtime.InteropServices.Marshalling;
+
 namespace Yotei.ORM.Tools;
 
 // ========================================================
@@ -80,7 +82,9 @@ public abstract partial class InvariantList<K, T> : IInvariantList<K, T>
     /// <summary>
     /// The actual contents carried by this instance.
     /// </summary>
-    protected virtual ICoreList<K, T> Items => field ??= CreateItems();
+    protected virtual ICoreList<K, T> Items => _Items ??= CreateItems();
+    ICoreList<K, T> _Items = null!;
+    protected bool ItemsCreated => _Items is not null;
 
     /// <summary>
     /// Invoked to create the repository of contents of this instance.

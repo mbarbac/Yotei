@@ -1,4 +1,4 @@
-﻿/*#pragma warning disable IDE0028
+﻿#pragma warning disable IDE0028, IDE0018
 
 namespace Yotei.ORM.Tools.Collections.Tests;
 
@@ -704,4 +704,4 @@ public static partial class Test_CoreList_KT
         Assert.Equal(3, done);
         Assert.Empty(chain);
     }
-}*/
+}

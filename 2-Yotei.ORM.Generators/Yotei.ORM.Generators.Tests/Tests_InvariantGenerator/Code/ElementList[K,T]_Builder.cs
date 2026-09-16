@@ -156,7 +156,7 @@ partial class ElementList_KT : IHost
         }
 
         /// <summary>
-        /// <inh
+        /// <inheritdoc/>
         /// </summary>
         public bool AcceptDuplicates
         {

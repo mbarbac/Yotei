@@ -78,8 +78,11 @@ public abstract partial class InvariantBag<T> : IInvariantBag<T>
 
     /// <summary>
     /// The actual contents carried by this instance.
+    /// <br/> Override is expected to cast to the appropriate type.
     /// </summary>
-    protected virtual ICoreBag<T> Items => field ??= CreateItems();
+    protected virtual ICoreBag<T> Items => _Items ??= CreateItems();
+    ICoreBag<T> _Items = null!;
+    protected bool ItemsCreated => _Items is not null;
 
     /// <summary>
     /// Invoked to create the repository of contents of this instance.

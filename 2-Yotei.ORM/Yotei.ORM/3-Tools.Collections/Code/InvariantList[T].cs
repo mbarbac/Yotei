@@ -79,7 +79,9 @@ public abstract partial class InvariantList<T> : IInvariantList<T>
     /// <summary>
     /// The actual contents carried by this instance.
     /// </summary>
-    protected virtual ICoreList<T> Items => field ??= CreateItems();
+    protected virtual ICoreList<T> Items => _Items ??= CreateItems();
+    ICoreList<T> _Items = null!;
+    protected bool ItemsCreated => _Items is not null;
 
     /// <summary>
     /// Invoked to create the repository of contents of this instance.

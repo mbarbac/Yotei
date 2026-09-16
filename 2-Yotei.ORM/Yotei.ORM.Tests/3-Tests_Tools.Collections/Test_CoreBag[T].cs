@@ -1,4 +1,4 @@
-﻿/*#pragma warning disable xUnit2017
+﻿#pragma warning disable xUnit2017, IDE0028, IDE0018
 
 namespace Yotei.ORM.Tools.Collections.Tests;
 
@@ -386,4 +386,4 @@ public static partial class Test_CoreBag_T
         Assert.Equal(3, done);
         Assert.Empty(chain);
     }
-}*/
+}
