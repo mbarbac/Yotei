@@ -1,4 +1,4 @@
-﻿using TKey = string;
+﻿/*using TKey = string;
 using IItem = Yotei.ORM.InvariantGenerator.Tests.IElement;
 using IHost = Yotei.ORM.InvariantGenerator.Tests.IElementList_KT;
 
@@ -21,4 +21,4 @@ public partial interface IElementList_KT : IItem
     /// Determines how to compare elements' names.
     /// </summary>
     bool IgnoreCase { get; }
-}
+}*/

@@ -1,4 +1,4 @@
-﻿#pragma warning disable xUnit2017, IDE0028, IDE0018
+﻿/*#pragma warning disable xUnit2017, IDE0028, IDE0018
 
 namespace Yotei.ORM.Tools.Collections.Tests;
 
@@ -401,4 +401,4 @@ public static partial class Test_InvariantBag_T
         Assert.NotSame(source, target);
         Assert.Empty(target);
     }
-}
+}*/

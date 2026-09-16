@@ -1,4 +1,4 @@
-﻿#pragma warning disable IDE0305
+﻿/*#pragma warning disable IDE0305
 
 namespace Yotei.ORM.Tools;
 
@@ -244,4 +244,4 @@ public abstract partial class InvariantBag<T> : IInvariantBag<T>
 
     object ICollection.SyncRoot => Items.SyncRoot;
     bool ICollection.IsSynchronized => false;
-}
+}*/

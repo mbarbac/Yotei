@@ -1,4 +1,4 @@
-﻿namespace Yotei.ORM.Tools;
+﻿/*namespace Yotei.ORM.Tools;
 
 // ========================================================
 /// <summary>
@@ -122,4 +122,4 @@ public partial interface IInvariantBag<T> : IReadOnlyCollection<T>, ICollection
     /// </summary>
     /// <returns>A new copy, or this instance if no changes have been made.</returns>
     IInvariantBag<T> Clear();
-}
+}*/

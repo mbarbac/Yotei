@@ -1,4 +1,4 @@
-﻿using TKey = string;
+﻿/*using TKey = string;
 using IItem = Yotei.ORM.InvariantGenerator.Tests.IElement;
 using IHost = Yotei.ORM.InvariantGenerator.Tests.IElementList_KT;
 using THost = Yotei.ORM.InvariantGenerator.Tests.ElementList_KT;
@@ -166,4 +166,4 @@ partial class ElementList_KT : IHost
             }
         }
     }
-}
+}*/
