@@ -1,7 +1,4 @@
-TOY:
-- ICoreBag, CoreBag
-- Invariant Collections
-- Generators, Tests
+
 
 TODO:
 - DbTokenVisitor
