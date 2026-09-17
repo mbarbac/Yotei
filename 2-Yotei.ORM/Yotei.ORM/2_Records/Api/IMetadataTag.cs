@@ -2,7 +2,7 @@
 
 // ========================================================
 /// <summary>
-/// Represents the not-empty collection of names by which a metadata entry is known.
+/// Represents the not-empty collection of tag names (aliases) by which a metadata entry is known.
 /// <br/> Permits a metadata entry to be identified by several aliases at once.
 /// <br/> Instances of this type are intended to be immutable ones.
 /// </summary>
@@ -16,44 +16,44 @@ public partial interface IMetadataTag : IEnumerable<string>, IEquatable<IMetadat
     IBuilder ToBuilder();
 
     /// <summary>
-    /// Determines if the names (aliases) in this collection are case sensitive, or not.
+    /// Determines if the tag names (aliases) in this collection are case sensitive, or not.
     /// </summary>
     bool IgnoreCase { get; }
 
     /// <summary>
-    /// The default name (alias) of this collection.
+    /// The default tag name (alias) of this collection.
     /// <br/> The getter returns, by default, an arbitrary one among the ones in this collection.
     /// <br/> The setter specifies which one, among the existing ones, is the default.
     /// </summary>
     string Default { get; set; }
 
     /// <summary>
-    /// Gets the number of names (aliases) in this collection.
+    /// Gets the number of tag names (aliases) in this collection.
     /// </summary>
     int Count { get; }
 
     /// <summary>
-    /// Determines if this collection contains the given name (alias), or not.
+    /// Determines if this collection contains the given tag name (alias), or not.
     /// </summary>
     /// <param name="name"></param>
     /// <returns></returns>
     bool Contains(string name);
 
     /// <summary>
-    /// Determines if this collection contains any name (alias) from the given range, or not.
+    /// Determines if this collection contains any tag name (alias) from the given range, or not.
     /// </summary>
     /// <param name="range"></param>
     /// <returns></returns>
     bool ContainsAny(IEnumerable<string> range);
 
     /// <summary>
-    /// Obtains an array with the names in this instance.
+    /// Obtains an array with the tag names (aliases) in this instance.
     /// </summary>
     /// <returns></returns>
     string[] ToArray();
 
     /// <summary>
-    /// Obtains a list with the names in this instance.
+    /// Obtains a list with the tag names (aliases) in this instance.
     /// </summary>
     /// <returns></returns>
     List<string> ToList();
@@ -61,8 +61,8 @@ public partial interface IMetadataTag : IEnumerable<string>, IEquatable<IMetadat
     // ------------------------------------------------
 
     /// <summary>
-    /// Returns a copy of this instance where the original name (alias) has been replaced by the
-    /// new given one.
+    /// Returns a copy of this instance where the original tag name (alias) has been replaced by
+    /// the new given one.
     /// </summary>
     /// <param name="oldname"></param>
     /// <param name="newname"></param>
@@ -70,22 +70,22 @@ public partial interface IMetadataTag : IEnumerable<string>, IEquatable<IMetadat
     IMetadataTag Replace(string oldname, string newname);
 
     /// <summary>
-    /// Returns a copy of this instance where the given name (alias) has been added to it.
+    /// Returns a copy of this instance where the given tag name (alias) has been added to it.
     /// </summary>
     /// <param name="name"></param>
     /// <returns>A new copy, or this instance if no changes have been made.</returns>
     IMetadataTag Add(string name);
 
     /// <summary>
-    /// Returns a copy of this instance where the names (aliases) from the given range have been
-    /// added to it.
+    /// Returns a copy of this instance where the tag names (aliases) from the given range have
+    /// been added to it.
     /// </summary>
     /// <param name="range"></param>
     /// <returns>A new copy, or this instance if no changes have been made.</returns>
     IMetadataTag AddRange(IEnumerable<string> range);
 
     /// <summary>
-    /// Returns a copy of this instance where the given name (alias) has been removed from it.
+    /// Returns a copy of this instance where the given tag name (alias) has been removed from it.
     /// <br/> An exception is thrown if it is the only remaining one.
     /// </summary>
     /// <param name="name"></param>
@@ -93,7 +93,7 @@ public partial interface IMetadataTag : IEnumerable<string>, IEquatable<IMetadat
     IMetadataTag Remove(string name);
 
     /// <summary>
-    /// Returns a copy of this instance where all its names (aliases) have been removed, except
+    /// Returns a copy of this instance where all its tag names (aliases) have been removed, except
     /// the default one.
     /// </summary>
     /// <returns>A new copy, or this instance if no changes have been made.</returns>

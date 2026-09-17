@@ -64,7 +64,7 @@ partial interface IMetadataTag
         // ------------------------------------------------
 
         /// <summary>
-        /// Replaces the original name (alias) by the new given one.
+        /// Replaces the original tag name (alias) by the new given one.
         /// </summary>
         /// <param name="oldname"></param>
         /// <param name="newname"></param>
@@ -72,21 +72,21 @@ partial interface IMetadataTag
         bool Replace(string oldname, string newname);
 
         /// <summary>
-        /// Adds to this collection the given name (alias).
+        /// Adds to this collection the given tag name (alias).
         /// </summary>
         /// <param name="name"></param>
         /// <returns>True if changes have been made. False otherwise.</returns>
         bool Add(string name);
 
         /// <summary>
-        /// Adds to this collection the names (aliases) from the given range.
+        /// Adds to this collection the tag names (aliases) from the given range.
         /// </summary>
         /// <param name="range"></param>
         /// <returns>True if changes have been made. False otherwise.</returns>
         bool AddRange(IEnumerable<string> range);
 
         /// <summary>
-        /// Removes from this collection the given name (alias).
+        /// Removes from this collection the given tag name (alias).
         /// <br/> An exception is thrown if it is the only remaining one.
         /// </summary>
         /// <param name="name"></param>
@@ -94,7 +94,7 @@ partial interface IMetadataTag
         bool Remove(string name);
 
         /// <summary>
-        /// Clears this collection, except the default name (alias).
+        /// Clears this collection, except the default tag name (alias).
         /// </summary>
         /// <returns>True if changes have been made. False otherwise.</returns>
         bool Clear();
