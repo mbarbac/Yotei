@@ -42,6 +42,12 @@ partial interface ICommandInfo
         /// </summary>
         bool IsConsistent { get; }
 
+        /// <summary>
+        /// Determines if this instance is in an execution-ready state, or not.
+        /// <br/> Inheritors shall invoke the base one first.
+        /// </summary>
+        bool IsValid { get; }
+
         // ------------------------------------------------
 
         /// <summary>
@@ -63,7 +69,7 @@ partial interface ICommandInfo
         /// the given optional values.
         /// <br/> If the text is null, then it is ignored.
         /// <br/> If text is not null, then the values must be encoded using either a positional
-        /// '{n}' specification, or a named '{name}' one (where if 'name' is not prefixed with
+        /// '{n}' specification, or a named '{name}' one (where if 'name' is not prefixed with the
         /// engine's prefix, it is added automatically).
         /// </summary>
         /// <param name="text"></param>

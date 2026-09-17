@@ -44,7 +44,7 @@ partial class CommandInfo
         /// from the given optional values have been added to it.
         /// <br/> If the text is null, then it is ignored.
         /// <br/> If text is not null, then the values must be encoded using either a positional
-        /// '{n}' specification, or a named '{name}' one (where if 'name' is not prefixed with
+        /// '{n}' specification, or a named '{name}' one (where if 'name' is not prefixed with the
         /// engine's prefix, it is added automatically).
         /// </summary>
         /// <param name="engine"></param>
@@ -149,6 +149,11 @@ partial class CommandInfo
             }
         }
 
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        public virtual bool IsValid => !IsEmpty && IsConsistent;
+
         // ------------------------------------------------
 
         /// <summary>
@@ -160,9 +165,19 @@ partial class CommandInfo
         {
             ArgumentNullException.ThrowIfNull(source);
 
-            var text = source.Text;
-            var pars = source.Parameters;
-            return Append(text, pars);
+            if (IsEmpty)
+            {
+                _Text.Append(source.Text);
+                _Parameters.AddRange(source.Parameters);
+                return true;
+            }
+            else
+            {
+                var checkUnused = false;
+                var text = source.Text;
+                var pars = source.Parameters;
+                return Append(checkUnused, text, pars);
+            }
         }
 
         /// <summary>
@@ -174,9 +189,19 @@ partial class CommandInfo
         {
             ArgumentNullException.ThrowIfNull(source);
 
-            var text = source.Text;
-            var pars = source.Parameters;
-            return Append(text, pars);
+            if (IsEmpty)
+            {
+                _Text.Append(source.Text);
+                _Parameters.AddRange(source.Parameters);
+                return true;
+            }
+            else
+            {
+                var checkUnused = false;
+                var text = source.Text;
+                var pars = source.Parameters;
+                return Append(checkUnused, text, pars);
+            }
         }
 
         // ------------------------------------------------
@@ -187,8 +212,11 @@ partial class CommandInfo
         /// <param name="text"></param>
         /// <param name="values"></param>
         /// <returns><inheritdoc/></returns>
-        public virtual bool Add(
-            string? text, params object?[]? values) => Append(text, values);
+        public virtual bool Add(string? text, params object?[]? values)
+        {
+            var checkUnused = true;
+            return Append(checkUnused, text, values);
+        }
 
         // ------------------------------------------------
 
@@ -199,17 +227,12 @@ partial class CommandInfo
         /// <returns><inheritdoc/></returns>
         public virtual bool ReplaceText(string? text)
         {
-            if (text is null && _Text.Length == 0) return false;
+            if (_Text.Length == 0 && (
+                text is null || text.Length == 0)) return false;
 
-            var old = Text;
             _Text.Clear();
-
-            if (!Append(text, []))
-            {
-                _Text.Clear();
-                _Text.Append(old);
-                return false;
-            }
+            
+            if (text is not null) _Text.Append(text);
             return true;
         }
 
@@ -224,16 +247,18 @@ partial class CommandInfo
 
             if (values.Length == 0 && _Parameters.Count == 0) return false;
 
-            var old = Parameters;
-            _Parameters.Clear();
+            var temp = Clone();
+            temp._Text.Clear();
+            temp._Parameters.Clear();
 
-            if (!Append(null, values))
+            var checkUnused = false;
+            if (temp.Append(checkUnused, null, values))
             {
                 _Parameters.Clear();
-                _Parameters.AddRange(old);
-                return false;
+                _Parameters.AddRange(temp._Parameters);
+                return true;
             }
-            return true;
+            return false;
         }
 
         // ------------------------------------------------
@@ -261,10 +286,13 @@ partial class CommandInfo
         /// '{n}' specification, or a named '{name}' one (where if 'name' is not prefixed with
         /// engine's prefix, it is added automatically).
         /// </summary>
+        /// <param name="checkUnused">If false, no unused elements checked.</param>
         /// <param name="text"></param>
         /// <param name="values"></param>
         /// <returns></returns>
-        bool Append(string? text, params object?[]? values)
+        bool Append(
+            bool checkUnused,
+            string? text, params object?[]? values)
         {
             values ??= [null];
 
@@ -288,7 +316,6 @@ partial class CommandInfo
                     case ValueElement item:
                         _Parameters.AddNew(item.Value, out par);
                         name = par.Name;
-                        par = Capture(par);
                         done = true;
                         break;
 
@@ -310,7 +337,11 @@ partial class CommandInfo
                 }
 
                 // No text, no need to adjust...
-                if (text is null) continue;
+                if (text is null)
+                {
+                    arg.Used = true;
+                    continue;
+                }
 
                 string? str;
                 int pos, ordinal;
@@ -322,6 +353,7 @@ partial class CommandInfo
                     text = text.Remove(pos, str!.Length);
                     text = text.Insert(pos, par.Name);
                     pos += par.Name.Length;
+                    arg.Used = true;
                 }
 
                 // Processing ordinal '{n}' brackets...
@@ -333,6 +365,7 @@ partial class CommandInfo
                         text = text.Remove(pos, str!.Length);
                         text = text.Insert(pos, par.Name);
                         pos += par.Name.Length;
+                        arg.Used = true;
                     }
                     else pos += str!.Length;
                 }
@@ -344,6 +377,7 @@ partial class CommandInfo
                     text = text.Remove(pos, str!.Length);
                     text = text.Insert(pos, par.Name);
                     pos += par.Name.Length;
+                    arg.Used = true;
                 }
 
                 // Processing ordinal '#n' sequences...
@@ -355,10 +389,16 @@ partial class CommandInfo
                         text = text.Remove(pos, str!.Length);
                         text = text.Insert(pos, par.Name);
                         pos += par.Name.Length;
+                        arg.Used = true;
                     }
                     else pos += str!.Length;
                 }
             }
+
+            // Validate all arguments used...
+            if (checkUnused && args.Any(x => !x.Used)) throw new ArgumentException(
+                "There are unused arguments.")
+                .WithData(args);
 
             // Finishing...
             if (text is not null && text.Length > 0) { _Text.Append(text); done = true; }
@@ -645,6 +685,7 @@ partial class CommandInfo
         {
             string Name { get; }
             object? Value { get; }
+            bool Used { get; set; }
 
             /// <summary>
             /// Captures the given list of values into a collection of arguments.
@@ -703,6 +744,7 @@ partial class CommandInfo
             {
                 var value = Value.Sketch();
                 var str = Name is null ? $"Value(-='{value}')" : $"Value({Name}='{value}')";
+                if (Used) str += ":Used";
                 return str;
             }
             public string Name
@@ -711,6 +753,7 @@ partial class CommandInfo
                 set => field = value is null ? null! : value.NotNullNotEmpty(trim: true);
             }
             public object? Value { get; set; }
+            public bool Used { get; set; }
         }
 
         // ------------------------------------------------
@@ -719,10 +762,16 @@ partial class CommandInfo
         /// </summary>
         class ParameterElement(IParameter par) : IElement
         {
-            public override string ToString() => $"Parameter({Name}='{Value.Sketch()}')";
+            public override string ToString()
+            {
+                var str = $"Parameter({Name}='{Value.Sketch()}')";
+                if (Used) str += ":Used";
+                return str;
+            }
             public IParameter Payload { get; set => field = value.ThrowWhenNull(); } = par;
             public string Name => Payload.Name;
             public object? Value => Payload.Value;
+            public bool Used { get; set; }
         }
 
         // ------------------------------------------------
@@ -731,9 +780,15 @@ partial class CommandInfo
         /// </summary>
         class AnonymousElement(string name, object? value) : IElement
         {
-            public override string ToString() => $"Anonymous({Name}='{Value.Sketch()}')";
+            public override string ToString()
+            {
+                var str = $"Anonymous({Name}='{Value.Sketch()}')";
+                if (Used) str += ":Used";
+                return str;
+            }
             public string Name { get; set => field = value.NotNullNotEmpty(trim: true); } = name;
             public object? Value { get; set; } = value;
+            public bool Used { get; set; }
 
             /// <summary>
             /// Tries to capture the given element as an anonymous one.

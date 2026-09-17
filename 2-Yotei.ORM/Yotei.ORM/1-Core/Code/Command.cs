@@ -4,7 +4,7 @@
 /// <summary>
 /// <inheritdoc cref="ICommand"/>
 /// </summary>
-[Cloneable]
+[Cloneable(ReturnType = typeof(ICommand))]
 public abstract partial class Command : ICommand
 {
     /// <summary>

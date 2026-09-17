@@ -32,7 +32,7 @@ public partial class CommandInfo : ICommandInfo
     /// from the given optional values have been added to it.
     /// <br/> If the text is null, then it is ignored.
     /// <br/> If text is not null, then the values must be encoded using either a positional
-    /// '{n}' specification, or a named '{name}' one (where if 'name' is not prefixed with
+    /// '{n}' specification, or a named '{name}' one (where if 'name' is not prefixed with the
     /// engine's prefix, it is added automatically).
     /// </summary>
     /// <param name="engine"></param>
@@ -85,6 +85,10 @@ public partial class CommandInfo : ICommandInfo
     /// <inheritdoc/>
     /// </summary>
     public bool IsConsistent => Items.IsConsistent;
+
+    /// <summary>
+    /// </summary>
+    public virtual bool IsValid => Items.IsValid;
 
     // ----------------------------------------------------
 
