@@ -1,8 +1,7 @@
-﻿using Item = Yotei.ORM.Code.Parameter;
-using Chain = Yotei.ORM.Code.ParameterList;
-using Microsoft.VisualBasic;
+﻿using Item = Yotei.ORM.Records.Code.Parameter;
+using Chain = Yotei.ORM.Records.Code.ParameterList;
 
-namespace Yotei.ORM.Tests;
+namespace Yotei.ORM.Records.Tests;
 
 // ========================================================
 //[Enforced]

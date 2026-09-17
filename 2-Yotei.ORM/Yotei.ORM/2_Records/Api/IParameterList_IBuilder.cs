@@ -1,8 +1,8 @@
 ﻿using TKey = string;
-using IItem = Yotei.ORM.IParameter;
-using IHost = Yotei.ORM.IParameterList;
+using IItem = Yotei.ORM.Records.IParameter;
+using IHost = Yotei.ORM.Records.IParameterList;
 
-namespace Yotei.ORM;
+namespace Yotei.ORM.Records;
 
 partial interface IParameterList
 {

@@ -28,3 +28,8 @@ global using Yotei.ORM.Records;
 global using Yotei.ORM.Records.Code;
 global using Yotei.ORM.Tools;
 global using Yotei.ORM.Internals;
+
+global using Yotei.ORM.Tests;
+global using Yotei.ORM.Records.Tests;
+global using Yotei.ORM.Tools.Collections.Tests;
+global using Yotei.ORM.Internals.Tests;
