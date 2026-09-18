@@ -95,6 +95,25 @@ public partial class KnownTags : IKnownTags
     // ----------------------------------------------------
 
     /// <summary>
+    /// Compares the two arrays of tags.
+    /// </summary>
+    static bool Compare(ImmutableArray<IMetadataTag> source, ImmutableArray<IMetadataTag> target)
+    {
+        if (source.Length != target.Length) return false;
+
+        for (int i = 0; i < source.Length; i++)
+        {
+            var xsource = source[i];
+            var xtarget = target[i];
+            if (!xsource.Equals(xtarget)) return false;
+        }
+
+        return true;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="other"></param>
@@ -108,19 +127,23 @@ public partial class KnownTags : IKnownTags
 
         if (IdentifierTags == null && other.IdentifierTags != null) return false;
         if (IdentifierTags != null && other.IdentifierTags == null) return false;
-        if (!IdentifierTags!.Value.SequenceEqual(other.IdentifierTags!.Value, new TagComparer())) return false;
+        if (IdentifierTags.HasValue && other.IdentifierTags.HasValue &&
+            !Compare(IdentifierTags!.Value, other.IdentifierTags!.Value)) return false;
 
         if (PrimaryKeyTag == null && other.PrimaryKeyTag != null) return false;
         if (PrimaryKeyTag != null && other.PrimaryKeyTag == null) return false;
-        if (!PrimaryKeyTag!.Equals(other.PrimaryKeyTag)) return false;
+        if (PrimaryKeyTag != null && other.PrimaryKeyTag != null &&
+            !PrimaryKeyTag!.Equals(other.PrimaryKeyTag)) return false;
 
         if (UniqueValuedTag == null && other.UniqueValuedTag != null) return false;
         if (UniqueValuedTag != null && other.UniqueValuedTag == null) return false;
-        if (!UniqueValuedTag!.Equals(other.UniqueValuedTag)) return false;
+        if (UniqueValuedTag != null && other.UniqueValuedTag != null &&
+            !UniqueValuedTag!.Equals(other.UniqueValuedTag)) return false;
 
         if (ReadOnlyTag == null && other.ReadOnlyTag != null) return false;
         if (ReadOnlyTag != null && other.ReadOnlyTag == null) return false;
-        if (!ReadOnlyTag!.Equals(other.ReadOnlyTag)) return false;
+        if (ReadOnlyTag != null && other.ReadOnlyTag != null &&
+            !ReadOnlyTag!.Equals(other.ReadOnlyTag)) return false;
 
         return true;
     }
@@ -162,19 +185,6 @@ public partial class KnownTags : IKnownTags
 
     // ----------------------------------------------------
 
-    readonly struct TagComparer : IEqualityComparer<IMetadataTag>
-    {
-        public bool Equals(IMetadataTag? x, IMetadataTag? y)
-        {
-            if (x is null && y is null) return true;
-            if (x is null || y is null) return false;
-            if (ReferenceEquals(x, y)) return true;
-            return x.Equals(y);
-        }
-        public int GetHashCode(
-            [DisallowNull] IMetadataTag obj) => throw new NotImplementedException();
-    }
-
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
@@ -189,16 +199,18 @@ public partial class KnownTags : IKnownTags
         init
         {
             if (value is null) { field = null; return; }
-            if (field.HasValue &&
-                field.Value.SequenceEqual(value.Value, new TagComparer())) return;
+            if (value.Value.Length == 0) { field = null; return; }
+            if (field.HasValue && Compare(field.Value, value.Value)) return;
 
             field = null; foreach (var tag in value)
             {
+                ArgumentNullException.ThrowIfNull(tag);
+
                 if (IgnoreCase != tag.IgnoreCase) throw new ArgumentException(
                     "IgnoreCase value of the given tag is not the same as this instance's one")
                     .WithData(tag);
 
-                if (this.Find(tag, out _)) throw new DuplicateException(
+                if (this.ContainsAny(tag)) throw new DuplicateException(
                     "This instance already carries a name from the given tag.")
                     .WithData(tag)
                     .WithData(this);
@@ -224,7 +236,7 @@ public partial class KnownTags : IKnownTags
                 .WithData(value);
 
             field = null;
-            if (this.Find(value, out _)) throw new DuplicateException(
+            if (this.ContainsAny(value)) throw new DuplicateException(
                 "This instance already carries a name from the given tag.")
                 .WithData(value)
                 .WithData(this);
@@ -249,7 +261,7 @@ public partial class KnownTags : IKnownTags
                 .WithData(value);
 
             field = null;
-            if (this.Find(value, out _)) throw new DuplicateException(
+            if (this.ContainsAny(value)) throw new DuplicateException(
                 "This instance already carries a name from the given tag.")
                 .WithData(value)
                 .WithData(this);
@@ -274,7 +286,7 @@ public partial class KnownTags : IKnownTags
                 .WithData(value);
 
             field = null;
-            if (this.Find(value, out _)) throw new DuplicateException(
+            if (this.ContainsAny(value)) throw new DuplicateException(
                 "This instance already carries a name from the given tag.")
                 .WithData(value)
                 .WithData(this);

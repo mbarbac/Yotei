@@ -53,4 +53,9 @@ public partial interface IEngine : IEquatable<IEngine>
     /// <br/> The value of this property must be a valid character.
     /// </summary>
     [With] char RightTerminator { get; }
+
+    /// <summary>
+    /// The collection of well-known tags of this instance.
+    /// </summary>
+    [With] IKnownTags KnownTags { get; }
 }

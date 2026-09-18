@@ -49,62 +49,64 @@ public partial interface IKnownTags : IEnumerable<IMetadataTag>, IEquatable<IKno
 }
 
 // ========================================================
-public static class EnumerableIMetadataTagsExtensions
+public static class EnumerableMetadataTagsExtensions
 {
     /// <summary>
-    /// Finds the first tag in the collection that contains the given name (alias).
+    /// Determines if the collection has a tag that contains the given name (alias).
     /// </summary>
     /// <param name="source"></param>
     /// <param name="name"></param>
-    /// <param name="tag"></param>
     /// <returns></returns>
-    static public bool Find(
+    public static bool Contains(
         this IEnumerable<IMetadataTag> source,
-        string name,
-        [NotNullWhen(true)] out IMetadataTag? tag)
+        string name)
+        => source.FindTags(name).Count > 0;
+
+    /// <summary>
+    /// Determines if the collection has a tag that contains any of the given names (aliases).
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="range"></param>
+    /// <returns></returns>
+    public static bool ContainsAny(
+        this IEnumerable<IMetadataTag> source,
+        IEnumerable<string> range)
+        => source.FindTags(range).Count > 0;
+
+    /// <summary>
+    /// Returns a list with the tags from the collection that contains the given name (alias).
+    /// </summary>
+    /// <param name="source"></param>
+    /// <param name="name"></param>
+    /// <returns></returns>
+    public static List<IMetadataTag> FindTags(
+        this IEnumerable<IMetadataTag> source,
+        string name)
     {
         ArgumentNullException.ThrowIfNull(source);
         name = name.NotNullNotEmpty(trim: true);
 
-        foreach (var temp in source)
-        {
-            if (temp.Contains(name))
-            {
-                tag = temp;
-                return true;
-            }
-        }
-
-        tag = null;
-        return false;
+        List<IMetadataTag> tags = [];
+        foreach (var tag in source) if (tag.Contains(name)) tags.Add(tag);
+        return tags;
     }
 
     /// <summary>
-    /// Finds the tags in the collection containing any of the names (aliases) in the given
-    /// range.
+    /// Returns a list with the tags from the collection that contains any of the the given names
+    /// (aliases).
     /// </summary>
     /// <param name="source"></param>
-    /// <param name="names"></param>
-    /// <param name="tags"></param>
+    /// <param name="range"></param>
     /// <returns></returns>
-    static public bool Find(
+    public static List<IMetadataTag> FindTags(
         this IEnumerable<IMetadataTag> source,
-        IEnumerable<string> names,
-        [NotNullWhen(true)] out List<IMetadataTag> tags)
+        IEnumerable<string> range)
     {
         ArgumentNullException.ThrowIfNull(source);
-        var done = false;
-        tags = [];
+        ArgumentNullException.ThrowIfNull(range);
 
-        foreach (var name in names)
-        {
-            if (source.Find(name, out var tag))
-            {
-                if (!tags.Contains(tag)) tags.Add(tag);
-                done = true;
-            }
-        }
-
-        return done;
+        List<IMetadataTag> tags = [];
+        foreach (var tag in source) if (tag.ContainsAny(range)) tags.Add(tag);
+        return tags;
     }
 }

@@ -13,11 +13,18 @@ public static class StringExtensions
     /// <param name="trim"></param>
     /// <returns></returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static string? NullWhenEmpty(this string? source, bool trim) => trim switch
+    public static string? NullWhenEmpty(this string? source, bool trim)
     {
-        true => string.IsNullOrWhiteSpace(source) ? null : (source?.Trim() ?? null),
-        false => string.IsNullOrEmpty(source) ? null : source,
-    };
+        if (source != null)
+        {
+            if (trim &&
+                source.Length > 0 && (
+                source.StartsWith(' ') || source.EndsWith(' ')))
+                source = source.Trim();
+        }
+
+        return string.IsNullOrEmpty(source) ? null : source;
+    }
 
     // ----------------------------------------------------
 

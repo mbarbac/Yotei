@@ -16,7 +16,6 @@ public partial class Engine : IEngine
     public const bool USETERMINATORS = true;
     public const char LEFTTERMINATOR = '[';
     public const char RIGHTTERMINATOR = ']';
-
     public const bool IGNORETAGSCASE = false; // To follow standard CLR behavior
 
     static char ValidateTerminator(char value)
@@ -24,14 +23,6 @@ public partial class Engine : IEngine
         if (value <= ' ') throw new ArgumentException("Invalid terminator.").WithData(value);
         if (value == '.') throw new ArgumentException("Invalid terminator.").WithData(value);
         return value;
-    }
-
-    static void ValidateTags(ImmutableArray<string> values)
-    {
-        foreach (var value in values)
-            if (string.IsNullOrWhiteSpace(value))
-                throw new ArgumentException("A tag name is null, empty, or white spaces only.")
-                .WithData(value);
     }
 
     // ----------------------------------------------------
@@ -49,24 +40,26 @@ public partial class Engine : IEngine
         UseTerminators = USETERMINATORS;
         LeftTerminator = LEFTTERMINATOR;
         RightTerminator = RIGHTTERMINATOR;
+        KnownTags = new KnownTags(IGNORETAGSCASE);
     }
 
     /// <summary>
     /// Copy constructor.
     /// </summary>
-    /// <param name="source"></param>
-    protected Engine(Engine source)
+    /// <param name="other"></param>
+    protected Engine(Engine other)
     {
-        ArgumentNullException.ThrowIfNull(source);
+        ArgumentNullException.ThrowIfNull(other);
 
-        IgnoreCase = source.IgnoreCase;
-        NullValueLiteral = source.NullValueLiteral;
-        PositionalParameters = source.PositionalParameters;
-        ParameterPrefix = source.ParameterPrefix;
-        NativePaging = source.NativePaging;
-        UseTerminators = source.UseTerminators;
-        LeftTerminator = source.LeftTerminator;
-        RightTerminator = source.RightTerminator;
+        IgnoreCase = other.IgnoreCase;
+        NullValueLiteral = other.NullValueLiteral;
+        PositionalParameters = other.PositionalParameters;
+        ParameterPrefix = other.ParameterPrefix;
+        NativePaging = other.NativePaging;
+        UseTerminators = other.UseTerminators;
+        LeftTerminator = other.LeftTerminator;
+        RightTerminator = other.RightTerminator;
+        KnownTags = other.KnownTags;
     }
 
     /// <summary>
@@ -93,7 +86,8 @@ public partial class Engine : IEngine
             NativePaging == other.NativePaging &&
             UseTerminators == other.UseTerminators &&
             LeftTerminator == other.LeftTerminator &&
-            RightTerminator == other.RightTerminator;
+            RightTerminator == other.RightTerminator &&
+            KnownTags.Equals(other.KnownTags);
     }
 
     /// <summary>
@@ -118,6 +112,7 @@ public partial class Engine : IEngine
         code = HashCode.Combine(code, UseTerminators);
         code = HashCode.Combine(code, LeftTerminator);
         code = HashCode.Combine(code, RightTerminator);
+        code = HashCode.Combine(code, KnownTags);
         return code;
     }
 
@@ -168,4 +163,9 @@ public partial class Engine : IEngine
     /// <inheritdoc/>
     /// </summary>
     public char RightTerminator { get; init => field = ValidateTerminator(value); }
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public IKnownTags KnownTags { get; init => field = value.ThrowWhenNull(); }
 }
