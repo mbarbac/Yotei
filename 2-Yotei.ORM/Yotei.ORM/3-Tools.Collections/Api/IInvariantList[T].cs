@@ -207,7 +207,7 @@ public partial interface IInvariantList<T>
     IInvariantList<T> RemoveRange(int index, int count);
 
     /// <summary>
-    /// Returns a copy of this instance where the first ocurrence of the given vale, if any, has
+    /// Returns a copy of this instance where the first ocurrence of the given value, if any, has
     /// been removed.
     /// </summary>
     /// <param name="value"></param>
@@ -215,7 +215,7 @@ public partial interface IInvariantList<T>
     IInvariantList<T> Remove(T value);
 
     /// <summary>
-    /// Returns a copy of this instance where the last ocurrence of the given vale, if any, has
+    /// Returns a copy of this instance where the last ocurrence of the given value, if any, has
     /// been removed.
     /// </summary>
     /// <param name="value"></param>

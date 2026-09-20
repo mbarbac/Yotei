@@ -1,6 +1,6 @@
 ﻿using StringSpan = System.ReadOnlySpan<char>;
 
-namespace Yotei.ORM.Code;
+namespace Yotei.ORM;
 
 // ========================================================
 /// <summary>

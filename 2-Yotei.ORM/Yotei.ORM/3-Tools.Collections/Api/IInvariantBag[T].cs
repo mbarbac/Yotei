@@ -86,7 +86,7 @@ public partial interface IInvariantBag<T> : IReadOnlyCollection<T>, ICollection
     IInvariantBag<T> AddRange(IEnumerable<T> range);
 
     /// <summary>
-    /// Returns a copy of this instance where the first ocurrence of the given vale, if any, has
+    /// Returns a copy of this instance where the first ocurrence of the given value, if any, has
     /// been removed.
     /// </summary>
     /// <param name="value"></param>
