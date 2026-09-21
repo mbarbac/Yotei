@@ -6,7 +6,8 @@ partial interface IIdentifier
     /// <summary>
     /// Represents a builder of <see cref="IIdentifier"/> instances.
     /// </summary>
-    public partial interface IBuilder
+    [Cloneable]
+    public partial interface IBuilder : IEnumerable<string?>
     {
         /// <summary>
         /// <inheritdoc cref="IIdentifier.ToString(bool, bool)"/>
@@ -20,7 +21,7 @@ partial interface IIdentifier
         /// Returns a new instance based upon the contents of this builder.
         /// </summary>
         /// <returns></returns>
-        IBuilder ToInstance();
+        IIdentifier ToInstance();
 
         // ------------------------------------------------
 
@@ -35,11 +36,12 @@ partial interface IIdentifier
         string? Value { get; }
 
         /// <summary>
-        /// <inheritdoc cref="IIdentifier.Enumerate(bool)"/>
+        /// <inheritdoc cref="IIdentifier.Enumerate(bool, bool)"/>
         /// </summary>
+        /// <param name="reduce"></param>
         /// <param name="useTerminators"></param>
         /// <returns></returns>
-        public IEnumerable<string?> Enumerate(bool useTerminators);
+        IEnumerable<string?> Enumerate(bool reduce, bool useTerminators);
 
         /// <summary>
         /// <inheritdoc cref="IIdentifier.Count"/>
@@ -51,7 +53,7 @@ partial interface IIdentifier
         /// </summary>
         /// <param name="index"></param>
         /// <returns></returns>
-        public string this[int index] { get; }
+        string? this[int index] { get; }
 
         /// <summary>
         /// <inheritdoc cref="IIdentifier.this[int, bool]"/>
@@ -59,7 +61,7 @@ partial interface IIdentifier
         /// <param name="index"></param>
         /// <param name="useTerminators"></param>
         /// <returns></returns>
-        public string this[int index, bool useTerminators] { get; }
+        string? this[int index, bool useTerminators] { get; }
 
         /// <summary>
         /// <inheritdoc cref="IIdentifier.Contains(string?)"/>
@@ -117,6 +119,11 @@ partial interface IIdentifier
         /// <returns></returns>
         List<int> IndexesOf(Predicate<string?> predicate);
 
+        /// <summary>
+        /// <inheritdoc cref="IIdentifier.Trim"/>
+        /// </summary>
+        void Trim();
+
         // ----------------------------------------------------
 
         /// <summary>
@@ -126,31 +133,25 @@ partial interface IIdentifier
         int Reduce();
 
         /// <summary>
-        /// Returns a copy of this instance with the requested number of parts, starting from the
-        /// given index.
-        /// </summary>
-        /// <param name="index"></param>
-        /// <param name="count"></param>
-        /// <returns>A new instance, or this one if no changes were made.</returns>
-        IBuilder GetRange(int index, int count);
-
-        /// <summary>
         /// Replaces the part at the given index by the new given one.
+        /// <br/> If the value is a multi-part one, its parts are individually inserted.
         /// </summary>
         /// <param name="index"></param>
-        /// <param name="part"></param>
+        /// <param name="value"></param>
         /// <returns>The number of changes made.</returns>
-        int Replace(int index, string? part);
+        int Replace(int index, string? value);
 
         /// <summary>
         /// Adds to this instance the given part.
+        /// <br/> If the value is a multi-part one, then its parts are used instead.
         /// </summary>
-        /// <param name="part"></param>
+        /// <param name="value"></param>
         /// <returns>The number of changes made.</returns>
-        int Add(string? part);
+        int Add(string? value);
 
         /// <summary>
         /// Adds to this instance the parts from the given range.
+        /// <br/> If any value is a multi-part one, then its parts are used instead.
         /// </summary>
         /// <param name="range"></param>
         /// <returns>The number of changes made.</returns>
@@ -158,14 +159,16 @@ partial interface IIdentifier
 
         /// <summary>
         /// Inserts into this instance the given part at the given index.
+        /// <br/> If the value is a multi-part one, then its parts are used instead.
         /// </summary>
         /// <param name="index"></param>
-        /// <param name="part"></param>
+        /// <param name="value"></param>
         /// <returns>The number of changes made.</returns>
-        int Insert(int index, string? part);
+        int Insert(int index, string? value);
 
         /// <summary>
         /// Inserts into this instance the parts from the given range starting at the given index.
+        /// <br/> If any part is a multi-part one, then its parts are used instead.
         /// </summary>
         /// <param name="index"></param>
         /// <param name="range"></param>

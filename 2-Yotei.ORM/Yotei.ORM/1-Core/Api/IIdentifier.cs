@@ -6,7 +6,8 @@
 /// missed one.
 /// <br/> Instances of this type are intended to be immutable ones.
 /// </summary>
-public partial interface IIdentifier : IEquatable<IIdentifier>
+[Cloneable]
+public partial interface IIdentifier : IEnumerable<string?>, IEquatable<IIdentifier>
 {
     /// <summary>
     /// Returns an alternate string representation of this instance where the null or empty head
@@ -38,13 +39,14 @@ public partial interface IIdentifier : IEquatable<IIdentifier>
     string? Value { get; }
 
     /// <summary>
-    /// Enumerates the dot-separated parts contained by this instance. Each will be returned
-    /// wrapped or not with the engine's terminators if it uses them and if such was explicitly
-    /// requested.
+    /// Enumerates the dot-separated parts contained by this instance where the null or empty
+    /// heading ones are removed (reduced) if requested, and where the remaining oine are wrapepd
+    /// or not with the engine's terminators if it uses them and if such was explicitly requested.
     /// </summary>
+    /// <param name="reduce"></param>
     /// <param name="useTerminators"></param>
     /// <returns></returns>
-    public IEnumerable<string?> Enumerate(bool useTerminators);
+    IEnumerable<string?> Enumerate(bool reduce, bool useTerminators);
 
     /// <summary>
     /// The number of dot-separared parts in this identifier.
@@ -57,7 +59,7 @@ public partial interface IIdentifier : IEquatable<IIdentifier>
     /// </summary>
     /// <param name="index"></param>
     /// <returns></returns>
-    public string this[int index] { get; }
+    string? this[int index] { get; }
 
     /// <summary>
     /// The value of the dot-separated part of this identifier at the index-th position, wrapped
@@ -66,10 +68,11 @@ public partial interface IIdentifier : IEquatable<IIdentifier>
     /// <param name="index"></param>
     /// <param name="useTerminators"></param>
     /// <returns></returns>
-    public string this[int index, bool useTerminators] { get; }
+    string? this[int index, bool useTerminators] { get; }
 
     /// <summary>
     /// Determines if this instance contains the given part, or not.
+    /// <br/> Multi-part values are not allowed.
     /// </summary>
     /// <param name="part"></param>
     /// <returns></returns>
@@ -78,6 +81,7 @@ public partial interface IIdentifier : IEquatable<IIdentifier>
     /// <summary>
     /// Determines the index of the first ocurrence of the given part in this instance, or -1
     /// if any.
+    /// <br/> Multi-part values are not allowed.
     /// </summary>
     /// <param name="part"></param>
     /// <returns></returns>
@@ -86,6 +90,7 @@ public partial interface IIdentifier : IEquatable<IIdentifier>
     /// <summary>
     /// Determines the index of the last ocurrence of the given part in this instance, or -1
     /// if any.
+    /// <br/> Multi-part values are not allowed.
     /// </summary>
     /// <param name="part"></param>
     /// <returns></returns>
@@ -93,6 +98,7 @@ public partial interface IIdentifier : IEquatable<IIdentifier>
 
     /// <summary>
     /// Determines the indexes of all the ocurrences of the given part in this instance.
+    /// <br/> Multi-part values are not allowed.
     /// </summary>
     /// <param name="part"></param>
     /// <returns></returns>
@@ -129,6 +135,11 @@ public partial interface IIdentifier : IEquatable<IIdentifier>
     /// <returns></returns>
     List<int> IndexesOf(Predicate<string?> predicate);
 
+    /// <summary>
+    /// Trims the internal data structures of this instance.
+    /// </summary>
+    void Trim();
+
     // ----------------------------------------------------
 
     /// <summary>
@@ -150,22 +161,25 @@ public partial interface IIdentifier : IEquatable<IIdentifier>
     /// <summary>
     /// Returns a copy of this instance where the part at the given index has been replaced by
     /// the new given one.
+    /// <br/> If the value is a multi-part one, its parts are individually inserted.
     /// </summary>
     /// <param name="index"></param>
-    /// <param name="part"></param>
+    /// <param name="value"></param>
     /// <returns>A new copy, or this instance if no changes have been made.</returns>
-    IIdentifier Replace(int index, string? part);
+    IIdentifier Replace(int index, string? value);
 
     /// <summary>
     /// Returns a copy of this instance where the given part has been added to it.
+    /// <br/> If the value is a multi-part one, then its parts are used instead.
     /// </summary>
-    /// <param name="part"></param>
+    /// <param name="value"></param>
     /// <returns>A new copy, or this instance if no changes have been made.</returns>
-    IIdentifier Add(string? part);
+    IIdentifier Add(string? value);
 
     /// <summary>
     /// Returns a copy of this instance where the parts from the given range have been added
     /// to it.
+    /// <br/> If any part is a multi-part one, then its parts are used instead.
     /// </summary>
     /// <param name="range"></param>
     /// <returns>A new copy, or this instance if no changes have been made.</returns>
@@ -174,15 +188,17 @@ public partial interface IIdentifier : IEquatable<IIdentifier>
     /// <summary>
     /// Returns a copy of this instance where the given part has been added inserted into it at
     /// the given index.
+    /// <br/> If the value is a multi-part one, then its parts are used instead.
     /// </summary>
     /// <param name="index"></param>
-    /// <param name="part"></param>
+    /// <param name="value"></param>
     /// <returns>A new copy, or this instance if no changes have been made.</returns>
-    IIdentifier Insert(int index, string? part);
+    IIdentifier Insert(int index, string? value);
 
     /// <summary>
     /// Returns a copy of this instance where the parts from the given range have been inserted
     /// into it, starting at the given index.
+    /// <br/> If any part is a multi-part one, then its parts are used instead.
     /// </summary>
     /// <param name="index"></param>
     /// <param name="range"></param>
