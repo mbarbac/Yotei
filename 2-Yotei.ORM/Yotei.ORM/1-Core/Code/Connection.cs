@@ -33,6 +33,7 @@ public abstract partial class Connection : DisposableClass, IConnection
         Retries = other.Retries;
         RetryInterval = other.RetryInterval;
         LockTimeout = other.LockTimeout;
+        foreach (var item in other.ToDbConverters) ToDbConverters.Add(item);
     }
 
     /// <summary>
@@ -333,4 +334,11 @@ public abstract partial class Connection : DisposableClass, IConnection
         await Transaction.StartAsync(token).ConfigureAwait(false);
         return Transaction;
     }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public IValueConverterList ToDbConverters { get; } = new ValueConverterList();
 }

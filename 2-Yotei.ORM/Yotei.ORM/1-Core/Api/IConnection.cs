@@ -80,4 +80,11 @@ public partial interface IConnection : IAsyncDisposableEx
     /// <param name="token"></param>
     /// <returns></returns>
     ValueTask<ITransaction> StartTransactionAsync(CancellationToken token = default);
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// The collection of converters from application-level values to database-level ones.
+    /// </summary>
+    IValueConverterList ToDbConverters { get; }
 }
