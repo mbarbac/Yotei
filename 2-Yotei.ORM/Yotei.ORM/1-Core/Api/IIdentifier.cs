@@ -46,6 +46,8 @@ public partial interface IIdentifier : IEnumerable<string?>, IEquatable<IIdentif
     /// <summary>
     /// Gets the value associated with this instance, or null if it represents an empty or missed
     /// one. If not null, this value includes its null or empty heading parts.
+    /// <br/> An instance with a null value may not be an empty one, carrying several null or empty
+    /// parts.
     /// </summary>
     string? Value { get; }
 
