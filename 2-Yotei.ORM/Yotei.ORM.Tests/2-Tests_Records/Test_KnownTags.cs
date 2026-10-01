@@ -1,6 +1,4 @@
-﻿using Xunit.Internal;
-
-namespace Yotei.ORM.Records.Tests;
+﻿namespace Yotei.ORM.Records.Tests;
 
 // ========================================================
 //[Enforced]
