@@ -56,13 +56,15 @@ public partial interface ISchemaEntry : IEnumerable<IMetadataItem>, IEquatable<I
     IEngine Engine { get; }
 
     /// <summary>
-    /// Gets the number of metadata entries in this instance.
+    /// Gets the number of actual metadata entries in this instance, which may not be the same
+    /// as the number of well-known properties.
     /// </summary>
     int Count { get; }
 
     /// <summary>
     /// Gets the metadata value carried by the entry whose metadata name is given, or throws an
-    /// exception if such entry does not exist yet.
+    /// exception if such entry does not exist yet (unless it is associated with a well-known,
+    /// returning <see langword="null"/> in this case).
     /// </summary>
     /// <param name="name"></param>
     /// <returns></returns>
@@ -84,8 +86,9 @@ public partial interface ISchemaEntry : IEnumerable<IMetadataItem>, IEquatable<I
     bool Contains(IEnumerable<string> names);
 
     /// <summary>
-    /// Returns the unique metadata entry in this collection with the given metadata name,
-    /// or null if such cannot be found.
+    /// Returns the unique metadata entry in this collection with the given metadata name, or null
+    /// if such cannot be found. If several entries are found then an exception is thrown.
+    /// 
     /// </summary>
     /// <param name="name"></param>
     /// <returns></returns>
