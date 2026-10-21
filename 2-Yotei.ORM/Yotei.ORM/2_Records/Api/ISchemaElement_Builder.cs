@@ -48,7 +48,7 @@ partial interface ISchemaElement
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        object? this[string name] { get; }
+        object? this[string name] { get; set; }
 
         /// <summary>
         /// <inheritdoc cref="ISchemaElement.Contains(string)"/>
@@ -58,7 +58,6 @@ partial interface ISchemaElement
         bool Contains(string name);
 
         /// <summary>
-        /// 
         /// <inheritdoc cref="ISchemaElement.Contains(IEnumerable{string})"/>
         /// </summary>
         /// <param name="names"></param>
@@ -66,7 +65,6 @@ partial interface ISchemaElement
         bool Contains(IEnumerable<string> names);
 
         /// <summary>
-        /// 
         /// <inheritdoc cref="ISchemaElement.Find(string)"/>
         /// </summary>
         /// <param name="name"></param>

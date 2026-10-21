@@ -12,27 +12,27 @@ public partial interface ISchemaElement : IEnumerable<IMetadataItem>, IEquatable
     /// The identifier by which this schema element is known, or null if this information is not
     /// available. Elements with no identifier are not considered valid ones.
     /// </summary>
-    [With] IIdentifier? Identifier { get; init; }
+    [With] IIdentifier? Identifier { get; }
 
     /// <summary>
     /// Whether this schema element is a primary key one (or part of a primary key group), or
     /// null if this information is not available. Only one group per schema descriptor is
     /// supported.
     /// </summary>
-    [With] bool? IsPrimaryKey { get; init; }
+    [With] bool? IsPrimaryKey { get; }
 
     /// <summary>
     /// Whether this schema element is a unique valued one (or part of a unique valued group), or
     /// null if this information is not available. Only one group per schema descriptor is
     /// supported.
     /// </summary>
-    [With] bool? IsUniqueValued { get; init; }
+    [With] bool? IsUniqueValued { get; }
 
     /// <summary>
     /// Whether this schema element is a read only one, or null if this information is not
     /// available.
     /// </summary>
-    [With] bool? IsReadOnly { get; init; }
+    [With] bool? IsReadOnly { get; }
 
     // ----------------------------------------------------
 
