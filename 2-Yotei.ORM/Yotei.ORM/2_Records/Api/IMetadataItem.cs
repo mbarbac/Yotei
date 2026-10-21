@@ -9,8 +9,8 @@
 public partial interface IMetadataItem : IEquatable<IMetadataItem>
 {
     /// <summary>
-    /// Determines if this instance shall be considered equal to the other given one, using
-    /// the given <paramref name="ignoreNameCase"/> value to compare the names.
+    /// Determines if this instance shall be considered equal to the other given one, using the
+    /// given <paramref name="ignoreNameCase"/> value to compare the names.
     /// </summary>
     /// <param name="other"></param>
     /// <param name="ignoreNameCase"></param>
