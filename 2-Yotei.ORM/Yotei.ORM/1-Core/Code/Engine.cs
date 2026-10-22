@@ -16,7 +16,7 @@ public partial class Engine : IEngine
     public const bool USETERMINATORS = true;
     public const char LEFTTERMINATOR = '[';
     public const char RIGHTTERMINATOR = ']';
-    public const bool IGNORETAGSCASE = true; // To follow standard metadata behavior
+    public const bool IGNORETAGSCASE = false; // To follow standard CLR behavior
 
     static char ValidateTerminator(char value)
     {

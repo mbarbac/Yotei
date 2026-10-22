@@ -11,6 +11,14 @@
 public partial interface IIdentifier : IEnumerable<string?>, IEquatable<IIdentifier>
 {
     /// <summary>
+    /// <inheritdoc cref="object.ToString"/> This method DOES include any null or empty heading
+    /// parts carried by this instance. If this was not the intention, please either use the
+    /// <see cref="Value"/> property, or the <see cref="ToString(bool, bool)"/> method.
+    /// </summary>
+    /// <returns></returns>
+    string ToString();
+
+    /// <summary>
     /// Returns an alternate string representation of this instance where the null or empty head
     /// parts may have been removed (reduced form), and the remaining ones ar wrapped or not with
     /// the engine's terminators if used and if requested explicitly.
@@ -45,9 +53,8 @@ public partial interface IIdentifier : IEnumerable<string?>, IEquatable<IIdentif
 
     /// <summary>
     /// Gets the value associated with this instance, or null if it represents an empty or missed
-    /// one. If not null, this value includes its null or empty heading parts.
-    /// <br/> An instance with a null value may not be an empty one, carrying several null or empty
-    /// parts.
+    /// one. Even if it is not a null one, the value of this property DOES NOT include its null
+    /// heading parts. If such is needed, please use <see cref="ToString(bool, bool)"/>.
     /// </summary>
     string? Value { get; }
 

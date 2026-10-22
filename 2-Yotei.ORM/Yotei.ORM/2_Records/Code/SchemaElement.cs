@@ -83,15 +83,14 @@ public partial class SchemaElement : ISchemaElement
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override string ToString() => _ToString ??= Items.ToString();
-    string? _ToString;
+    public override string ToString() => Items.ToString();
 
     /// <summary>
     /// Returns a string representation of this instance for DEBUG purposes.
     /// </summary>
     /// <param name="count"></param>
     /// <returns></returns>
-    public virtual string ToString(int count) => Items.ToString(count);
+    public virtual string ToDebugString(int count) => Items.ToDebugString(count);
 
     /// <summary>
     /// <inheritdoc/>
@@ -118,20 +117,21 @@ public partial class SchemaElement : ISchemaElement
         if (!IsUniqueValued.EqualsEx(other.IsUniqueValued)) return false;
         if (!IsReadOnly.EqualsEx(other.IsReadOnly)) return false;
 
-        if (Count != other.Count) return false;
-        var temps = other.ToList();
-        try
+        if (Count != other.Count) return false;        
+        var temp = (Builder)other.ToBuilder();
+        foreach (var item in Items)
         {
-            while (temps.Count > 0)
-            {
-                var temp = temps[0];
-                var item = Find(temp.Name);
-                if (item is null) return false;
-                if (!item.Value.EqualsEx(temp.Value)) return false;
-                temps.RemoveAt(0);
-            }
+            var indexes = temp.IndexesOf([item.Name]);
+            if (indexes.Count == 0) return false;
+            if (indexes.Count > 1) return false;
+
+            var value = temp[item.Name];
+            if (!item.Value.EqualsEx(value)) return false;
+
+            temp.Remove(item.Name);
         }
-        catch { return false; } // Intercepting Find() exceptions...
+        if (temp.Count != 0) return false;
+
         return true;
     }
 

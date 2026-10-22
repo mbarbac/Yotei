@@ -38,10 +38,10 @@ partial class Identifier
         }
 
         /// <summary>
-        /// <inheritdoc/>
+        /// <inheritdoc cref="IIdentifier.ToString()"/>
         /// </summary>
         /// <returns></returns>
-        public override string ToString() => ToString(false, true);
+        public override string ToString() => ToString(reduce: false, useTerminators: true);
 
         /// <summary>
         /// <inheritdoc/>
@@ -122,7 +122,7 @@ partial class Identifier
         {
             get
             {
-                var parts = Enumerate(false, true);
+                var parts = Enumerate(reduce: true, useTerminators: true);
                 return
                     parts.All(x => x == null) ? null :
                     string.Join('.', parts);
@@ -313,7 +313,6 @@ partial class Identifier
 
             Items.Add(parts[0]);
             return 1;
-
         }
 
         /// <summary>

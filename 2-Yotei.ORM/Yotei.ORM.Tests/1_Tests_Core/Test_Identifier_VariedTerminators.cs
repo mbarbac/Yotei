@@ -62,7 +62,6 @@ public static class Test_Identifier_Varied_Terminators
         Assert.Null(chain[2]); Assert.Null(chain[2, true]);
         Assert.Null(chain.Value);
         Assert.Equal("..", chain.ToString());
-        Assert.Equal("", chain.ToString(true, true));
 
         chain = new Identifier(engine, " [ ] . [ ] ");
         Assert.Equal(2, chain.Count);
@@ -70,7 +69,6 @@ public static class Test_Identifier_Varied_Terminators
         Assert.Null(chain[1]); Assert.Null(chain[1, true]);
         Assert.Null(chain.Value);
         Assert.Equal(".", chain.ToString());
-        Assert.Equal("", chain.ToString(true, true));
     }
 
     //[Enforced]
@@ -84,9 +82,8 @@ public static class Test_Identifier_Varied_Terminators
         Assert.Null(chain[0]); Assert.Null(chain[0, true]);
         Assert.Equal("[two]", chain[1]); Assert.Equal("two", chain[1, false]);
         Assert.Null(chain[2]); Assert.Null(chain[2, true]);
-        Assert.Equal(".[two].", chain.Value);
+        Assert.Equal("[two].", chain.Value);
         Assert.Equal(".[two].", chain.ToString());
-        Assert.Equal("[two].", chain.ToString(true, true));
 
         chain = new Identifier(engine, "[ aa . bb ]");
         Assert.Single(chain);
@@ -107,9 +104,8 @@ public static class Test_Identifier_Varied_Terminators
         Assert.Null(chain[1]); Assert.Null(chain[1, true]);
         Assert.Equal("[three]", chain[2]); Assert.Equal("three", chain[2, false]);
         Assert.Null(chain[3]); Assert.Null(chain[3, true]);
-        Assert.Equal("..[three].", chain.Value);
+        Assert.Equal("[three].", chain.Value);
         Assert.Equal("..[three].", chain.ToString());
-        Assert.Equal("[three].", chain.ToString(true, true));
 
         chain = new Identifier(engine, "one", "one");
         Assert.Equal(2, chain.Count);
@@ -149,9 +145,8 @@ public static class Test_Identifier_Varied_Terminators
         Assert.Equal("[bb]", target[2]);
         Assert.Equal("[cc]", target[3]);
         Assert.Null(target[4]);
-        Assert.Equal(".[aa].[bb].[cc].", target.Value);
+        Assert.Equal("[aa].[bb].[cc].", target.Value);
         Assert.Equal(".[aa].[bb].[cc].", target.ToString());
-        Assert.Equal("[aa].[bb].[cc].", target.ToString(true, true));
     }
 
     // ----------------------------------------------------
@@ -279,9 +274,8 @@ public static class Test_Identifier_Varied_Terminators
         Assert.Null(target[0, false]);
         Assert.Null(target[1, false]);
         Assert.Equal("cc", target[2, false]);
-        Assert.Equal("..[cc]", target.Value);
+        Assert.Equal("[cc]", target.Value);
         Assert.Equal("..[cc]", target.ToString());
-        Assert.Equal("[cc]", target.ToString(true, true));
     }
 
     //[Enforced]
@@ -317,9 +311,8 @@ public static class Test_Identifier_Varied_Terminators
         Assert.Equal(2, target.Count);
         Assert.Null(target[0, false]);
         Assert.Equal("two", target[1, false]);
-        Assert.Equal(".[two]", target.Value);
+        Assert.Equal("[two]", target.Value);
         Assert.Equal(".[two]", target.ToString());
-        Assert.Equal("[two]", target.ToString(true, true));
     }
 
     //[Enforced]
@@ -375,9 +368,8 @@ public static class Test_Identifier_Varied_Terminators
         Assert.Equal(2, target.Count);
         Assert.Null(target[0, false]);
         Assert.Equal("two", target[1, false]);
-        Assert.Equal(".[two]", target.Value);
+        Assert.Equal("[two]", target.Value);
         Assert.Equal(".[two]", target.ToString());
-        Assert.Equal("[two]", target.ToString(true, true));
 
         try { source.Insert(1, "any"); Assert.Fail(); }
         catch (ArgumentOutOfRangeException) { }

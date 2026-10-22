@@ -37,7 +37,7 @@ public sealed partial class Identifier : IIdentifier
     }
 
     /// <summary>
-    /// <inheritdoc/>
+    /// <inheritdoc cref="IIdentifier.ToString()"/>
     /// </summary>
     /// <returns></returns>
     public override string ToString() => _ToString ??= Items.ToString();
@@ -85,17 +85,15 @@ public sealed partial class Identifier : IIdentifier
     {
         if (ReferenceEquals(this, other)) return true;
         if (other is null) return false;
-        if (other is not IIdentifier valid) return false;
 
         if (!Engine.Equals(other.Engine)) return false;
 
-        if (Count != valid.Count) return false;
-        for (int i = 0; i < Count; i++)
-        {
-            var item = Items[i];
-            var temp = other[i];
-            if (string.Compare(item, temp, Engine.IgnoreCase) != 0) return false;
-        }
+        var reduce = true;
+        var useTerminators = false;
+        var source = this.ToString(reduce, useTerminators);
+        var target = other.ToString(reduce, useTerminators);
+        if (string.Compare(source, target, Engine.IgnoreCase) != 0) return false;
+
         return true;
     }
 
