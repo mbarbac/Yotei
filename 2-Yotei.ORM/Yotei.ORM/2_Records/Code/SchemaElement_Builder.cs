@@ -571,7 +571,14 @@ partial class SchemaElement
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        public int Count { get { EvaluateWellKnownProperties(); return Items.Count; } }
+        public int Count
+        {
+            get
+            {
+                EvaluateWellKnownProperties();
+                return Items.Count;
+            }
+        }
 
         /// <summary>
         /// <inheritdoc/>

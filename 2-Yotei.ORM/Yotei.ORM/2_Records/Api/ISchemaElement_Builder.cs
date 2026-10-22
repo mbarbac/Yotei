@@ -45,6 +45,9 @@ partial interface ISchemaElement
         /// The getter returns the value of the metadata item whose metadata name is given, or
         /// throws an exception if such item does not exist. The setter either creates such item,
         /// or updates the value of the existing one.
+        /// <br/> Note that the setter DOES not validate the given value being of the right type
+        /// so, for instance, when later obtaining the value of a well known property an invalid
+        /// cast exception might be thrown. As this is a builder, this is consider acceptable.
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
