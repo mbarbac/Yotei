@@ -2,8 +2,8 @@
 
 // ========================================================
 /// <summary>
-/// Represents the metadata associated with a given element in a record descriptor. As this is
-/// the equivalent of a schema's column descriptor in a relational world, hence its name.
+/// Represents the collection of metadata, and well-known properties, associated with a given
+/// record descriptor (the equivalente of a column descriptor in a relational world).
 /// </summary>
 [Cloneable]
 public partial interface ISchemaElement : IEnumerable<IMetadataItem>, IEquatable<ISchemaElement>

@@ -1,9 +1,5 @@
-
-
-TODO:
-- DbTokenVisitor
-- CommandFragment
-- RawCommand
+PENDIENTE:
+- Estoy escribiendo SchemaDescriptor, Match: necesito que IIdentifier tambien lo tenga.
 
 BUGS:
 - Parece que WithGenerator da un bug cuando la clase derivada es sealed.
