@@ -17,20 +17,28 @@ public partial class SchemaDescriptor : IHost
     /// Initializes a new empty instance.
     /// </summary>
     /// <param name="engine"></param>
-    public SchemaDescriptor(IEngine engine) => throw null;
+    public SchemaDescriptor(IEngine engine) => Engine = engine.ThrowWhenNull();
 
     /// <summary>
     /// Initializes a new instance with the elements from the given range.
     /// </summary>
     /// <param name="engine"></param>
     /// <param name="range"></param>
-    public SchemaDescriptor(IEngine engine, IEnumerable<IItem> range) => throw null;
+    public SchemaDescriptor(IEngine engine, IEnumerable<IItem> range)
+        : this(engine)
+        => Items.AddRange(range);
 
     /// <summary>
-    /// Initializes a new instance of the Builder class by copying values from an existing instance.
+    /// Copy constructor.
     /// </summary>
-    /// <param name="other">The Builder instance to copy values from.</param>
-    protected SchemaDescriptor(THost other) => throw null;
+    /// <param name="other"></param>
+    protected SchemaDescriptor(THost other)
+    {
+        ArgumentNullException.ThrowIfNull(other);
+
+        Engine = other.Engine;
+        Items.AddRange(other);
+    }
 
     // ----------------------------------------------------
 
@@ -58,25 +66,22 @@ public partial class SchemaDescriptor : IHost
     /// </summary>
     /// <param name="other"></param>
     /// <returns><inheritdoc/></returns>
-    public virtual bool Equals(IHost? other) => throw null;
-    /*{
+    public virtual bool Equals(IHost? other)
+    {
         if (ReferenceEquals(this, other)) return true;
         if (other is null) return false;
-        if (other is not IHost valid) return false;
 
         if (!Engine.Equals(other.Engine)) return false;
+        if (Count != other.Count) return false;
 
-        if (Count != valid.Count) return false;
         for (int i = 0; i < Count; i++)
         {
-            var item = this[i];
-            var temp = valid[i];
-            var same = item.Equals(temp, Engine.IgnoreCase);
-            if (!same) return false;
+            var item = Items[i];
+            var temp = other[i];
+            if (!item.Equals(temp)) return false;
         }
-
         return true;
-    }*/
+    }
 
     /// <summary>
     /// <inheritdoc/>
@@ -99,13 +104,13 @@ public partial class SchemaDescriptor : IHost
     /// <inheritdoc/>
     /// </summary>
     /// <returns><inheritdoc/></returns>
-    public override int GetHashCode() => throw null;
-    /*{
+    public override int GetHashCode()
+    {
         var code = Engine.GetHashCode();
-        code = HashCode.Combine(code, Items);
-        for (int i = 0; i < Count; i++) code = HashCode.Combine(code, this[i]);
+        code = HashCode.Combine(code, Count);
+        for (int i = 0; i < Count; i++) code = HashCode.Combine(code, Items[i]);
         return code;
-    }*/
+    }
 
     // ----------------------------------------------------
 
@@ -121,28 +126,28 @@ public partial class SchemaDescriptor : IHost
     /// </summary>
     /// <param name="identifier"></param>
     /// <returns></returns>
-    public bool Contains(string identifier) => throw null;
+    public bool Contains(string identifier) => Items.Contains(identifier);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="identifier"></param>
     /// <returns></returns>
-    public int IndexOf(string identifier) => throw null;
+    public int IndexOf(string identifier) => Items.IndexOf(identifier);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="identifier"></param>
     /// <returns></returns>
-    public int LastIndexOf(string identifier) => throw null;
+    public int LastIndexOf(string identifier) => Items.LastIndexOf(identifier);
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="identifier"></param>
     /// <returns></returns>
-    public List<int> IndexesOf(string identifier) => throw null;
+    public List<int> IndexesOf(string identifier) => Items.IndexesOf(identifier);
 
     // ----------------------------------------------------
 
@@ -151,7 +156,7 @@ public partial class SchemaDescriptor : IHost
     /// </summary>
     /// <param name="specs"></param>
     /// <returns></returns>
-    public List<int> Match(string? specs) => throw null;
+    public List<int> Match(string? specs) => Items.Match(specs);
 
     /// <summary>
     /// <inheritdoc/>
@@ -159,7 +164,8 @@ public partial class SchemaDescriptor : IHost
     /// <param name="specs"></param>
     /// <param name="unique"></param>
     /// <returns></returns>
-    public List<int> Match(string? specs, out IItem? unique) => throw null;
+    public List<int> Match(
+        string? specs, out IItem? unique) => Items.Match(specs, out unique);
 
     // ----------------------------------------------------
 
@@ -168,19 +174,34 @@ public partial class SchemaDescriptor : IHost
     /// </summary>
     /// <param name="identifier"></param>
     /// <returns><inheritdoc/></returns>
-    public virtual IHost Remove(string identifier) => throw null;
+    public virtual IHost Remove(string identifier)
+    {
+        var builder = ToBuilder();
+        var done = builder.Remove(identifier);
+        return done ? builder.ToInstance() : this;
+    }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="identifier"></param>
     /// <returns><inheritdoc/></returns>
-    public virtual IHost RemoveLast(string identifier) => throw null;
+    public virtual IHost RemoveLast(string identifier)
+    {
+        var builder = ToBuilder();
+        var done = builder.RemoveLast(identifier);
+        return done ? builder.ToInstance() : this;
+    }
 
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
     /// <param name="identifier"></param>
     /// <returns><inheritdoc/></returns>
-    public virtual IHost RemoveAll(string identifier) => throw null;
+    public virtual IHost RemoveAll(string identifier)
+    {
+        var builder = ToBuilder();
+        var done = builder.RemoveAll(identifier);
+        return done ? builder.ToInstance() : this;
+    }
 }

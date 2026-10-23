@@ -51,6 +51,8 @@ partial class SchemaDescriptor
         /// <returns></returns>
         public override IItem ValidateElement(IItem value)
         {
+            ArgumentNullException.ThrowIfNull(value);
+
             if (!Engine.Equals(value.Engine)) throw new ArgumentException(
                 "Element's engine is not the one of this instance.")
                 .WithData(value)
