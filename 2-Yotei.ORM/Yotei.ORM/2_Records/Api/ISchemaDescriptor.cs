@@ -9,6 +9,7 @@ namespace Yotei.ORM.Records;
 /// Represents a record descriptor, the ordered collection of schema elements that describes the
 /// structure of a record, it being the unit of information transfer to and from an underlying
 /// database.
+/// <br/> Instances of this type are intended to be immutable ones.
 /// </summary>
 [IInvariantList<TKey, IItem>]
 public partial interface ISchemaDescriptor : IEquatable<IHost>

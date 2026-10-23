@@ -1,5 +1,5 @@
 PENDIENTE:
-- Estoy escribiendo SchemaDescriptor, Match: necesito que IIdentifier tambien lo tenga.
+- Escribir Record.
 
 BUGS:
 - Parece que WithGenerator da un bug cuando la clase derivada es sealed.

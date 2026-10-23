@@ -4,6 +4,7 @@
 /// <summary>
 /// Represents the collection of metadata, and well-known properties, associated with a given
 /// record descriptor (the equivalente of a column descriptor in a relational world).
+/// <br/> Instances of this type are intended to be immutable ones.
 /// </summary>
 [Cloneable]
 public partial interface ISchemaElement : IEnumerable<IMetadataItem>, IEquatable<ISchemaElement>
