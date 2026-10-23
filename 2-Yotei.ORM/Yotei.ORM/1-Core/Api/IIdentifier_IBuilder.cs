@@ -127,6 +127,15 @@ partial interface IIdentifier
         // ----------------------------------------------------
 
         /// <summary>
+        /// <inheritdoc cref="IIdentifier.Match(string?)"/>
+        /// </summary>
+        /// <param name="specs"></param>
+        /// <returns></returns>
+        bool Match(string? specs);
+
+        // ----------------------------------------------------
+
+        /// <summary>
         /// Reduces this instance to a simpler form by removing its null or empty heading parts.
         /// </summary>
         /// <returns>The number of changes made.</returns>

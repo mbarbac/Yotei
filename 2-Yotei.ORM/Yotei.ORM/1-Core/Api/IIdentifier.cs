@@ -149,6 +149,16 @@ public partial interface IIdentifier : IEnumerable<string?>, IEquatable<IIdentif
     // ----------------------------------------------------
 
     /// <summary>
+    /// Determines if this identifier matches the given specs, which consist in a string with
+    /// dot-separated parts where the null or empty one are considered an implicit match.
+    /// </summary>
+    /// <param name="specs"></param>
+    /// <returns></returns>
+    bool Match(string? specs);
+
+    // ----------------------------------------------------
+
+    /// <summary>
     /// Returns a copy of this instance reduced to a simpler form by removing its null or empty
     /// heading parts.
     /// </summary>

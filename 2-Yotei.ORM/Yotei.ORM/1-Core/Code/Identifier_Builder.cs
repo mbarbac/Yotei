@@ -1,4 +1,6 @@
-﻿namespace Yotei.ORM.Code;
+﻿using System.Net.Http;
+
+namespace Yotei.ORM.Code;
 
 partial class Identifier
 {
@@ -262,6 +264,78 @@ partial class Identifier
         /// <inheritdoc/>
         /// </summary>
         public void Trim() => Items.TrimExcess();
+
+        // ----------------------------------------------------
+
+        /// <summary>
+        /// <inheritdoc/>
+        /// </summary>
+        /// <param name="specs"></param>
+        /// <returns></returns>
+        public bool Match(string? specs)
+        {
+            // Null specs is equivalent to an empty filter...
+            if (specs is null) return true;
+
+            // Getting the spec's parts, which may also be an empty filter...
+            var parts = GetParts(Engine, specs, reduce: true);
+            if (parts.Count == 0 || parts.All(x => x is null)) return true;
+
+            // Having now a valid spec, if this instance is empty then no match...
+            var num = ReducedCount();
+            if (num == 0) return false;
+
+            // Iterating from right to left...
+            var xthis = Items.Count;
+            var xpart = parts.Count;
+
+            while (true)
+            {
+                xthis--;
+                xpart--;
+
+                if (xthis < 0 && xpart < 0) break; // Same items' lenght as parts' lenght
+                
+                if (xthis < 0) // If there are valid parts, false...
+                {
+                    while (xpart >= 0)
+                    {
+                        var temp = parts[xpart]; if (temp is not null) return false;
+                        xpart--;
+                    }
+                    return true;
+                }
+                if (xpart < 0) // No more parts, equivalent to null specs...
+                {
+                    return true;
+                }
+
+                var part = parts[xpart]; if (part is null) continue;
+                var item = Items[xthis];
+                if (string.Compare(part, item, Engine.IgnoreCase) != 0) return false;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Gets the reduced count of this instance, not taking into consideration the null or
+        /// empty heading parts.
+        /// </summary>
+        int ReducedCount()
+        {
+            var num = 0;
+            var done = false;
+
+            for (int i = 0; i < Items.Count; i++)
+            {
+                var item = Items[i]; if (item != null || done)
+                {
+                    num++;
+                    done = true;
+                }
+            }
+            return num;
+        }
 
         // ----------------------------------------------------
 

@@ -224,6 +224,15 @@ public sealed partial class Identifier : IIdentifier
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
+    /// <param name="specs"></param>
+    /// <returns></returns>
+    public bool Match(string? specs) => Items.Match(specs);
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
     /// <returns><inheritdoc/></returns>
     public IIdentifier Reduce()
     {
