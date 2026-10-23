@@ -1,7 +1,7 @@
 ﻿using TKey = Yotei.ORM.IIdentifier;
 using IItem = Yotei.ORM.Records.ISchemaElement;
 using IHost = Yotei.ORM.Records.ISchemaDescriptor;
-using System.Runtime.InteropServices.Marshalling;
+using THost = Yotei.ORM.Records.Code.SchemaDescriptor;
 
 namespace Yotei.ORM.Records.Code;
 
@@ -117,9 +117,17 @@ partial class SchemaDescriptor
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        public override IEnumerable<IItem> FindDuplicates(TKey key) => throw null;
-        //    => TryFindAll(x => CompareKeys(GetKey(x), key), out var items) ? items : [];
+        public override IEnumerable<IItem> FindDuplicates(TKey key)
+        {
+            ArgumentNullException.ThrowIfNull(key);
 
+            var nums = IndexesOf(x => x.Identifier!.Match(key.Value));
+            var temp = IndexesOf(x => key.Match(x.Identifier!.Value));
+
+            foreach (var num in temp) if (!nums.Contains(num)) nums.Add(num);
+            nums.Sort();
+            return nums.Select(x => this[x]);
+        }
 
         /// <summary>
         /// <inheritdoc/>
@@ -127,7 +135,19 @@ partial class SchemaDescriptor
         /// <param name="value"></param>
         /// <param name="range"></param>
         /// <returns></returns>
-        //public override bool AllowDuplicate(IItem value, IEnumerable<IItem> range) => true;
+        public override bool AllowDuplicate(IItem value, IEnumerable<IItem> range)
+        {
+            ArgumentNullException.ThrowIfNull(value);
+            ArgumentNullException.ThrowIfNull(range);
+
+            // Duplicates allowed only if are the same item (carrying the same metadata)...
+            if (range.Any(x => ReferenceEquals(x, value))) return true;
+
+            throw new DuplicateException(
+                "This instance already carries other elements with the same identifier.")
+                .WithData(value)
+                .WithData(this);
+        }
 
         /// <summary>
         /// <inheritdoc/>
@@ -135,9 +155,8 @@ partial class SchemaDescriptor
         /// <param name="source"></param>
         /// <param name="target"></param>
         /// <returns></returns>
-        //public override bool SameElement(IItem source, IItem target)
-        //    => ReferenceEquals(source, target)
-        //    || CompareKeys(GetKey(source), GetKey(target));
+        public override bool SameElement(
+            IItem source, IItem target) => ReferenceEquals(source, target);
 
         // ------------------------------------------------
 
@@ -145,7 +164,9 @@ partial class SchemaDescriptor
         /// <inheritdoc/>
         /// </summary>
         /// <returns></returns>
-        public virtual IHost ToInstance() => throw null;
+        public virtual IHost ToInstance() => Count == 0
+            ? new THost(Engine)
+            : new THost(Engine, this);
 
         /// <summary>
         /// <inheritdoc/>
@@ -159,28 +180,46 @@ partial class SchemaDescriptor
         /// </summary>
         /// <param name="identifier"></param>
         /// <returns></returns>
-        public bool Contains(string identifier) => throw null;
+        public bool Contains(string identifier) => IndexOf(identifier) >= 0;
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         /// <param name="identifier"></param>
         /// <returns></returns>
-        public int IndexOf(string identifier) => throw null;
+        public int IndexOf(string identifier)
+        {
+            identifier = identifier.NotNullNotEmpty(trim: true);
+
+            var key = new Identifier(Engine, identifier);
+            return IndexOf(key);
+        }
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         /// <param name="identifier"></param>
         /// <returns></returns>
-        public int LastIndexOf(string identifier) => throw null;
+        public int LastIndexOf(string identifier)
+        {
+            identifier = identifier.NotNullNotEmpty(trim: true);
+
+            var key = new Identifier(Engine, identifier);
+            return LastIndexOf(key);
+        }
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         /// <param name="identifier"></param>
         /// <returns></returns>
-        public List<int> IndexesOf(string identifier) => throw null;
+        public List<int> IndexesOf(string identifier)
+        {
+            identifier = identifier.NotNullNotEmpty(trim: true);
+
+            var key = new Identifier(Engine, identifier);
+            return IndexesOf(key);
+        }
 
         // ----------------------------------------------------
 
@@ -189,7 +228,7 @@ partial class SchemaDescriptor
         /// </summary>
         /// <param name="specs"></param>
         /// <returns></returns>
-        public List<int> Match(string? specs) => throw null;
+        public List<int> Match(string? specs) => Match(specs, out _);
 
         /// <summary>
         /// <inheritdoc/>
@@ -197,7 +236,18 @@ partial class SchemaDescriptor
         /// <param name="specs"></param>
         /// <param name="unique"></param>
         /// <returns></returns>
-        public List<int> Match(string? specs, out IItem? unique) => throw null;
+        public List<int> Match(string? specs, out IItem? unique)
+        {
+            List<int> list = []; for (int i = 0; i < Count; i++)
+            {
+                var item = this[i];
+                var match = item.Identifier!.Match(specs);
+                if (match) list.Add(i);
+            }
+
+            unique = list.Count == 1 ? this[list[0]] : null;
+            return list;
+        }
 
         // ----------------------------------------------------
 
@@ -206,20 +256,38 @@ partial class SchemaDescriptor
         /// </summary>
         /// <param name="identifier"></param>
         /// <returns><inheritdoc/></returns>
-        public virtual bool Remove(string identifier) => throw null;
+        public virtual bool Remove(string identifier)
+        {
+            var index = IndexOf(identifier);
+            return index >= 0 && (RemoveAt(index) > 0);
+        }
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         /// <param name="identifier"></param>
         /// <returns><inheritdoc/></returns>
-        public virtual bool RemoveLast(string identifier) => throw null;
+        public virtual bool RemoveLast(string identifier)
+        {
+            var index = LastIndexOf(identifier);
+            return index >= 0 && (RemoveAt(index) > 0);
+        }
 
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
         /// <param name="identifier"></param>
         /// <returns><inheritdoc/></returns>
-        public virtual bool RemoveAll(string identifier) => throw null;
+        public virtual bool RemoveAll(string identifier)
+        {
+            var done = false; while (true)
+            {
+                var temp = Remove(identifier);
+
+                if (temp) done = true;
+                else break;
+            }
+            return done;
+        }
     }
 }
