@@ -86,7 +86,7 @@ static class CloneExtensions
     /// </summary>
     /// <param name="type"></param>
     /// <returns></returns>
-    public static MethodInfo? GetCloneMethod(Type type)
+    static MethodInfo? GetCloneMethod(Type type)
     {
         lock (Methods)
         {
