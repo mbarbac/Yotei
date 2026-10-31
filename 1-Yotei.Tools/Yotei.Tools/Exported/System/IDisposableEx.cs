@@ -7,7 +7,7 @@ namespace Yotei.Tools;
 
 // ========================================================
 /// <summary>
-/// 
+/// Extends the <see cref="IDisposable"/> interface.
 /// </summary>
 #if YOTEI_TOOLS_GENERATORS
 internal
