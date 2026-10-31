@@ -1,0 +1,23 @@
+<Solution>
+  <Configurations>
+    <BuildType Name="Debug" />
+    <BuildType Name="Local" />
+    <BuildType Name="Release" />
+  </Configurations>
+  <Folder Name="/0-Environment/">
+    <Project Path="0-Environment/Runner/Runner.csproj" Id="2bd15658-6cda-4291-9aaf-598253d17261" />
+  </Folder>
+  <Folder Name="/1-Yotei.Tools/">
+    <Project Path="1-Yotei.Tools/Yotei.Tools.Exported.Tests/Yotei.Tools.Exported.Tests.csproj" Id="81b6f0fb-7067-46f2-b73c-8f49de8c7bf3">
+      <BuildType Solution="Local|*" Project="Debug" />
+    </Project>
+    <Project Path="1-Yotei.Tools/Yotei.Tools.Tests/Yotei.Tools.Tests.csproj" Id="5cba5bdd-6056-4c36-a14f-b42ca4f7f4be" />
+    <Project Path="1-Yotei.Tools/Yotei.Tools/Yotei.Tools.csproj" Id="15f4f455-5a7a-4dd8-9151-8b2ee9be2c9f" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".gitignore" />
+    <File Path="LICENSE" />
+    <File Path="README.md" />
+    <File Path="TODO.md" />
+  </Folder>
+</Solution>
