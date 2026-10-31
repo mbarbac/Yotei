@@ -8,7 +8,7 @@ internal static class ArgumentNullExceptionExtensions
     extension(ArgumentNullException)
     {
         /// <summary>
-        /// Throws an exception if the value is null.
+        /// Throws an exception if the given value is null.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="value"></param>

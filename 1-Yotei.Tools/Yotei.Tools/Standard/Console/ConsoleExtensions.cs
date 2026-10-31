@@ -72,11 +72,5 @@ public static class ConsoleExtensions
             Console.BackgroundColor = oldback;
             Console.ForegroundColor = oldfore;
         }
-
-        // ------------------------------------------------
-
-        internal static void WriteDebug(bool debug, string message)
-        {
-        }
     }
 }

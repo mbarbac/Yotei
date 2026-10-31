@@ -6,7 +6,7 @@
 		<LangVersion>preview</LangVersion>
 		<ImplicitUsings>disable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<NoWarn>IDE0130</NoWarn>
+		<NoWarn>IDE0130;CS0579</NoWarn>
 	</PropertyGroup>
 	<!--IDE0130: Namespace does not match folder structure-->
 
@@ -26,9 +26,17 @@
 	<PropertyGroup>
 		<DefineConstants>$(DefineConstants);YOTEI_TOOLS_GENERATORS</DefineConstants>
 	</PropertyGroup>
+
 	<ItemGroup>
-		<Compile Include="..\Yotei.Tools\Exported\**\*.cs">
+		<Compile
+			Include="..\Yotei.Tools\Exported\**\*.cs"
+			Exclude="..\Yotei.Tools\Exported\**\obj\**;..\Yotei.Tools\Exported\**\bin\**">
 			<Link>Tools\%(RecursiveDir)%(FileName)%(Extension)</Link>
+		</Compile>
+		<Compile
+			Include="..\Yotei.Tools.Tests\Exported\**\*.cs"
+			Exclude="..\Yotei.Tools.Tests\Exported\**\obj\**;..\Yotei.Tools.Tests\Exported\**\bin\**">
+			<Link>Tests\%(RecursiveDir)%(FileName)%(Extension)</Link>
 		</Compile>
 	</ItemGroup>
 

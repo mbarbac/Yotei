@@ -23,10 +23,6 @@
 		</PackageReference>
 	</ItemGroup>
 
-	<PropertyGroup>
-		<DefineConstants>$(DefineConstants);YOTEI_TOOLS_GENERATORS</DefineConstants>
-	</PropertyGroup>
-
 	<!-- DEBUG configuration -->
 	<ItemGroup Condition="'$(Configuration)'=='Debug'">
 		<ProjectReference Include="..\Yotei.Tools\Yotei.Tools.csproj" />

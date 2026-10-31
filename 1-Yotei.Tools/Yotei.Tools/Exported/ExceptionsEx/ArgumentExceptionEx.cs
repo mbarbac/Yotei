@@ -8,7 +8,7 @@ internal static class ArgumentExceptionExtensions
     extension(ArgumentException)
     {
         /// <summary>
-        /// Throws an exception if value is null or empty.
+        /// Throws an exception if the given value is null or empty.
         /// </summary>
         /// <param name="value"></param>
         /// <param name="name"></param>
@@ -21,7 +21,7 @@ internal static class ArgumentExceptionExtensions
             if (value.Length == 0) throw new EmptyException($"'{name}' is empty.");
         }
 
-        /// Throws an exception if value is null, empty, or white spaces only.
+        /// Throws an exception if the given value is null, empty, or white spaces only.
         /// </summary>
         /// <param name="value"></param>
         /// <param name="name"></param>

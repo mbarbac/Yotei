@@ -8,7 +8,7 @@ internal static class ArgumentOutOfRangeExceptionExtensions
     extension(ArgumentOutOfRangeException)
     {
         /// <summary>
-        /// Throws an exception if value is zero.
+        /// Throws an exception if the given value is zero.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="value"></param>
@@ -24,7 +24,7 @@ internal static class ArgumentOutOfRangeExceptionExtensions
         }
 
         /// <summary>
-        /// Throws an exception if value is negative.
+        /// Throws an exception if the given value is negative.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="value"></param>
@@ -40,7 +40,7 @@ internal static class ArgumentOutOfRangeExceptionExtensions
         }
 
         /// <summary>
-        /// Throws an exception if value is negative or zero.
+        /// Throws an exception if the given value is negative or zero.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="value"></param>
@@ -58,7 +58,7 @@ internal static class ArgumentOutOfRangeExceptionExtensions
         // ------------------------------------------------
 
         /// <summary>
-        /// Throws an exception if value is equal to other.
+        /// Throws an exception if the given value is equal to other.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="value"></param>
@@ -76,7 +76,7 @@ internal static class ArgumentOutOfRangeExceptionExtensions
         }
 
         /// <summary>
-        /// Throws an exception if value is not equal to other.
+        /// Throws an exception if the given value is not equal to other.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="value"></param>
@@ -94,7 +94,7 @@ internal static class ArgumentOutOfRangeExceptionExtensions
         }
 
         /// <summary>
-        /// Throws an exception if value is greater than other.
+        /// Throws an exception if the given value is greater than other.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="value"></param>
@@ -112,7 +112,7 @@ internal static class ArgumentOutOfRangeExceptionExtensions
         }
 
         /// <summary>
-        /// Throws an exception if value is equal to or greater than other.
+        /// Throws an exception if the given value is equal to or greater than other.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="value"></param>
@@ -130,7 +130,7 @@ internal static class ArgumentOutOfRangeExceptionExtensions
         }
 
         /// <summary>
-        /// Throws an exception if value is less than other.
+        /// Throws an exception the given if value is less than other.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="value"></param>
@@ -148,7 +148,7 @@ internal static class ArgumentOutOfRangeExceptionExtensions
         }
 
         /// <summary>
-        /// Throws an exception if value is equal to or less than other.
+        /// Throws an exception the given if value is equal to or less than other.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="value"></param>

@@ -1,4 +1,4 @@
-﻿namespace Yotei.Tools.Exported.Tests;
+﻿namespace Yotei.Tools.Tests.Exported;
 
 // ========================================================
 //public static class Test_
