@@ -16,7 +16,7 @@ public static class Test_ArgumentException
 
         value = "";
         try { ArgumentException.ThrowIfNullOrEmpty(value); Assert.Fail(""); }
-        catch (EmptyException) { }
+        catch (ArgumentException) { }
 
         value = " ";
         ArgumentException.ThrowIfNullOrEmpty(value);
@@ -31,7 +31,7 @@ public static class Test_ArgumentException
 
         value = "";
         try { ArgumentException.ThrowIfNullOrWhiteSpace(value); Assert.Fail(""); }
-        catch (EmptyException) { }
+        catch (ArgumentException) { }
 
         value = " ";
         try { ArgumentException.ThrowIfNullOrWhiteSpace(value); Assert.Fail(""); }

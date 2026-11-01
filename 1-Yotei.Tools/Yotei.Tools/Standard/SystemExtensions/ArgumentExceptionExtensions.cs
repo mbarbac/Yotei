@@ -19,7 +19,7 @@ internal static class ArgumentExceptionExtensions
             [CallerArgumentExpression(nameof(value))] string? name = null)
         {
             if (value is null) throw new ArgumentNullException(name);
-            if (value.Length == 0) throw new EmptyException($"'{name}' is empty.");
+            if (value.Length == 0) throw new ArgumentException($"'{name}' is empty.");
         }
 
         /// Throws an exception if the given value is null, empty, or white spaces only.
@@ -32,7 +32,7 @@ internal static class ArgumentExceptionExtensions
             [CallerArgumentExpression(nameof(value))] string? name = null)
         {
             if (value is null) throw new ArgumentNullException(name);
-            if (value.Length == 0) throw new EmptyException($"'{name}' is empty.");
+            if (value.Length == 0) throw new ArgumentException($"'{name}' is empty.");
             if (string.IsNullOrWhiteSpace(value))
                 throw new ArgumentException($"'{name}' is whitespaces only.");
         }
