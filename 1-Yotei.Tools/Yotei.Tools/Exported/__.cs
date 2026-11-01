@@ -1,12 +1,12 @@
 ﻿#if YOTEI_TOOLS_GENERATORS
-namespace Yotei.Tools.Generators;
+namespace Yotei.Tools.Std20
 #pragma warning disable CS0436
 #else
 namespace Yotei.Tools;
 #endif
 
 // ========================================================
-//#if YOTEI_TOOLS_GENERATORS
+//#if NETSTANDARD2_0
 //internal
 //#else
 //public

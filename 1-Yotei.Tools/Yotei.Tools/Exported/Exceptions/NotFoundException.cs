@@ -8,7 +8,7 @@ namespace Yotei.Tools;
 /// <summary>
 /// Represents a failed attempt of finding a value.
 /// </summary>
-#if YOTEI_TOOLS_GENERATORS
+#if NETSTANDARD2_0
 internal
 #else
 public

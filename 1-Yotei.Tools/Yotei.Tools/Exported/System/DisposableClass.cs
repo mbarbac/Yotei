@@ -8,7 +8,7 @@ namespace Yotei.Tools;
 /// <summary>
 /// Base class implementing <see cref="IDisposableEx"/> and <see cref="IAsyncDisposableEx"/>
 /// </summary>
-#if YOTEI_TOOLS_GENERATORS
+#if NETSTANDARD2_0
 internal
 #else
 public

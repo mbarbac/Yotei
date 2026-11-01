@@ -1,11 +1,11 @@
-﻿#if YOTEI_TOOLS_GENERATORS
-namespace Yotei.Tools.Generators;
+﻿#if NETSTANDARD2_0
+namespace Yotei.Tools.Std20;
 #else
 namespace Yotei.Tools;
 #endif
 
 // ========================================================
-#if YOTEI_TOOLS_GENERATORS
+#if NETSTANDARD2_0
 internal
 #else
 public

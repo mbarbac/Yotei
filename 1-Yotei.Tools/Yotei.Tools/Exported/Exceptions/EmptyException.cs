@@ -8,7 +8,7 @@ namespace Yotei.Tools;
 /// <summary>
 /// Represents finding or attempting to use an empty element.
 /// </summary>
-#if YOTEI_TOOLS_GENERATORS
+#if NETSTANDARD2_0
 internal
 #else
 public

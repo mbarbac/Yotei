@@ -8,7 +8,7 @@ namespace Yotei.Tools;
 /// <summary>
 /// Represents the ocurrence of a duplicated element when it was not supposed to happen.
 /// </summary>
-#if YOTEI_TOOLS_GENERATORS
+#if NETSTANDARD2_0
 internal
 #else
 public

@@ -9,7 +9,7 @@ namespace Yotei.Tools;
 /// <summary>
 /// Extends the <see cref="IAsyncDisposable"/> interface.
 /// </summary>
-#if YOTEI_TOOLS_GENERATORS
+#if NETSTANDARD2_0
 internal
 #else
 public
