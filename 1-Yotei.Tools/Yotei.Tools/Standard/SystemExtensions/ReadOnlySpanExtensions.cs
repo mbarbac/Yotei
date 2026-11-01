@@ -611,8 +611,72 @@ static class ReadOnlySpanExtensions
     }
 
     // ----------------------------------------------------
-    // StartsWithAny
-    // EndsWithAny
+
+    /// <summary>
+    /// Determines if the span starts with any of the given values.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <returns></returns>
+    public static bool StartsWithAny<T>(
+        this ReadOnlySpan<T> source, IEnumerable<T> values)
+        => source.StartsWithAny(values, EqualityComparer<T>.Default);
+
+    /// <summary>
+    /// Determines if the span starts with any of the given values, using the given comparer.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static bool StartsWithAny<T>(
+        this ReadOnlySpan<T> source, IEnumerable<T> values, IEqualityComparer<T> comparer)
+    {
+        values.ThrowWhenNull();
+        comparer.ThrowWhenNull();
+
+        if (source.Length == 0) return false;
+
+        var item = source[0];
+        foreach (var value in values) if (comparer.Equals(item, value)) return true;
+        return false;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Determines if the span ends with any of the given values.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <returns></returns>
+    public static bool EndsWithAny<T>(
+        this ReadOnlySpan<T> source, IEnumerable<T> values)
+        => source.EndsWithAny(values, EqualityComparer<T>.Default);
+
+    /// <summary>
+    /// Determines if the span ends with any of the given values, using the given comparer.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static bool EndsWithAny<T>(
+        this ReadOnlySpan<T> source, IEnumerable<T> values, IEqualityComparer<T> comparer)
+    {
+        values.ThrowWhenNull();
+        comparer.ThrowWhenNull();
+
+        if (source.Length == 0) return false;
+
+        var item = source[^1];
+        foreach (var value in values) if (comparer.Equals(item, value)) return true;
+        return false;
+    }
 
     // ----------------------------------------------------
     // bool TryFind(Predicate<T> predicate, out T value);

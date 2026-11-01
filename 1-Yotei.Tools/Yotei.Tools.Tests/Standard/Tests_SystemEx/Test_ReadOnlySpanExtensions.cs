@@ -18,7 +18,6 @@ public static class Test_ReadOnlySpanExtensions
             if (y is null) return +1;
             return x.CompareTo(y);
         }
-
         public bool Equals(T? x, T? y)
         {
             if (x is null && y is null) return true;
@@ -335,5 +334,31 @@ public static class Test_ReadOnlySpanExtensions
         Assert.Equal(0, indexes[0]);
         Assert.Equal(2, indexes[1]);
         Assert.Equal(3, indexes[2]);
+    }
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_StartsWithAny()
+    {
+        bool found;
+        ReadOnlySpan<int> span;
+
+        span = []; found = span.StartsWithAny([0, 99]); Assert.False(found);
+        span = [1, 2]; found = span.StartsWithAny([0, 3]); Assert.False(found);
+        span = [1, 2]; found = span.StartsWithAny([0, 1]); Assert.True(found);
+        span = [1, 2]; found = span.StartsWithAny([0, 1], new MyComparer<int>()); Assert.True(found);
+    }
+
+    [Fact]
+    public static void Test_EndsWithAny()
+    {
+        bool found;
+        ReadOnlySpan<int> span;
+
+        span = []; found = span.EndsWithAny([0, 99]); Assert.False(found);
+        span = [1, 2]; found = span.EndsWithAny([0, 3]); Assert.False(found);
+        span = [2, 1]; found = span.EndsWithAny([0, 1]); Assert.True(found);
+        span = [2, 1]; found = span.EndsWithAny([0, 1], new MyComparer<int>()); Assert.True(found);
     }
 }
