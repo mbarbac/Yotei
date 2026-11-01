@@ -3,15 +3,35 @@
 // ========================================================
 public static class Test_ArgumentException
 {
-    public class Example { }
-
-    // ----------------------------------------------------
 
     [Fact]
-    public static void Test_ThrowIfNull()
+    public static void Test_ThrowIfNullOrEmpty()
     {
-        Example? value = null;
-        try { ArgumentNullException.ThrowIfNull(value); Assert.Fail(); }
+        string? value = null;
+        try { ArgumentException.ThrowIfNullOrEmpty(value); Assert.Fail(); }
         catch (ArgumentNullException) { }
+
+        value = "";
+        try { ArgumentException.ThrowIfNullOrEmpty(value); Assert.Fail(); }
+        catch (ArgumentException) { }
+
+        value = " ";
+        ArgumentException.ThrowIfNullOrEmpty(value);
+    }
+
+    [Fact]
+    public static void Test_ThrowIfNullOrWhiteSpace()
+    {
+        string? value = null;
+        try { ArgumentException.ThrowIfNullOrWhiteSpace(value); Assert.Fail(); }
+        catch (ArgumentNullException) { }
+
+        value = "";
+        try { ArgumentException.ThrowIfNullOrWhiteSpace(value); Assert.Fail(); }
+        catch (ArgumentException) { }
+
+        value = " ";
+        try { ArgumentException.ThrowIfNullOrWhiteSpace(value); Assert.Fail(); }
+        catch (ArgumentException) { }
     }
 }
