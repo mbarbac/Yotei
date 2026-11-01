@@ -16,4 +16,15 @@ such as source code generators ones.
 	</PropertyGroup>
 	<!--IDE0130: Namespace does not match folder structure-->
 
+	<PropertyGroup>
+		<ToolsPath>..\..\1-Yotei.Tools\Yotei.Tools</ToolsPath>
+	</PropertyGroup>
+	<ItemGroup>
+		<Compile
+			Include="$(ToolsPath)\Exported\**\*.cs"
+			Exclude="(ToolsPath)\Exported\**\obj\**;(ToolsPath)\Exported\**\bin\**">
+			<Link>Tools\%(RecursiveDir)%(FileName)%(Extension)</Link>
+		</Compile>
+	</ItemGroup>
+
 </Project>
