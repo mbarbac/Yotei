@@ -1,4 +1,4 @@
-﻿namespace Yotei.Tools.Tests;
+﻿/*namespace Yotei.Tools.Tests;
 
 // ========================================================
 public static class Test_ArrayExtensions
@@ -183,8 +183,28 @@ public static class Test_ArrayExtensions
 
     // ----------------------------------------------------
 
+    [Fact]
+    public static void Test_Trim()
+    {
+        var source = Array.Empty<int>();
+        var target = source.Trim();
+        Assert.Same(source, target);
+
+        source = [1, 2, 3];
+        target = source.Trim();
+        Assert.Same(source, target);
+
+        source = [0, 1, 2, 3];
+        target = source.Trim();
+        Assert.NotSame(source, target);
+        Assert.Equal(3, target.Length);
+        Assert.True(target is [1, 2, 3]);
+    }
+
+    // ----------------------------------------------------
+
     //[Fact]
     //public static void Test_()
     //{
     //}
-}
+}*/

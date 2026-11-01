@@ -1,7 +1,8 @@
-﻿#if YOTEI_TOOLS_GENERATORS
+﻿/*#if YOTEI_TOOLS_GENERATORS
 namespace Yotei.Tools.Generators;
-//#pragma warning disable CS0436
 #else
+using System.ComponentModel.DataAnnotations;
+
 namespace Yotei.Tools;
 #endif
 
@@ -57,7 +58,7 @@ static class ArrayExtensions
         /// <returns></returns>
         public int IndexOf(T value)
         {
-            var comparer = EqualityComparer<T>.Default; ;
+            var comparer = EqualityComparer<T>.Default;
             return source.IndexOf(value, comparer);
         }
 
@@ -68,7 +69,7 @@ static class ArrayExtensions
         /// <returns></returns>
         public int LastIndexOf(T value)
         {
-            var comparer = EqualityComparer<T>.Default; ;
+            var comparer = EqualityComparer<T>.Default;
             return source.LastIndexOf(value, comparer);
         }
 
@@ -79,7 +80,7 @@ static class ArrayExtensions
         /// <returns></returns>
         public List<int> IndexesOf(T value)
         {
-            var comparer = EqualityComparer<T>.Default; ;
+            var comparer = EqualityComparer<T>.Default;
             return source.IndexesOf(value, comparer);
         }
 
@@ -172,7 +173,7 @@ static class ArrayExtensions
         /// </summary>
         /// <param name="predicate"></param>
         /// <returns></returns>
-        public List<int> IndexesOf(Predicate<T?> predicate)
+        public List<int> IndexesOf(Predicate<T> predicate)
         {
             ArgumentNullException.ThrowIfNull(predicate);
 
@@ -180,5 +181,61 @@ static class ArrayExtensions
             for (int i = 0; i < source.Length; i++) if (predicate(source[i])) nums.Add(i);
             return nums;
         }
+
+        // ------------------------------------------------
+
+        /// <summary>
+        /// Returns a copy of this array where the leading and trailing default element values
+        /// have been removed from it.
+        /// </summary>
+        /// <returns></returns>
+        public T[] Trim() => source.Trim(default(T)!);
+
+        /// <summary>
+        /// Returns a copy of this array where the leading and trailing values equal to the given
+        /// one have been removed from it.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public T[] Trim(T value) => source.Trim(value, EqualityComparer<T>.Default);
+
+        /// <summary>
+        /// Returns a copy of this array where the leading and trailing values equal to the given
+        /// one have been removed from it, using the given comparer.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="comparer"></param>
+        /// <returns></returns>
+        public T[] Trim(T value, IEqualityComparer<T> comparer)
+        {
+            ArgumentNullException.ThrowIfNull(comparer);
+            return source.Trim(x => comparer.Equals(x, value));
+        }
+
+        /// <summary>
+        /// Returns a copy of this array where the leading and trailing values that match the
+        /// given predicate have been removed from it.
+        /// </summary>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
+        public T[] Trim(Predicate<T> predicate)
+        {
+            ArgumentNullException.ThrowIfNull(predicate);
+
+            if (source.Length == 0) return source;
+            var ini = source.IndexOf(predicate); if (ini < 0) return source;
+            var span = source.AsSpan(ini + 1);
+
+            //var end = span.lastindexof
+
+            throw null;
+
+            //var end = source.LastIndexOf(predicate);
+
+            //var span = source.AsSpan(ini + 1);
+            //var len = end - ini + 1;
+            //span = span[len..];
+            //return span.ToArray();
+        }
     }
-}
+}*/
