@@ -1,36 +1,42 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<Configurations>Debug;Release;Local</Configurations>
-		<TargetFramework>net10.0</TargetFramework>
+		<TargetFramework>netcoreapp3.1</TargetFramework>
+		<RollForward>Major</RollForward>
+		<Configurations>Debug;Release;Local</Configurations>		
 		<LangVersion>preview</LangVersion>
 		<ImplicitUsings>disable</ImplicitUsings>
 		<Nullable>enable</Nullable>
+		<IsPackable>false</IsPackable>
 		<NoWarn>IDE0130</NoWarn>
 	</PropertyGroup>
 	<!--IDE0130: Namespace does not match folder structure-->
 
+	<!--Latests versions compatible with NETStandard 2.0-->
 	<ItemGroup>
-		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
-		<PackageReference Include="xunit.v3" Version="4.0.2" />
-		<PackageReference Include="xunit.runner.visualstudio" Version="4.0.1">
-			<PrivateAssets>all</PrivateAssets>
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.4.0" />
+		<PackageReference Include="xunit" Version="2.4.2" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
-		<PackageReference Include="coverlet.collector" Version="10.1.0">
 			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 	</ItemGroup>
 
 	<PropertyGroup>
-		<ToolsPath>..\..\1-Yotei.Tools\Yotei.Tools.Tests</ToolsPath>
+		<DefineConstants>$(DefineConstants);NETSTANDARD2_0</DefineConstants>
+		<ToolsPath>..\..\1-Yotei.Tools\Yotei.Tools</ToolsPath>
+		<TestsPath>..\..\1-Yotei.Tools\Yotei.Tools.Tests</TestsPath>
 	</PropertyGroup>
 	<ItemGroup>
 		<Compile
 			Include="$(ToolsPath)\Standard\**\*.cs"
 			Exclude="(ToolsPath)\Standard\**\obj\**;(ToolsPath)\Exported\**\bin\**">
-			<Link>Imported\%(RecursiveDir)%(FileName)%(Extension)</Link>
+			<Link>Tools\%(RecursiveDir)%(FileName)%(Extension)</Link>
+		</Compile>
+		<Compile
+			Include="$(TestsPath)\Standard\**\*.cs"
+			Exclude="(TestsPath)\Standard\**\obj\**;(ToolsPath)\Exported\**\bin\**">
+			<Link>Tests\%(RecursiveDir)%(FileName)%(Extension)</Link>
 		</Compile>
 	</ItemGroup>
 

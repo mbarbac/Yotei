@@ -4,6 +4,8 @@ namespace Yotei.Tools.Std20;
 // ========================================================
 internal static class ArgumentExceptionExtensions
 {
+#pragma warning disable IDE0079
+#pragma warning disable CS0436
     extension(ArgumentException)
     {
         /// <summary>
@@ -35,6 +37,7 @@ internal static class ArgumentExceptionExtensions
                 throw new ArgumentException($"'{name}' is whitespaces only.");
         }
     }
+#pragma warning restore
 }
 
 #endif
