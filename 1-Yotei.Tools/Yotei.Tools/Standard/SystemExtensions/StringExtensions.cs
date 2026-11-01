@@ -1,5 +1,7 @@
 ﻿#if NETSTANDARD2_0
 namespace Yotei.Tools.Std20;
+#pragma warning disable IDE0079
+#pragma warning disable CS0436
 #else
 namespace Yotei.Tools;
 #endif
@@ -27,8 +29,6 @@ static class StringExtensions
             return string.IsNullOrEmpty(source) ? null : source;
         }
 
-#pragma warning disable IDE0079
-#pragma warning disable CS0436
         /// <summary>
         /// Guarantees that the returned string is not null and not empty, after having trimmed
         /// this instance if such is requested.
@@ -42,12 +42,10 @@ static class StringExtensions
             [CallerArgumentExpression(nameof(source))] string? name = null)
         {
             if (string.IsNullOrWhiteSpace(name)) name = nameof(source);
-
-            ArgumentNullException.ThrowIfNull(source, name);
+            source.ThrowWhenNull(name);
 
             source = source.NullWhenEmpty(trim);
             return source is null ? throw new EmptyException(name!) : source;
         }
-#pragma warning restore
     }
 }

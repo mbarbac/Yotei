@@ -15,7 +15,7 @@ internal
 #else
 public
 #endif
-sealed class DayDate : IComparable<DayDate>
+sealed record DayDate : IComparable<DayDate>
 {
     /// <summary>
     /// Initializes a new instance.
@@ -36,7 +36,7 @@ sealed class DayDate : IComparable<DayDate>
     /// <param name="source"></param>
     public DayDate(DayDate source)
     {
-        ArgumentNullException.ThrowIfNull(source);
+        source.ThrowWhenNull();
         Year = source.Year;
         Month = source.Month;
         Day = source.Day;
@@ -197,10 +197,10 @@ sealed class DayDate : IComparable<DayDate>
         get;
         init
         {
-            //ArgumentOutOfRangeException.ThrowIfLessThan(value, 1);
+            if (value < 1) throw new ArgumentOutOfRangeException(nameof(value)).WithData(value);
 
             var max = DaysInMonthInternal(Year, Month);
-            //ArgumentOutOfRangeException.ThrowIfGreaterThan(value, max);
+            if (value > max) throw new ArgumentOutOfRangeException(nameof(value)).WithData(value);
 
             field = value;
         }

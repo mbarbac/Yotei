@@ -1,4 +1,22 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<!--
+This project is architected to test elements of 'Yotei.Tools' under .NET Standard 2.0 conditions,
+such as those found in source code generation projects.
+
+For these scenarios:
+- The 'NETSTANDARD2_0' compilation symbol must be defined.
+- Instead of referencing the 'Yotei.Tools' project or package, the files under its 'Standard'
+  folder shall be link-imported as shown below. This way, they become part of the solution under
+  their own 'Yotei.Tools.Std20' namespace.
+
+Considerations:
+- Extension blocks are only supported from c# 14 and .NET 10... so as they are not strictly
+  technical neccesary, its better to avoid them.
+
+In addition, only for testing purposes and only for this project:
+- We use a legacy framework that emulates that environment.
+- We reference the latest stable Xunit packages for that framework.
+-->
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFramework>netcoreapp3.1</TargetFramework>

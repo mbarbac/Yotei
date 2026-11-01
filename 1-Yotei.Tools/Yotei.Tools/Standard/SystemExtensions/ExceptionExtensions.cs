@@ -1,5 +1,7 @@
 ﻿#if NETSTANDARD2_0
 namespace Yotei.Tools.Std20;
+#pragma warning disable IDE0079
+#pragma warning disable CS0436
 #else
 namespace Yotei.Tools;
 #endif
@@ -14,8 +16,6 @@ static class ExceptionExtensions
 {
     extension<T>(T source) where T : Exception
     {
-#pragma warning disable IDE0079
-#pragma warning disable CS0436
         /// <summary>
         /// Adds or replaces the given [name=value] pair in the exception's dictionary.
         /// </summary>
@@ -28,6 +28,5 @@ static class ExceptionExtensions
             source.Data[name] = value;
             return source;
         }
-#pragma warning restore
     }
 }
