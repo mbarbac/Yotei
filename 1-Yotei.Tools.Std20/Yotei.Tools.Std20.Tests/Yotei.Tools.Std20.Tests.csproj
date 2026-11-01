@@ -28,9 +28,9 @@
 	</PropertyGroup>
 	<ItemGroup>
 		<Compile
-			Include="$(ToolsPath)\Exported\**\*.cs"
-			Exclude="(ToolsPath)\Exported\**\obj\**;(ToolsPath)\Exported\**\bin\**">
-			<Link>Tools\%(RecursiveDir)%(FileName)%(Extension)</Link>
+			Include="$(ToolsPath)\Standard\**\*.cs"
+			Exclude="(ToolsPath)\Standard\**\obj\**;(ToolsPath)\Exported\**\bin\**">
+			<Link>Imported\%(RecursiveDir)%(FileName)%(Extension)</Link>
 		</Compile>
 	</ItemGroup>
 
