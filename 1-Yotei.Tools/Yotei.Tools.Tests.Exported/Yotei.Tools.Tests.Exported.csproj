@@ -23,16 +23,19 @@
 		</PackageReference>
 	</ItemGroup>
 
+	<!--Just to import 'Yotei.Tools' for a generator-alike .Net Standard 2.0 scenario...-->
 	<PropertyGroup>
 		<DefineConstants>$(DefineConstants);YOTEI_TOOLS_GENERATORS</DefineConstants>
 	</PropertyGroup>
-
+	
 	<ItemGroup>
+		<!--Instead of referencing 'Yotei.Tools', we just link to the appropriate files...-->
 		<Compile
 			Include="..\Yotei.Tools\Exported\**\*.cs"
 			Exclude="..\Yotei.Tools\Exported\**\obj\**;..\Yotei.Tools\Exported\**\bin\**">
 			<Link>Tools\%(RecursiveDir)%(FileName)%(Extension)</Link>
 		</Compile>
+		<!--And, in this case, we do the same with the appropriate 'Yotei.Tools.Tests' ones...-->
 		<Compile
 			Include="..\Yotei.Tools.Tests\Exported\**\*.cs"
 			Exclude="..\Yotei.Tools.Tests\Exported\**\obj\**;..\Yotei.Tools.Tests\Exported\**\bin\**">

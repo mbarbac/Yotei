@@ -4,6 +4,32 @@
 public static class Test_ReadOnlySpanExtensions
 {
     [Fact]
+    public static void Test_Contains()
+    {
+        ReadOnlySpan<int> span;
+        Predicate<int> Predicate(int value) => x => x == value;
+        IEqualityComparer<int> Comparer(
+            int value) => EqualityComparer<int>.Create((x, y) => x == value && y == value);
+
+        span = []; Assert.False(span.Contains(9));
+        span = [9]; Assert.True(span.Contains(9));
+        span = [0, 9]; Assert.True(span.Contains(9));
+        span = [9, 0]; Assert.True(span.Contains(9));
+
+        span = []; Assert.False(span.Contains(9, Comparer(9)));
+        span = [9]; Assert.True(span.Contains(9, Comparer(9)));
+        span = [0, 9]; Assert.True(span.Contains(9, Comparer(9)));
+        span = [9, 0]; Assert.True(span.Contains(9, Comparer(9)));
+
+        span = []; Assert.False(span.Contains(Predicate(9)));
+        span = [9]; Assert.True(span.Contains(Predicate(9)));
+        span = [0, 9]; Assert.True(span.Contains(Predicate(9)));
+        span = [9, 0]; Assert.True(span.Contains(Predicate(9)));
+    }
+
+    // ----------------------------------------------------
+
+    [Fact]
     public static void Test_IndexOf()
     {
         List<int> indexes;
@@ -67,8 +93,6 @@ public static class Test_ReadOnlySpanExtensions
         span = [0, 9, 0, 1]; index = span.FirstCropIndex(Predicate(9)); Assert.Equal(0, index);
     }
 
-    // ----------------------------------------------------
-
     [Fact]
     public static void Test_LastCropIndex()
     {
@@ -131,8 +155,6 @@ public static class Test_ReadOnlySpanExtensions
         source = [0, 9, 9]; target = source.TrimStart(Predicate(9)); Assert.True(target is [0, 9, 9]);
     }
 
-    // ----------------------------------------------------
-
     [Fact]
     public static void TrimEnd()
     {
@@ -158,8 +180,6 @@ public static class Test_ReadOnlySpanExtensions
         source = [0, 9, 9]; target = source.TrimEnd(Predicate(9)); Assert.True(target is [0]);
         source = [9, 9, 0]; target = source.TrimEnd(Predicate(9)); Assert.True(target is [9, 9, 0]);
     }
-
-    // ----------------------------------------------------
 
     [Fact]
     public static void Trim()
@@ -191,5 +211,57 @@ public static class Test_ReadOnlySpanExtensions
         source = [9, 9, 0]; target = source.Trim(Predicate(9)); Assert.True(target is [0]);
         source = [9, 0, 0, 9]; target = source.Trim(Predicate(9)); Assert.True(target is [0, 0]);
         source = [0, 9, 9, 0]; target = source.Trim(Predicate(9)); Assert.True(target is [0, 9, 9, 0]);
+    }
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_StartsWith()
+    {
+        ReadOnlySpan<int> span;
+        Predicate<int> Predicate(int value) => x => x == value;
+        IEqualityComparer<int> Comparer(
+            int value) => EqualityComparer<int>.Create((x, y) => x == value && y == value);
+
+        span = []; Assert.False(span.StartsWith(9));
+        span = [9]; Assert.True(span.StartsWith(9));
+        span = [0, 9]; Assert.False(span.StartsWith(9));
+        span = [9, 0]; Assert.True(span.StartsWith(9));
+
+        span = []; Assert.False(span.StartsWith(9, Comparer(9)));
+        span = [9]; Assert.True(span.StartsWith(9, Comparer(9)));
+        span = [0, 9]; Assert.False(span.StartsWith(9, Comparer(9)));
+        span = [9, 0]; Assert.True(span.StartsWith(9, Comparer(9)));
+
+        span = []; Assert.False(span.StartsWith(Predicate(9)));
+        span = [9]; Assert.True(span.StartsWith(Predicate(9)));
+        span = [0, 9]; Assert.False(span.StartsWith(Predicate(9)));
+        span = [9, 0]; Assert.True(span.StartsWith(Predicate(9)));
+    }
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_EndsWith()
+    {
+        ReadOnlySpan<int> span;
+        Predicate<int> Predicate(int value) => x => x == value;
+        IEqualityComparer<int> Comparer(
+            int value) => EqualityComparer<int>.Create((x, y) => x == value && y == value);
+
+        span = []; Assert.False(span.EndsWith(9));
+        span = [9]; Assert.True(span.EndsWith(9));
+        span = [0, 9]; Assert.True(span.EndsWith(9));
+        span = [9, 0]; Assert.False(span.EndsWith(9));
+
+        span = []; Assert.False(span.EndsWith(9, Comparer(9)));
+        span = [9]; Assert.True(span.EndsWith(9, Comparer(9)));
+        span = [0, 9]; Assert.True(span.EndsWith(9, Comparer(9)));
+        span = [9, 0]; Assert.False(span.EndsWith(9, Comparer(9)));
+
+        span = []; Assert.False(span.EndsWith(Predicate(9)));
+        span = [9]; Assert.True(span.EndsWith(Predicate(9)));
+        span = [0, 9]; Assert.True(span.EndsWith(Predicate(9)));
+        span = [9, 0]; Assert.False(span.EndsWith(Predicate(9)));
     }
 }

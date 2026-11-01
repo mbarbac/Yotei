@@ -17,25 +17,11 @@ static class ReadOnlySpanExtensions
     extension<T>(ReadOnlySpan<T> source)
     {
         /// <summary>
-        /// Searches for the indexes of the ocurrences of the given value.
+        /// Determines if this span contains a value that matches the given predicate.
         /// </summary>
-        /// <param name="value"></param>
+        /// <param name="predicate"></param>
         /// <returns></returns>
-        public List<int> IndexesOf(T value) => source.IndexesOf(value, EqualityComparer<T>.Default);
-
-        // ------------------------------------------------
-
-        /// <summary>
-        /// Searches for the indexes of the ocurrences of the given value, using the given comparer.
-        /// </summary>
-        /// <param name="value"></param>
-        /// <param name="comparer"></param>
-        /// <returns></returns>
-        public List<int> IndexesOf(T value, IEqualityComparer<T> comparer)
-        {
-            ArgumentNullException.ThrowIfNull(comparer);
-            return source.IndexesOf(x => comparer.Equals(x, value));
-        }
+        public bool Contains(Predicate<T> predicate) => source.IndexOf(predicate) >= 0;
 
         // ------------------------------------------------
 
@@ -52,6 +38,8 @@ static class ReadOnlySpanExtensions
             return -1;
         }
 
+        // ------------------------------------------------
+
         /// <summary>
         /// Searches for the index of the last element that matches the given predicate.
         /// </summary>
@@ -63,6 +51,27 @@ static class ReadOnlySpanExtensions
 
             for (int i = source.Length - 1; i >= 0; i--) if (predicate(source[i])) return i;
             return -1;
+        }
+
+        // ------------------------------------------------
+
+        /// <summary>
+        /// Searches for the indexes of the ocurrences of the given value.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public List<int> IndexesOf(T value) => source.IndexesOf(value, EqualityComparer<T>.Default);
+
+        /// <summary>
+        /// Searches for the indexes of the ocurrences of the given value, using the given comparer.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="comparer"></param>
+        /// <returns></returns>
+        public List<int> IndexesOf(T value, IEqualityComparer<T> comparer)
+        {
+            ArgumentNullException.ThrowIfNull(comparer);
+            return source.IndexesOf(x => comparer.Equals(x, value));
         }
 
         /// <summary>
@@ -80,7 +89,7 @@ static class ReadOnlySpanExtensions
         }
 
         // ------------------------------------------------
-        
+
         /// <summary>
         /// Searches for the index of the first ocurrence of a value that is not the given one.
         /// Returns -1 if any or empty.
@@ -149,7 +158,7 @@ static class ReadOnlySpanExtensions
         {
             ArgumentNullException.ThrowIfNull(predicate);
 
-            for (int i = source.Length -1; i >= 0; i--) if (!predicate(source[i])) return i;
+            for (int i = source.Length - 1; i >= 0; i--) if (!predicate(source[i])) return i;
             return -1;
         }
 
@@ -238,13 +247,6 @@ static class ReadOnlySpanExtensions
         public ReadOnlySpan<T> Trim() => source.Trim(default!, EqualityComparer<T>.Default);
 
         /// <summary>
-        /// Removes all leading and trailing ocurrences of the given value.
-        /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        //public ReadOnlySpan<T> Trim(T value) => source.Trim(value, EqualityComparer<T>.Default);
-
-        /// <summary>
         /// Removes all leading and trailing ocurrences of the given value, using the given comparer.
         /// </summary>
         /// <param name="value"></param>
@@ -263,5 +265,27 @@ static class ReadOnlySpanExtensions
         /// <returns></returns>
         public ReadOnlySpan<T> Trim(
             Predicate<T> predicate) => source.TrimStart(predicate).TrimEnd(predicate);
+
+        // ------------------------------------------------
+
+        /// <summary>
+        /// Determines if the span starts with a value that matches the given predicate.
+        /// </summary>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
+        public bool StartsWith(Predicate<T> predicate)
+            => source.Length > 0
+            && source.IndexOf(predicate) == 0;
+
+        // ------------------------------------------------
+
+        /// <summary>
+        /// Determines if the span ends with a value that matches the given predicate.
+        /// </summary>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
+        public bool EndsWith(Predicate<T> predicate)
+            => source.Length > 0
+            && source.IndexOf(predicate) == source.Length - 1;
     }
 }
