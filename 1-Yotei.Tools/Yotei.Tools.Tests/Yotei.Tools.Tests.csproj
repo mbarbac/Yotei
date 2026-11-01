@@ -37,8 +37,5 @@
 	<ItemGroup Condition="'$(Configuration)'=='Local'">
 		<PackageReference Include="Yotei.Tools" Version="0.6.5-v0001" />
 	</ItemGroup>
-	<ItemGroup>
-	  <Folder Include="Standard\" />
-	</ItemGroup>
 
 </Project>
