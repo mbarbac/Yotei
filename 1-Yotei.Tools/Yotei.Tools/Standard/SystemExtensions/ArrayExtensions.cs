@@ -15,6 +15,16 @@ public
 static class ArrayExtensions
 {
     /// <summary>
+    /// Returns a typed enumerator for the given array.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    public static IEnumerator<T> GetTypedEnumerator<T>(
+        this T[] source)
+        => ((IEnumerable<T>)source).GetEnumerator();
+
+    /// <summary>
     /// Returns a clone of this array where its elements are either the original ones, or cloned
     /// if deep cloning was requested.
     /// </summary>

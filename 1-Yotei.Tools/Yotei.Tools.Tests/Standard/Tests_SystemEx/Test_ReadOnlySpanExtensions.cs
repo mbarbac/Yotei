@@ -1,6 +1,8 @@
 ﻿#if NETSTANDARD2_0
 namespace Yotei.Tools.Std20.Tests;
 #else
+using Xunit.Sdk;
+
 namespace Yotei.Tools;
 #endif
 
@@ -26,6 +28,22 @@ public static class Test_ReadOnlySpanExtensions
     }
 
     // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_SequenceEqual()
+    {
+        ReadOnlySpan<int> span;
+        bool same;
+
+        span = []; same = span.SequenceEqual([]); Assert.True(same);
+
+        span = [1, 2];
+        same = span.SequenceEqual([]); Assert.False(same);
+        same = span.SequenceEqual([1]); Assert.False(same);
+        same = span.SequenceEqual([1, 2, 3]); Assert.False(same);
+        same = span.SequenceEqual([1, 2]); Assert.True(same);
+        same = span.SequenceEqual([1, 2], new MyComparer<int>()); Assert.True(same);
+    }
 
     [Fact]
     public static void Test_SequenceCompareTo()

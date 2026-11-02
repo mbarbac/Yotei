@@ -15,6 +15,62 @@ public
 static class ReadOnlySpanExtensions
 {
     /// <summary>
+    /// Determines equality of the two given sequences by validating they contain the same elements,
+    /// using the given comparer.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static bool SequenceEqual<T>(
+        this ReadOnlySpan<T> source,
+        IEnumerable<T> values, IComparer<T> comparer)
+        => source.SequenceCompareTo<T>(values, comparer) == 0;
+
+    /// <summary>
+    /// Determines the relative order of two sequences by comparing their elements with the given
+    /// comparer.
+    /// <br/>- If less than 0, <c>source</c> precedes <c>values</c>.
+    /// <br/>- If 0, <c>source</c> equals <c>values</c>.
+    /// <br/>- If greater than cero, <c>values</c> follow <c>source</c>.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="fallbackComparison"></param>
+    /// <returns></returns>
+    public static int SequenceCompareTo<T>(
+        this ReadOnlySpan<T> source, IEnumerable<T> values, Func<T, T, int>? fallbackComparison = null)
+        => source.SequenceCompareTo(values, ComparerFactory.Create<T>(fallbackComparison));
+
+    // Used because 'Comparer<T>.Default' needs 'T' to implement 'IComparable'...
+    static class ComparerFactory
+    {
+        // Returns either 'Comparer<T>.Default' or a custom one...
+        public static IComparer<T> Create<T>(Func<T, T, int>? fallbackComparison = null)
+        {
+            // If 'T' implements 'IComparable' we're done...
+            var type = typeof(T);
+            if (typeof(IComparable<T>).IsAssignableFrom(type) ||
+                typeof(IComparable).IsAssignableFrom(type))
+                return Comparer<T>.Default;
+
+            // We may have given same comparison logic...
+            if (fallbackComparison != null) return Comparer<T>.Create((x, y) => fallbackComparison(x, y));
+
+            // Fallback logic is by comparing their string representations...
+            return Comparer<T>.Create((x, y) =>
+            {
+                if (x is null && y is null) return 0;
+                if (x is null) return -1;
+                if (y is null) return +1;
+                return string.Compare(x.ToString(), y.ToString(), StringComparison.Ordinal);
+            });
+        }
+    }
+
+    /// <summary>
     /// Determines the relative order of two sequences by comparing their elements with the given
     /// comparer.
     /// <br/>- If less than 0, <c>source</c> precedes <c>values</c>.

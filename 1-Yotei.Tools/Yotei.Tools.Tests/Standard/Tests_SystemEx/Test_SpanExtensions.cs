@@ -29,6 +29,23 @@ public static class Test_SpanExtensions
 
     [SuppressMessage("", "IDE0300")]
     [Fact]
+    public static void Inherit_SequenceEqual()
+    {
+        Span<int> span;
+        bool same;
+
+        span = []; same = span.SequenceEqual([]); Assert.True(same);
+
+        span = new int[] { 1, 2 };
+        same = span.SequenceEqual([]); Assert.False(same);
+        same = span.SequenceEqual([1]); Assert.False(same);
+        same = span.SequenceEqual([1, 2, 3]); Assert.False(same);
+        same = span.SequenceEqual([1, 2]); Assert.True(same);
+        same = span.SequenceEqual([1, 2], new MyComparer<int>()); Assert.True(same);
+    }
+
+    [SuppressMessage("", "IDE0300")]
+    [Fact]
     public static void Inherit_SequenceCompareTo()
     {
         int comp;
