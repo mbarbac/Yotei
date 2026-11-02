@@ -27,6 +27,17 @@ public static class Test_CloneExtensions
     }
 
     [Fact]
+    public static void Test_Clone_Reference_Types()
+    {
+        var source = new Item<int>(3);
+        var target = source.TryClone();
+
+        Assert.NotSame(source, target);
+        Assert.Equal(source.Value, target!.Value);
+        Assert.IsType(source.GetType(), target);
+    }
+
+    [Fact]
     public static void Test_Clone_Primitives()
     {
         var source = 7;
