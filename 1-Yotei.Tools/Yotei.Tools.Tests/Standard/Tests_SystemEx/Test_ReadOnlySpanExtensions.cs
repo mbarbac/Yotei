@@ -1,8 +1,6 @@
 ﻿#if NETSTANDARD2_0
 namespace Yotei.Tools.Std20.Tests;
 #else
-using Xunit.Runner.Common;
-
 namespace Yotei.Tools;
 #endif
 
@@ -171,7 +169,7 @@ public static class Test_ReadOnlySpanExtensions
     // ----------------------------------------------------
 
     [Fact]
-    public static void TrimStart()
+    public static void Test_TrimStart()
     {
         ReadOnlySpan<int> source;
         ReadOnlySpan<int> target;
@@ -195,7 +193,7 @@ public static class Test_ReadOnlySpanExtensions
     }
 
     [Fact]
-    public static void TrimEnd()
+    public static void Test_TrimEnd()
     {
         ReadOnlySpan<int> source;
         ReadOnlySpan<int> target;
@@ -219,7 +217,7 @@ public static class Test_ReadOnlySpanExtensions
     }
 
     [Fact]
-    public static void Trim()
+    public static void Test_Trim()
     {
         ReadOnlySpan<int> source;
         ReadOnlySpan<int> target;
@@ -360,5 +358,28 @@ public static class Test_ReadOnlySpanExtensions
         span = [1, 2]; found = span.EndsWithAny([0, 3]); Assert.False(found);
         span = [2, 1]; found = span.EndsWithAny([0, 1]); Assert.True(found);
         span = [2, 1]; found = span.EndsWithAny([0, 1], new MyComparer<int>()); Assert.True(found);
+    }
+
+    // ----------------------------------------------------
+
+    [Fact]
+    [SuppressMessage("", "IDE0018")]
+    public static void Test_TryFind()
+    {
+        int value;
+        List<int> list;
+        ReadOnlySpan<int> span;
+
+        span = []; Assert.False(span.TryFind(x => x != 0, out value)); Assert.Equal(0, value);
+        span = [1, 3, 2]; Assert.True(span.TryFind(x => x > 1, out value)); Assert.Equal(3, value);
+
+        span = []; Assert.False(span.TryFindLast(x => x != 0, out value)); Assert.Equal(0, value);
+        span = [3, 2, 1]; Assert.True(span.TryFindLast(x => x > 1, out value)); Assert.Equal(2, value);
+
+        span = []; Assert.False(span.TryFindAll(x => x != 0, out list)); Assert.Empty(list);
+        span = [1, 3, 2, 1]; Assert.True(span.TryFindAll(x => x > 1, out list));
+        Assert.Equal(2, list.Count);
+        Assert.Equal(3, list[0]);
+        Assert.Equal(2, list[1]);
     }
 }

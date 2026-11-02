@@ -1,6 +1,4 @@
 ﻿#if NETSTANDARD2_0
-using System.Net.Sockets;
-
 namespace Yotei.Tools.Std20;
 #pragma warning disable IDE0079
 #pragma warning disable CS0436
@@ -679,20 +677,79 @@ static class ReadOnlySpanExtensions
     }
 
     // ----------------------------------------------------
-    // bool TryFind(Predicate<T> predicate, out T value);
-    // bool TryFindLast(Predicate<T> predicate, out T value);
-    // bool TryFind(Predicate<T> predicate, out List<T> values);
 
-    // ----------------------------------------------------
-    // Replace
-    // Add
-    // AddRange
-    // Insert
-    // InsertRange
-    // RemoveAt
-    // RemoveRange
-    // Remove
-    // RemoveLast
-    // RemoveAll
-    // Clear
+    /// <summary>
+    /// Tries to find the first ocurrence of a value in the span that matches the given predicate.
+    /// If found, sets the out argument to it, and returns true. Otherwise, returns false.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="predicate"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public static bool TryFind<T>(this ReadOnlySpan<T> source, Predicate<T> predicate, out T value)
+    {
+        predicate.ThrowWhenNull();
+
+        for (int i = 0; i < source.Length; i++)
+        {
+            var temp = source[i];
+            if (predicate(temp))
+            {
+                value = temp;
+                return true;
+            }
+        }
+        value = default!;
+        return false;
+    }
+
+    /// <summary>
+    /// Tries to find the last ocurrence of a value in the span that matches the given predicate.
+    /// If found, sets the out argument to it, and returns true. Otherwise, returns false.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="predicate"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public static bool TryFindLast<T>(this ReadOnlySpan<T> source, Predicate<T> predicate, out T value)
+    {
+        predicate.ThrowWhenNull();
+
+        for (int i = source.Length - 1; i >= 0; i--)
+        {
+            var temp = source[i];
+            if (predicate(temp))
+            {
+                value = temp;
+                return true;
+            }
+        }
+        value = default!;
+        return false;
+    }
+
+    /// <summary>
+    /// Tries to find all the ocurrences of values in the span that match the given predicate.
+    /// Sets the out argument to the collection of found ones. Returns true if any is found,
+    /// otherwise, returns false.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="predicate"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public static bool TryFindAll<T>(
+        this ReadOnlySpan<T> source, Predicate<T> predicate, out List<T> values)
+    {
+        predicate.ThrowWhenNull();
+
+        values = []; for (int i = 0; i < source.Length; i++)
+        {
+            var temp = source[i];
+            if (predicate(temp)) values.Add(temp);
+        }
+        return values.Count > 0;
+    }
 }
