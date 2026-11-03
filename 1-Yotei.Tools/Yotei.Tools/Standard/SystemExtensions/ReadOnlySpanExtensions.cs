@@ -270,6 +270,156 @@ static class ReadOnlySpanExtensions
     }
 
     // ----------------------------------------------------
+#if NETSTANDARD2_0
+    /// <summary>
+    /// Determines if the sequence contains any of the given values.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <returns></returns>
+    public static bool ContainsAny<T>(
+        this ReadOnlySpan<T> source, IEnumerable<T> values)
+        => source.ContainsAny(values, EqualityComparer<T>.Default);
+#endif
+
+#if NETSTANDARD2_0
+    /// <summary>
+    /// Determines if the sequence contains any of the given values, using the given comparer.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static bool ContainsAny<T>(
+        this ReadOnlySpan<T> source, IEnumerable<T> values, IEqualityComparer<T> comparer)
+        => source.IndexOfAny(values, comparer) >= 0;
+#endif
+
+    // ----------------------------------------------------
+#if NETSTANDARD2_0
+    /// <summary>
+    /// Searches for the first index of any of the given values.
+    /// Returns -1 if any.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <returns></returns>
+    public static int IndexOfAny<T>(
+        this ReadOnlySpan<T> source, IEnumerable<T> values)
+        => source.IndexOfAny(values, EqualityComparer<T>.Default);
+#endif
+
+#if NETSTANDARD2_0
+    /// <summary>
+    /// Searches for the first index of any of the given values using the given comparer.
+    /// Returns -1 if any.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static int IndexOfAny<T>(
+        this ReadOnlySpan<T> source, IEnumerable<T> values, IEqualityComparer<T> comparer)
+    {
+        values.ThrowWhenNull();
+        comparer.ThrowWhenNull();
+
+        for (int i = 0; i < source.Length; i++)
+        {
+            var item = source[i];
+            foreach (var value in values) if (comparer.Equals(value, item)) return i;
+        }
+        return -1;
+    }
+#endif
+
+    // ----------------------------------------------------
+#if NETSTANDARD2_0
+    /// <summary>
+    /// Searches for the last index of any of the given values.
+    /// Returns -1 if any.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <returns></returns>
+    public static int LastIndexOfAny<T>(
+        this ReadOnlySpan<T> source, IEnumerable<T> values)
+        => source.LastIndexOfAny(values, EqualityComparer<T>.Default);
+#endif
+
+#if NETSTANDARD2_0
+    /// <summary>
+    /// Searches for the last index of any of the given values using the given comparer.
+    /// Returns -1 if any.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static int LastIndexOfAny<T>(
+        this ReadOnlySpan<T> source, IEnumerable<T> values, IEqualityComparer<T> comparer)
+    {
+        values.ThrowWhenNull();
+        comparer.ThrowWhenNull();
+
+        for (int i = source.Length - 1; i >= 0; i--)
+        {
+            var item = source[i];
+            foreach (var value in values) if (comparer.Equals(value, item)) return i;
+        }
+        return -1;
+    }
+#endif
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Determines if the sequence contains any values other than the given one.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public static bool ContainsAnyExcept<T>(
+        this ReadOnlySpan<T> source, T value)
+        => source.ContainsAnyExcept(value, EqualityComparer<T>.Default);
+
+#if NETSTANDARD2_0
+    /// <summary>
+    /// Determines if the sequence contains any values other than the given one, using the given
+    /// comparer.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static bool ContainsAnyExcept<T>(
+        this ReadOnlySpan<T> source, T value, IEqualityComparer<T> comparer)
+    {
+        comparer.ThrowWhenNull();
+        return source.ContainsAnyExcept(x => comparer.Equals(x, value));
+    }
+#endif
+
+    /// <summary>
+    /// Determines if the sequence contains any values other than the ones that match the given
+    /// predicate.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="predicate"></param>
+    /// <returns></returns>
+    public static bool ContainsAnyExcept<T>(
+        this ReadOnlySpan<T> source, Predicate<T> predicate) => source.IndexOfAnyExcept(predicate) >= 0;
+
+    // ----------------------------------------------------
 
     /// <summary>
     /// Searches for the first index of any value other than the given one.
@@ -313,6 +463,55 @@ static class ReadOnlySpanExtensions
         predicate.ThrowWhenNull();
 
         for (int i = 0; i < source.Length; i++) if (!predicate(source[i])) return i;
+        return -1;
+    }
+
+    // ----------------------------------------------------
+
+#if NETSTANDARD2_0
+    /// <summary>
+    /// Searches for the last index of any value other than the given one.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public static int LastIndexOfAnyExcept<T>(
+        this ReadOnlySpan<T> source, T value)
+        => source.LastIndexOfAnyExcept(value, EqualityComparer<T>.Default);
+#endif
+
+#if NETSTANDARD2_0
+    /// <summary>
+    /// Searches for the last index of any value other than the given one, using the given
+    /// comparer.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static int LastIndexOfAnyExcept<T>(
+        this ReadOnlySpan<T> source, T value, IEqualityComparer<T> comparer)
+    {
+        comparer.ThrowWhenNull();
+        return source.LastIndexOfAnyExcept(x => comparer.Equals(x, value));
+    }
+#endif
+
+    /// <summary>
+    /// Searches for the last index of any value other than the ones that match the given
+    /// predicate.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="predicate"></param>
+    /// <returns></returns>
+    public static int LastIndexOfAnyExcept<T>(this ReadOnlySpan<T> source, Predicate<T> predicate)
+    {
+        predicate.ThrowWhenNull();
+
+        for (int i = source.Length - 1; i >= 0; i--) if (!predicate(source[i])) return i;
         return -1;
     }
 }

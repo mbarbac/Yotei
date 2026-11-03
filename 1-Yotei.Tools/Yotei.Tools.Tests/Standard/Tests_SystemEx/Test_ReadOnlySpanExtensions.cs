@@ -101,7 +101,6 @@ public static class Test_ReadOnlySpanExtensions
         Assert.True(span.Contains(Predicate(2)));
     }
 
-    // ----------------------------------------------------
 
     [Fact]
     public static void Test_IndexOf()
@@ -161,27 +160,146 @@ public static class Test_ReadOnlySpanExtensions
     }
 
     // ----------------------------------------------------
-#if !NETSTANDARD2_0
+
     [Fact]
-    public static void Test()
+    public static void Test_ContainsAny()
+    {
+        ReadOnlySpan<Item<int>> span = Span([]);
+        Assert.False(span.ContainsAny([]));
+        Assert.False(span.ContainsAny([], Comparer()));
+        Assert.False(span.ContainsAny([Item(1), Item(2)]));
+        Assert.False(span.ContainsAny([Item(1), Item(2)], Comparer()));
+
+        span = Span([Item(1), Item(2), Item(3)]);
+        Assert.False(span.ContainsAny([]));
+        Assert.False(span.ContainsAny([], Comparer()));
+        Assert.False(span.ContainsAny([Item(9), Item(2)]));
+        Assert.True(span.ContainsAny([Item(9), Item(2)], Comparer()));
+    }
+
+    [Fact]
+    public static void Test_IndexOfAny()
+    {
+        ReadOnlySpan<Item<int>> span = Span([]);
+        Assert.Equal(-1, span.IndexOfAny([]));
+        Assert.Equal(-1, span.IndexOfAny([], Comparer()));
+        Assert.Equal(-1, span.IndexOfAny([Item(1), Item(2)]));
+        Assert.Equal(-1, span.IndexOfAny([Item(1), Item(2)], Comparer()));
+
+        span = Span([Item(1), Item(2), Item(3)]);
+        Assert.Equal(-1, span.IndexOfAny([]));
+        Assert.Equal(-1, span.IndexOfAny([], Comparer()));
+        Assert.Equal(-1, span.IndexOfAny([Item(9), Item(2)]));
+        Assert.Equal(1, span.IndexOfAny([Item(9), Item(2)], Comparer()));
+    }
+
+    [Fact]
+    public static void Test_LastIndexOfAny()
+    {
+        ReadOnlySpan<Item<int>> span = Span([]);
+        Assert.Equal(-1, span.LastIndexOfAny([]));
+        Assert.Equal(-1, span.LastIndexOfAny([], Comparer()));
+        Assert.Equal(-1, span.LastIndexOfAny([Item(1), Item(2)]));
+        Assert.Equal(-1, span.LastIndexOfAny([Item(1), Item(2)], Comparer()));
+
+        span = Span([Item(1), Item(2), Item(3)]);
+        Assert.Equal(-1, span.LastIndexOfAny([]));
+        Assert.Equal(-1, span.LastIndexOfAny([], Comparer()));
+        Assert.Equal(-1, span.LastIndexOfAny([Item(9), Item(2)]));
+        Assert.Equal(1, span.LastIndexOfAny([Item(9), Item(2)], Comparer()));
+    }
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_ContainsAnyExcept()
+    {
+        ReadOnlySpan<Item<int>> span = Span([]);
+        Assert.False(span.ContainsAnyExcept(Item(9)));
+        Assert.False(span.ContainsAnyExcept(Item(9), Comparer()));
+        Assert.False(span.ContainsAnyExcept(Predicate(9)));
+
+        span = Span([Item(9)]);
+        Assert.True(span.ContainsAnyExcept(Item(9)));
+        Assert.False(span.ContainsAnyExcept(Item(9), Comparer()));
+        Assert.False(span.ContainsAnyExcept(Predicate(9)));
+
+        span = Span([Item(9), Item(9), Item(9)]);
+        Assert.True(span.ContainsAnyExcept(Item(9)));
+        Assert.False(span.ContainsAnyExcept(Item(9), Comparer()));
+        Assert.False(span.ContainsAnyExcept(Predicate(9)));
+
+        span = Span([Item(9), Item(9), Item(0), Item(9), Item(9)]);
+        Assert.True(span.ContainsAnyExcept(Item(9)));
+        Assert.True(span.ContainsAnyExcept(Item(9), Comparer()));
+        Assert.True(span.ContainsAnyExcept(Predicate(9)));
+    }
+
+    [Fact]
+    public static void Test_IndexOfAnyExcept()
     {
         ReadOnlySpan<Item<int>> span = Span([]);
         Assert.Equal(-1, span.IndexOfAnyExcept(Item(9)));
         Assert.Equal(-1, span.IndexOfAnyExcept(Item(9), Comparer()));
         Assert.Equal(-1, span.IndexOfAnyExcept(Predicate(9)));
 
+        span = Span([Item(9)]);
+        Assert.Equal(0, span.IndexOfAnyExcept(Item(9)));
+        Assert.Equal(-1, span.IndexOfAnyExcept(Item(9), Comparer()));
+        Assert.Equal(-1, span.IndexOfAnyExcept(Predicate(9)));
 
-        //span = Span([]); index = span.IndexOfAnyExcept(Item(9)); Assert.Equal(-1, index);
-        //span = Span([Item(9)]); index = span.IndexOfAnyExcept(Item(9)); Assert.Equal(0, index);
-        //span = Span([Item(9), Item(9), Item(9)]); index = span.IndexOfAnyExcept(Item(9)); Assert.Equal(0, index);
+        span = Span([Item(9), Item(9), Item(9)]);
+        Assert.Equal(0, span.IndexOfAnyExcept(Item(9)));
+        Assert.Equal(-1, span.IndexOfAnyExcept(Item(9), Comparer()));
+        Assert.Equal(-1, span.IndexOfAnyExcept(Predicate(9)));
 
-        //span = Span([]); index = span.IndexOfAnyExcept(Item(9), Comparer()); Assert.Equal(-1, index);
-        //span = Span([Item(9)]); index = span.IndexOfAnyExcept(Item(9), Comparer()); Assert.Equal(-1, index);
-        //span = Span([Item(9), Item(9), Item(9)]); index = span.IndexOfAnyExcept(Item(9), Comparer()); Assert.Equal(-1, index);
-        //span = Span([Item(1), Item(2)]); index = span.IndexOfAnyExcept(Item(9), Comparer()); Assert.Equal(0, index);
-        //span = Span([Item(9), Item(9), Item(1), Item(2)]); Assert.Equal(2, index = span.IndexOfAnyExcept(Item(9), Comparer()));
+        span = Span([Item(9), Item(9), Item(0), Item(9), Item(9)]);
+        Assert.Equal(0, span.IndexOfAnyExcept(Item(9)));
+        Assert.Equal(2, span.IndexOfAnyExcept(Item(9), Comparer()));
+        Assert.Equal(2, span.IndexOfAnyExcept(Predicate(9)));
+    }
 
-        //span = Span([]); index = span.IndexOfAnyExcept(Predicate(9));
+    [Fact]
+    public static void Test_LastIndexOfAnyExcept()
+    {
+        ReadOnlySpan<Item<int>> span = Span([]);
+        Assert.Equal(-1, span.LastIndexOfAnyExcept(Item(9)));
+        Assert.Equal(-1, span.LastIndexOfAnyExcept(Item(9), Comparer()));
+        Assert.Equal(-1, span.LastIndexOfAnyExcept(Predicate(9)));
+
+        span = Span([Item(9)]);
+        Assert.Equal(0, span.LastIndexOfAnyExcept(Item(9)));
+        Assert.Equal(-1, span.LastIndexOfAnyExcept(Item(9), Comparer()));
+        Assert.Equal(-1, span.LastIndexOfAnyExcept(Predicate(9)));
+
+        span = Span([Item(9), Item(9), Item(9)]);
+        Assert.Equal(2, span.LastIndexOfAnyExcept(Item(9)));
+        Assert.Equal(-1, span.LastIndexOfAnyExcept(Item(9), Comparer()));
+        Assert.Equal(-1, span.LastIndexOfAnyExcept(Predicate(9)));
+
+        span = Span([Item(9), Item(9), Item(0), Item(9), Item(9)]);
+        Assert.Equal(4, span.LastIndexOfAnyExcept(Item(9)));
+        Assert.Equal(2, span.LastIndexOfAnyExcept(Item(9), Comparer()));
+        Assert.Equal(2, span.LastIndexOfAnyExcept(Predicate(9)));
+    }
+
+    // ----------------------------------------------------
+    // A ver: public static Memory<T> TrimStart<T>(this Memory<T> memory, ReadOnlySpan<T> trimElements)
+    // O sea, que el argument es un span, no un item individual!
+    // Asi que hay que replicar los 4 metodos.
+
+#if !NETSTANDARD2_0
+    [Fact]
+    public static void Test_()
+    {
+        ReadOnlySpan<Item<int>> source;
+        ReadOnlySpan<Item<int>> target;
+
+        //source = Span([]);
+        //target = source.TrimStart();
+        //target = source.TrimStart(Item(9));
+        //target = source.TrimStart(Item(9), Comparer());
+        //target = source.TrimStart(Predicate(9));
     }
 #endif
 }
