@@ -1,54 +1,83 @@
 ﻿#if NETSTANDARD2_0
 namespace Yotei.Tools.Std20.Tests;
 #else
-using Xunit.Internal;
-
 namespace Yotei.Tools;
 #endif
+#pragma warning disable IDE0079
+#pragma warning disable IDE0059, CA1859
 
+/* Note:
+* - Two instances of the Item<T> type are not equal to each other, even if they cary the same
+*   value, because it is a reference type. This is on purpose to check reference types with custom
+*   comparers and predicate. Reference types with value semantics are easily implemented.
+*/
 // ========================================================
 public static class Test_ReadOnlySpanExtensions
 {
-    static Item<int> ToItem(int value) => new(value);
-    static ReadOnlySpan<Item<int>> ToSpan(Item<int>[] values) => values.AsSpan();
-    static ItemComparer<int> ToComparer() => new();
+    static Item<int> Item(int value) => new(value);
+    static ReadOnlySpan<Item<int>> Span(Item<int>[] values) => values.AsSpan();
+    static ComparerFactory.InnerComparer<Item<int>> Comparer() => Item<int>.Create();
+    static Predicate<Item<int>> Predicate(int value) => x => x.Value == value;
 
     // ----------------------------------------------------
 
     [Fact]
     public static void Test_SequenceEquals()
     {
-        ReadOnlySpan<Item<int>> span;
-        bool same;
+        ReadOnlySpan<Item<int>> span = Span([]);        
+        Assert.True(span.SequenceEqual([]));
+        Assert.True(span.SequenceEqual([], Comparer()));
 
-        span = ToSpan([]); same = span.SequenceEqual([]); Assert.True(same);
-        span = ToSpan([new(1)]); same = span.SequenceEqual([]); Assert.False(same);
-        span = ToSpan([new(1)]); same = span.SequenceEqual([new(1)]); Assert.True(same);
-        span = ToSpan([new(1), new(2)]); same = span.SequenceEqual([new(1)]); Assert.False(same);
-        span = ToSpan([new(1), new(2)]); same = span.SequenceEqual([new(1), new(2)]); Assert.True(same);
+        span = Span([Item(1)]);        
+        Assert.False(span.SequenceEqual([]));
+        Assert.False(span.SequenceEqual([Item(1)]));
 
-        span = ToSpan([]); same = span.SequenceEqual([], ToComparer()); Assert.True(same);
-        span = ToSpan([new(1)]); same = span.SequenceEqual([], ToComparer()); Assert.False(same);
-        span = ToSpan([new(1)]); same = span.SequenceEqual([new(1)], ToComparer()); Assert.True(same);
-        span = ToSpan([new(1), new(2)]); same = span.SequenceEqual([new(1)], ToComparer()); Assert.False(same);
-        span = ToSpan([new(1), new(2)]); same = span.SequenceEqual([new(1), new(2)], ToComparer()); Assert.True(same);
+        Assert.False(span.SequenceEqual([], Comparer()));
+        Assert.True(span.SequenceEqual([Item(1)], Comparer()));
+
+        span = Span([Item(1), Item(2)]);        
+        Assert.False(span.SequenceEqual([]));
+        Assert.False(span.SequenceEqual([Item(1)]));
+        Assert.False(span.SequenceEqual([Item(1), Item(2)]));
+
+        Assert.False(span.SequenceEqual([], Comparer()));
+        Assert.False(span.SequenceEqual([Item(1)], Comparer()));
+        Assert.True(span.SequenceEqual([Item(1), Item(2)], Comparer()));
     }
 
     [Fact]
     public static void Test_SequenceCompareTo()
     {
-        ReadOnlySpan<Item<int>> span;
-        int same;
+        ReadOnlySpan<Item<int>> span = Span([]);
+        Assert.Equal(0, span.SequenceCompareTo([]));
+        Assert.Equal(-1, span.SequenceCompareTo([Item(1)]));
 
-        span = ToSpan([]); same = span.SequenceCompareTo([]); Assert.Equal(0, same);
-        span = ToSpan([new(1), new(2)]); same = span.SequenceCompareTo([]); Assert.Equal(+1, same);
-        span = ToSpan([]); same = span.SequenceCompareTo([new(1), new(2)]); Assert.Equal(-1, same);
-        span = ToSpan([new(1), new(2)]); same = span.SequenceCompareTo([new(1), new(2)]); Assert.Equal(0, same);
+        Assert.Equal(0, span.SequenceCompareTo([], Comparer()));        
+        Assert.Equal(-1, span.SequenceCompareTo([Item(1)], Comparer()));
 
-        span = ToSpan([]); same = span.SequenceCompareTo([], ToComparer()); Assert.Equal(0, same);
-        span = ToSpan([new(1), new(2)]); same = span.SequenceCompareTo([], ToComparer()); Assert.Equal(+1, same);
-        span = ToSpan([]); same = span.SequenceCompareTo([new(1), new(2)], ToComparer()); Assert.Equal(-1, same);
-        span = ToSpan([new(1), new(2)]); same = span.SequenceCompareTo([new(1), new(2)], ToComparer()); Assert.Equal(0, same);
+        span = Span([Item(5)]);
+        Assert.Equal(+1, span.SequenceCompareTo([]));
+        Assert.Equal(-1, span.SequenceCompareTo([Item(1)]));
+        Assert.Equal(-1, span.SequenceCompareTo([Item(9)]));
+        Assert.Equal(-1, span.SequenceCompareTo([Item(5)]));
+
+        Assert.Equal(+1, span.SequenceCompareTo([], Comparer()));
+        Assert.Equal(+1, span.SequenceCompareTo([Item(1)], Comparer()));
+        Assert.Equal(-1, span.SequenceCompareTo([Item(9)], Comparer()));
+        Assert.Equal(0, span.SequenceCompareTo([Item(5)], Comparer()));
+
+        span = Span([Item(5), Item(6)]);
+        Assert.Equal(+1, span.SequenceCompareTo([]));
+        Assert.Equal(-1, span.SequenceCompareTo([Item(5)]));
+        Assert.Equal(-1, span.SequenceCompareTo([Item(4), Item(6)]));
+        Assert.Equal(-1, span.SequenceCompareTo([Item(5), Item(7)]));
+        Assert.Equal(-1, span.SequenceCompareTo([Item(5), Item(6), Item(7)]));
+
+        Assert.Equal(+1, span.SequenceCompareTo([], Comparer()));
+        Assert.Equal(+1, span.SequenceCompareTo([Item(5)], Comparer()));
+        Assert.Equal(+1, span.SequenceCompareTo([Item(4), Item(6)], Comparer()));
+        Assert.Equal(-1, span.SequenceCompareTo([Item(5), Item(7)], Comparer()));
+        Assert.Equal(-1, span.SequenceCompareTo([Item(5), Item(6), Item(7)], Comparer()));
     }
 
     // ----------------------------------------------------
@@ -56,24 +85,20 @@ public static class Test_ReadOnlySpanExtensions
     [Fact]
     public static void Test_Contains()
     {
-        Predicate<Item<int>> Predicate(int value) => x => x.Value == value;
-        ReadOnlySpan<Item<int>> span;
-        bool same;
+        ReadOnlySpan<Item<int>> span = Span([]);
+        Assert.False(span.Contains(Item(9)));
+        Assert.False(span.Contains(Item(9), Comparer()));
+        Assert.False(span.Contains(Predicate(9)));
 
-        span = ToSpan([]);
-        same = span.Contains(ToItem(9)); Assert.False(same);
-        same = span.Contains(new(9), ToComparer()); Assert.False(same);
-        same = span.Contains(Predicate(9));
+        span = Span([Item(1), Item(2)]);
+        Assert.False(span.Contains(Item(9)));
+        Assert.False(span.Contains(Item(9), Comparer()));
+        Assert.False(span.Contains(Predicate(9)));
 
-        span = ToSpan([new(1), new(2)]);
-        same = span.Contains(ToItem(9)); Assert.False(same);
-        same = span.Contains(new(9), ToComparer()); Assert.False(same);
-        same = span.Contains(Predicate(9)); Assert.False(same);
-
-        span = ToSpan([new(1), new(2), new(1), new(2)]);
-        same = span.Contains(ToItem(2)); Assert.False(same);
-        same = span.Contains(new(2), ToComparer()); Assert.True(same);
-        same = span.Contains(Predicate(2)); Assert.True(same);
+        span = Span([Item(1), Item(2), Item(1), Item(2)]);
+        Assert.False(span.Contains(Item(2)));
+        Assert.True(span.Contains(Item(2), Comparer()));
+        Assert.True(span.Contains(Predicate(2)));
     }
 
     // ----------------------------------------------------
@@ -81,69 +106,82 @@ public static class Test_ReadOnlySpanExtensions
     [Fact]
     public static void Test_IndexOf()
     {
-        Predicate<Item<int>> Predicate(int value) => x => x.Value == value;
-        ReadOnlySpan<Item<int>> span;
-        int index;
+        ReadOnlySpan<Item<int>> span = Span([]);
+        Assert.Equal(-1, span.IndexOf(Item(9)));
+        Assert.Equal(-1, span.IndexOf(Item(9), Comparer()));
+        Assert.Equal(-1, span.IndexOf(Predicate(9)));
 
-        span = ToSpan([]);
-        index = span.IndexOf(ToItem(9)); Assert.Equal(-1, index);
-        index = span.IndexOf(new(9), ToComparer()); Assert.Equal(-1, index);
-        index = span.IndexOf(Predicate(9));
+        span = Span([Item(1), Item(2)]);
+        Assert.Equal(-1, span.IndexOf(Item(9)));
+        Assert.Equal(-1, span.IndexOf(Item(9), Comparer()));
+        Assert.Equal(-1, span.IndexOf(Predicate(9)));
 
-        span = ToSpan([new(1), new(2)]);
-        index = span.IndexOf(ToItem(9)); Assert.Equal(-1, index);
-        index = span.IndexOf(new(9), ToComparer()); Assert.Equal(-1, index);
-        index = span.IndexOf(Predicate(9)); Assert.Equal(-1, index);
-
-        span = ToSpan([new(1), new(2), new(1), new(2)]);
-        index = span.IndexOf(ToItem(2)); Assert.Equal(-1, index);
-        index = span.IndexOf(new(2), ToComparer()); Assert.Equal(1, index);
-        index = span.IndexOf(Predicate(2)); Assert.Equal(1, index);
+        span = Span([Item(1), Item(2), Item(1), Item(2)]);
+        Assert.Equal(-1, span.IndexOf(Item(2)));
+        Assert.Equal(1, span.IndexOf(Item(2), Comparer()));
+        Assert.Equal(1, span.IndexOf(Predicate(2)));
     }
 
     [Fact]
     public static void Test_LastIndexOf()
     {
-        Predicate<Item<int>> Predicate(int value) => x => x.Value == value;
-        ReadOnlySpan<Item<int>> span;
-        int index;
+        ReadOnlySpan<Item<int>> span = Span([]);
+        Assert.Equal(-1, span.LastIndexOf(Item(9)));
+        Assert.Equal(-1, span.LastIndexOf(Item(9), Comparer()));
+        Assert.Equal(-1, span.LastIndexOf(Predicate(9)));
 
-        span = ToSpan([]);
-        index = span.LastIndexOf(ToItem(9)); Assert.Equal(-1, index);
-        index = span.LastIndexOf(new(9), ToComparer()); Assert.Equal(-1, index);
-        index = span.LastIndexOf(Predicate(9));
+        span = Span([Item(1), Item(2)]);
+        Assert.Equal(-1, span.LastIndexOf(Item(9)));
+        Assert.Equal(-1, span.LastIndexOf(Item(9), Comparer()));
+        Assert.Equal(-1, span.LastIndexOf(Predicate(9)));
 
-        span = ToSpan([new(1), new(2)]);
-        index = span.LastIndexOf(ToItem(9)); Assert.Equal(-1, index);
-        index = span.LastIndexOf(new(9), ToComparer()); Assert.Equal(-1, index);
-        index = span.LastIndexOf(Predicate(9)); Assert.Equal(-1, index);
-
-        span = ToSpan([new(1), new(2), new(1), new(2)]);
-        index = span.LastIndexOf(ToItem(2)); Assert.Equal(-1, index);
-        index = span.LastIndexOf(new(2), ToComparer()); Assert.Equal(3, index);
-        index = span.LastIndexOf(Predicate(2)); Assert.Equal(3, index);
+        span = Span([Item(1), Item(2), Item(1), Item(2)]);
+        Assert.Equal(-1, span.LastIndexOf(Item(2)));
+        Assert.Equal(3, span.LastIndexOf(Item(2), Comparer()));
+        Assert.Equal(3, span.LastIndexOf(Predicate(2)));
     }
 
     [Fact]
     public static void Test_IndexesOf()
     {
-        Predicate<Item<int>> Predicate(int value) => x => x.Value == value;
-        ReadOnlySpan<Item<int>> span;
-        List<int> indexes;
+        ReadOnlySpan<Item<int>> span = Span([]);
+        Assert.Empty(span.IndexesOf(Item(9)));
+        Assert.Empty(span.IndexesOf(Item(9), Comparer()));
+        Assert.Empty(span.IndexesOf(Predicate(9)));
 
-        span = ToSpan([]);
-        indexes = span.IndexesOf(ToItem(9)); Assert.Empty(indexes);
-        indexes = span.IndexesOf(new(9), ToComparer()); Assert.Empty(indexes);
-        indexes = span.IndexesOf(Predicate(9)); Assert.Empty(indexes);
-        
-        span = ToSpan([new(1), new(2)]);
-        indexes = span.IndexesOf(ToItem(9)); Assert.Empty(indexes);
-        indexes = span.IndexesOf(new(9), ToComparer()); Assert.Empty(indexes);
-        indexes = span.IndexesOf(Predicate(9)); Assert.Empty(indexes);
+        span = Span([Item(1), Item(2)]);
+        Assert.Empty(span.IndexesOf(Item(9)));
+        Assert.Empty(span.IndexesOf(Item(9), Comparer()));
+        Assert.Empty(span.IndexesOf(Predicate(9)));
 
-        span = ToSpan([new(1), new(2), new(1), new(2)]);
-        indexes = span.IndexesOf(ToItem(2)); Assert.Empty(indexes);
-        indexes = span.IndexesOf(ToItem(2), ToComparer()); Assert.True(indexes is [1, 3]);
-        indexes = span.IndexesOf(Predicate(2)); Assert.True(indexes is [1, 3]);
+        span = Span([Item(1), Item(2), Item(1), Item(2)]);
+        Assert.Empty(span.IndexesOf(Item(2)));
+        Assert.True(span.IndexesOf(Item(2), Comparer()) is [1,3]);
+        Assert.True(span.IndexesOf(Predicate(2)) is [1, 3]);
     }
+
+    // ----------------------------------------------------
+#if !NETSTANDARD2_0
+    [Fact]
+    public static void Test()
+    {
+        ReadOnlySpan<Item<int>> span = Span([]);
+        Assert.Equal(-1, span.IndexOfAnyExcept(Item(9)));
+        Assert.Equal(-1, span.IndexOfAnyExcept(Item(9), Comparer()));
+        Assert.Equal(-1, span.IndexOfAnyExcept(Predicate(9)));
+
+
+        //span = Span([]); index = span.IndexOfAnyExcept(Item(9)); Assert.Equal(-1, index);
+        //span = Span([Item(9)]); index = span.IndexOfAnyExcept(Item(9)); Assert.Equal(0, index);
+        //span = Span([Item(9), Item(9), Item(9)]); index = span.IndexOfAnyExcept(Item(9)); Assert.Equal(0, index);
+
+        //span = Span([]); index = span.IndexOfAnyExcept(Item(9), Comparer()); Assert.Equal(-1, index);
+        //span = Span([Item(9)]); index = span.IndexOfAnyExcept(Item(9), Comparer()); Assert.Equal(-1, index);
+        //span = Span([Item(9), Item(9), Item(9)]); index = span.IndexOfAnyExcept(Item(9), Comparer()); Assert.Equal(-1, index);
+        //span = Span([Item(1), Item(2)]); index = span.IndexOfAnyExcept(Item(9), Comparer()); Assert.Equal(0, index);
+        //span = Span([Item(9), Item(9), Item(1), Item(2)]); Assert.Equal(2, index = span.IndexOfAnyExcept(Item(9), Comparer()));
+
+        //span = Span([]); index = span.IndexOfAnyExcept(Predicate(9));
+    }
+#endif
 }

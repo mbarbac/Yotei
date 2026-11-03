@@ -268,4 +268,51 @@ static class ReadOnlySpanExtensions
         for (int i = 0; i < source.Length; i++) if (predicate(source[i])) nums.Add(i);
         return nums;
     }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Searches for the first index of any value other than the given one.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public static int IndexOfAnyExcept<T>(
+        this ReadOnlySpan<T> source, T value)
+        => source.IndexOfAnyExcept(value, EqualityComparer<T>.Default);
+
+#if NETSTANDARD2_0
+    /// <summary>
+    /// Searches for the first index of any value other than the given one, using the given
+    /// comparer.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static int IndexOfAnyExcept<T>(
+        this ReadOnlySpan<T> source, T value, IEqualityComparer<T> comparer)
+    {
+        comparer.ThrowWhenNull();
+        return source.IndexOfAnyExcept(x => comparer.Equals(x, value));
+    }
+#endif
+
+    /// <summary>
+    /// Searches for the first index of any value other than the ones that match the given
+    /// predicate.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="predicate"></param>
+    /// <returns></returns>
+    public static int IndexOfAnyExcept<T>(this ReadOnlySpan<T> source, Predicate<T> predicate)
+    {
+        predicate.ThrowWhenNull();
+
+        for (int i = 0; i < source.Length; i++) if (!predicate(source[i])) return i;
+        return -1;
+    }
 }
