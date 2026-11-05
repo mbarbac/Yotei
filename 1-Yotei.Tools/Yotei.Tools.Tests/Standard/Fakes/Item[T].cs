@@ -16,10 +16,4 @@ public class Item<T>(T value) : ICloneable
 
     public Item<T> Clone() => new(Value);
     object ICloneable.Clone() => Clone();
-
-    public static ComparerFactory.InnerComparer<Item<T>> Create(
-        Func<Item<T>, Item<T>, int>? comparer = null)
-        => comparer != null
-        ? ComparerFactory.Create(comparer)
-        : ComparerFactory.Create(comparer, StringComparison.Ordinal);
 }
