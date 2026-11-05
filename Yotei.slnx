@@ -7,10 +7,23 @@
   <Folder Name="/0-Environment/">
     <Project Path="0-Environment/Runner/Runner.csproj" Id="2bd15658-6cda-4291-9aaf-598253d17261" />
   </Folder>
+  <Folder Name="/1-Yotei.Tools.NStd20/">
+    <Project Path="1-Yotei.Tools.NStd20/Yotei.Tools.NStd20.Tests/Yotei.Tools.NStd20.Tests.csproj" Id="2821e479-c17a-4be3-9447-0c6c09c7f8a0">
+      <BuildType Solution="Local|*" Project="Debug" />
+    </Project>
+    <Project Path="1-Yotei.Tools.NStd20/Yotei.Tools.NStd20/Yotei.Tools.NStd20.csproj" Id="c765428c-244d-4a74-abd3-8552acf57a0d">
+      <BuildType Solution="Local|*" Project="Debug" />
+    </Project>
+  </Folder>
   <Folder Name="/1-Yotei.Tools/">
     <Project Path="1-Yotei.Tools/Yotei.Tools.Tests/Yotei.Tools.Tests.csproj" Id="5cba5bdd-6056-4c36-a14f-b42ca4f7f4be" />
     <Project Path="1-Yotei.Tools/Yotei.Tools/Yotei.Tools.csproj" Id="15f4f455-5a7a-4dd8-9151-8b2ee9be2c9f" />
   </Folder>
+  <Folder Name="/2-Yotei.Tools.Generators/" />
+  <Folder Name="/3-Yotei.ORM.Generators/" />
+  <Folder Name="/3-Yotei.ORM/" />
+  <Folder Name="/4-Yotei.ORM.Relational/" />
+  <Folder Name="/5-Yotei.ORM.SqlServer/" />
   <Folder Name="/Solution Items/">
     <File Path=".editorconfig" />
     <File Path=".gitignore" />

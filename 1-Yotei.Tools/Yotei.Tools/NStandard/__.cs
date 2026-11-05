@@ -1,10 +1,9 @@
 ﻿#if NETSTANDARD2_0
-namespace Yotei.Tools.Std20;
 #pragma warning disable IDE0079
 #pragma warning disable CS0436
-#else
-namespace Yotei.Tools;
 #endif
+
+namespace Yotei.Tools;
 
 // ========================================================
 //#if NETSTANDARD2_0

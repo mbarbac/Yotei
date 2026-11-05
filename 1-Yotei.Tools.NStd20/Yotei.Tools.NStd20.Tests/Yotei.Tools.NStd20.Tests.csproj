@@ -1,0 +1,45 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<Configurations>Debug;Release;Local</Configurations>
+		<TargetFramework>net10.0</TargetFramework>
+		<LangVersion>preview</LangVersion>
+		<ImplicitUsings>disable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<IsPackable>false</IsPackable>
+		<NoWarn>IDE0130</NoWarn>
+	</PropertyGroup>
+	<!--IDE0130: Namespace does not match folder structure-->
+	
+	<ItemGroup>
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
+		<PackageReference Include="xunit.v3" Version="4.0.2" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="4.0.1">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="coverlet.collector" Version="10.1.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+
+	<!--This references the intermediate project that imports 'Yotei.Tools' files.-->
+	<ItemGroup>
+		<ProjectReference Include="..\Yotei.Tools.NStd20\Yotei.Tools.NStd20.csproj" />
+	</ItemGroup>
+
+	<!--This includes the NStandard tests defined in the imported 'Yotei.Tools.Tests' files.-->
+	<PropertyGroup>
+		<ToolsPath>..\..\1-Yotei.Tools\Yotei.Tools.Tests</ToolsPath>
+	</PropertyGroup>
+	<ItemGroup>
+		<Compile Include="$(ToolsPath)\NStandard\**\*.cs" Exclude="$(ToolsPath)\NStandard\**\obj\**;(ToolsPath)\NStandard\**\bin\**">
+			<Link>Yotei.Tools.Tests\%(RecursiveDir)%(FileName)%(Extension)</Link>
+		</Compile>
+	</ItemGroup>
+	<ItemGroup>
+	  <Compile Remove="..\..\1-Yotei.Tools\Yotei.Tools.Tests\NStandard\Test_.cs" />
+	</ItemGroup>
+
+</Project>

@@ -1,8 +1,4 @@
-﻿#if NETSTANDARD2_0
-namespace Yotei.Tools.Std20.Tests;
-#else
-namespace Yotei.Tools;
-#endif
+﻿namespace Yotei.Tools.Tests;
 
 // ========================================================
 /// <summary>

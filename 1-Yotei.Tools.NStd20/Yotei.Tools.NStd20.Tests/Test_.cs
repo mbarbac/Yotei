@@ -1,4 +1,4 @@
-﻿namespace Yotei.Tools.Tests;
+﻿namespace Yotei.Tools.NStd20.Tests;
 
 // ========================================================
 //public static class Test_
@@ -8,3 +8,5 @@
 //    {
 //    }
 //}
+
+public interface IFake { }
