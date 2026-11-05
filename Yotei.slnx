@@ -7,11 +7,6 @@
   <Folder Name="/0-Environment/">
     <Project Path="0-Environment/Runner/Runner.csproj" Id="2bd15658-6cda-4291-9aaf-598253d17261" />
   </Folder>
-  <Folder Name="/1-Yotei.Tools.Std20/">
-    <Project Path="1-Yotei.Tools.Std20/Yotei.Tools.Std20.Tests/Yotei.Tools.Std20.Tests.csproj" Id="66960001-676a-412d-8605-a6b54b04c7d0">
-      <BuildType Solution="Local|*" Project="Debug" />
-    </Project>
-  </Folder>
   <Folder Name="/1-Yotei.Tools/">
     <Project Path="1-Yotei.Tools/Yotei.Tools.Tests/Yotei.Tools.Tests.csproj" Id="5cba5bdd-6056-4c36-a14f-b42ca4f7f4be" />
     <Project Path="1-Yotei.Tools/Yotei.Tools/Yotei.Tools.csproj" Id="15f4f455-5a7a-4dd8-9151-8b2ee9be2c9f" />
