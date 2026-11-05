@@ -6,6 +6,8 @@
 namespace Yotei.Tools;
 
 // ========================================================
+///// <summary>
+///// </summary>
 //#if NETSTANDARD2_0
 //internal
 //#else

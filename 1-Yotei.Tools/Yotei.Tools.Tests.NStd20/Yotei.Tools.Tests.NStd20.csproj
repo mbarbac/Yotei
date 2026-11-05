@@ -1,0 +1,52 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<Configurations>Debug;Release;Local</Configurations>
+		<TargetFramework>netcoreapp3.1</TargetFramework>
+		<LangVersion>preview</LangVersion>
+		<ImplicitUsings>disable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<IsPackable>false</IsPackable>
+		<NoWarn>IDE0130</NoWarn>
+	</PropertyGroup>
+	<!--IDE0130: Namespace does not match folder structure-->
+
+	<!--Latest version compatible with a NET Standard 2.0 -alike envirnment.-->
+	<ItemGroup>
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.4.0" />
+		<PackageReference Include="xunit" Version="2.4.2" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="coverlet.collector" Version="6.0.2">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+
+	<!--This is used to emulate a NET Standard 2.0 (source code generator) environment.-->
+	<PropertyGroup>
+		<DefineConstants>$(DefineConstants);NETSTANDARD2_0</DefineConstants>
+	</PropertyGroup>
+
+	<!--This is used to import the 'Yotei.Tools' files, as a source code generator would do.-->
+	<!--It also imports the 'Yotei.Tools.Tests' ones, for testing purposes.-->
+	<PropertyGroup>
+		<ToolsPath>..\..\1-Yotei.Tools\Yotei.Tools</ToolsPath>
+		<TestsPath>..\..\1-Yotei.Tools\Yotei.Tools.Tests</TestsPath>
+	</PropertyGroup>
+	<ItemGroup>
+		<Compile
+			Include="$(ToolsPath)\NStandard\**\*.cs"
+			Exclude="$(ToolsPath)\NStandard\**\obj\**;(ToolsPath)\NStandard\**\bin\**">
+			<Link>Yotei.Tools\%(RecursiveDir)%(FileName)%(Extension)</Link>
+		</Compile>
+		<Compile
+			Include="$(TestsPath)\NStandard\**\*.cs"
+			Exclude="$(TestsPath)\NStandard\**\obj\**;(ToolsPath)\NStandard\**\bin\**">
+			<Link>Yotei.Tools.Tests\%(RecursiveDir)%(FileName)%(Extension)</Link>
+		</Compile>
+	</ItemGroup>
+
+</Project>
