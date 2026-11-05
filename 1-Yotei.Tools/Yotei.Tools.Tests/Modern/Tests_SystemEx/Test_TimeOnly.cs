@@ -1,7 +1,7 @@
 ﻿namespace Yotei.Tools.Tests;
 
 // ========================================================
-public static class Test_TimeOnlyExtensions
+public static class Test_TimeOnly
 {
     [Fact]
     public static void Test_ToIsoString()
