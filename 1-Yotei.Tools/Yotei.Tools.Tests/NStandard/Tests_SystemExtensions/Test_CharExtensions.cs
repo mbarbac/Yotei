@@ -1,4 +1,4 @@
-﻿namespace Yotei.Tools.Test;
+﻿namespace Yotei.Tools.Tests;
 
 // ========================================================
 public static class Test_CharExtensions
