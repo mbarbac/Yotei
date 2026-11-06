@@ -41,41 +41,41 @@ public static partial class Test_ReadOnlySpanExtensions
     [Fact]
     public static void Test_IntSpan_IndexOf()
     {
-        int data;
+        int result;
         var span = IntSpan([]);
-        data = span.IndexOf(9); Assert.Equal(-1, data);
-        data = span.IndexOf(9, IntEquality()); Assert.Equal(-1, data);
-        data = span.IndexOf(IntPredicate(9)); Assert.Equal(-1, data);
+        result = span.IndexOf(9); Assert.Equal(-1, result);
+        result = span.IndexOf(9, IntEquality()); Assert.Equal(-1, result);
+        result = span.IndexOf(IntPredicate(9)); Assert.Equal(-1, result);
 
         span = [1, 2, 3];
-        data = span.IndexOf(0); Assert.Equal(-1, data);
-        data = span.IndexOf(0, IntEquality()); Assert.Equal(-1, data);
-        data = span.IndexOf(IntPredicate(0)); Assert.Equal(-1, data);
+        result = span.IndexOf(0); Assert.Equal(-1, result);
+        result = span.IndexOf(0, IntEquality()); Assert.Equal(-1, result);
+        result = span.IndexOf(IntPredicate(0)); Assert.Equal(-1, result);
 
         span = [1, 0, 2, 0, 4];
-        data = span.IndexOf(0); Assert.Equal(1, data);
-        data = span.IndexOf(0, IntEquality()); Assert.Equal(1, data);
-        data = span.IndexOf(IntPredicate(0)); Assert.Equal(1, data);
+        result = span.IndexOf(0); Assert.Equal(1, result);
+        result = span.IndexOf(0, IntEquality()); Assert.Equal(1, result);
+        result = span.IndexOf(IntPredicate(0)); Assert.Equal(1, result);
     }
 
     [Fact]
     public static void Test_ItemSpan_IndexOf()
     {
-        int data;
+        int result;
         var span = ItemSpan([]);
-        data = span.IndexOf(Item(9)); Assert.Equal(-1, data);
-        data = span.IndexOf(Item(9), ItemEquality()); Assert.Equal(-1, data);
-        data = span.IndexOf(ItemPredicate(9)); Assert.Equal(-1, data);
+        result = span.IndexOf(Item(9)); Assert.Equal(-1, result);
+        result = span.IndexOf(Item(9), ItemEquality()); Assert.Equal(-1, result);
+        result = span.IndexOf(ItemPredicate(9)); Assert.Equal(-1, result);
 
         span = ItemSpan([new(1), new(2), new(3)]);
-        data = span.IndexOf(Item(0)); Assert.Equal(-1, data);
-        data = span.IndexOf(Item(0), ItemEquality()); Assert.Equal(-1, data);
-        data = span.IndexOf(ItemPredicate(0)); Assert.Equal(-1, data);
+        result = span.IndexOf(Item(0)); Assert.Equal(-1, result);
+        result = span.IndexOf(Item(0), ItemEquality()); Assert.Equal(-1, result);
+        result = span.IndexOf(ItemPredicate(0)); Assert.Equal(-1, result);
 
         span = ItemSpan([new(1), new(0), new(2), new(0), new(4)]);
-        data = span.IndexOf(Item(0)); Assert.Equal(-1, data);
-        data = span.IndexOf(Item(0), ItemEquality()); Assert.Equal(1, data);
-        data = span.IndexOf(ItemPredicate(0)); Assert.Equal(1, data);
+        result = span.IndexOf(Item(0)); Assert.Equal(-1, result);
+        result = span.IndexOf(Item(0), ItemEquality()); Assert.Equal(1, result);
+        result = span.IndexOf(ItemPredicate(0)); Assert.Equal(1, result);
     }
 
     // ----------------------------------------------------
@@ -83,41 +83,41 @@ public static partial class Test_ReadOnlySpanExtensions
     [Fact]
     public static void Test_IntSpan_LastIndexOf()
     {
-        int data;
+        int result;
         var span = IntSpan([]);
-        data = span.LastIndexOf(9); Assert.Equal(-1, data);
-        data = span.LastIndexOf(9, IntEquality()); Assert.Equal(-1, data);
-        data = span.LastIndexOf(IntPredicate(9)); Assert.Equal(-1, data);
+        result = span.LastIndexOf(9); Assert.Equal(-1, result);
+        result = span.LastIndexOf(9, IntEquality()); Assert.Equal(-1, result);
+        result = span.LastIndexOf(IntPredicate(9)); Assert.Equal(-1, result);
 
         span = [1, 2, 3];
-        data = span.LastIndexOf(0); Assert.Equal(-1, data);
-        data = span.LastIndexOf(0, IntEquality()); Assert.Equal(-1, data);
-        data = span.LastIndexOf(IntPredicate(0)); Assert.Equal(-1, data);
+        result = span.LastIndexOf(0); Assert.Equal(-1, result);
+        result = span.LastIndexOf(0, IntEquality()); Assert.Equal(-1, result);
+        result = span.LastIndexOf(IntPredicate(0)); Assert.Equal(-1, result);
 
         span = [1, 0, 2, 0, 4];
-        data = span.LastIndexOf(0); Assert.Equal(3, data);
-        data = span.LastIndexOf(0, IntEquality()); Assert.Equal(3, data);
-        data = span.LastIndexOf(IntPredicate(0)); Assert.Equal(3, data);
+        result = span.LastIndexOf(0); Assert.Equal(3, result);
+        result = span.LastIndexOf(0, IntEquality()); Assert.Equal(3, result);
+        result = span.LastIndexOf(IntPredicate(0)); Assert.Equal(3, result);
     }
 
     [Fact]
     public static void Test_ItemSpan_LastIndexOf()
     {
-        int data;
+        int result;
         var span = ItemSpan([]);
-        data = span.LastIndexOf(Item(9)); Assert.Equal(-1, data);
-        data = span.LastIndexOf(Item(9), ItemEquality()); Assert.Equal(-1, data);
-        data = span.LastIndexOf(ItemPredicate(9)); Assert.Equal(-1, data);
+        result = span.LastIndexOf(Item(9)); Assert.Equal(-1, result);
+        result = span.LastIndexOf(Item(9), ItemEquality()); Assert.Equal(-1, result);
+        result = span.LastIndexOf(ItemPredicate(9)); Assert.Equal(-1, result);
 
         span = ItemSpan([new(1), new(2), new(3)]);
-        data = span.LastIndexOf(Item(0)); Assert.Equal(-1, data);
-        data = span.LastIndexOf(Item(0), ItemEquality()); Assert.Equal(-1, data);
-        data = span.LastIndexOf(ItemPredicate(0)); Assert.Equal(-1, data);
+        result = span.LastIndexOf(Item(0)); Assert.Equal(-1, result);
+        result = span.LastIndexOf(Item(0), ItemEquality()); Assert.Equal(-1, result);
+        result = span.LastIndexOf(ItemPredicate(0)); Assert.Equal(-1, result);
 
         span = ItemSpan([new(1), new(0), new(2), new(0), new(4)]);
-        data = span.LastIndexOf(Item(0)); Assert.Equal(-1, data);
-        data = span.LastIndexOf(Item(0), ItemEquality()); Assert.Equal(3, data);
-        data = span.LastIndexOf(ItemPredicate(0)); Assert.Equal(3, data);
+        result = span.LastIndexOf(Item(0)); Assert.Equal(-1, result);
+        result = span.LastIndexOf(Item(0), ItemEquality()); Assert.Equal(3, result);
+        result = span.LastIndexOf(ItemPredicate(0)); Assert.Equal(3, result);
     }
 
     // ----------------------------------------------------
@@ -125,41 +125,41 @@ public static partial class Test_ReadOnlySpanExtensions
     [Fact]
     public static void Test_IntSpan_IndexesOf()
     {
-        List<int> data;
+        List<int> result;
         var span = IntSpan([]);
-        data = span.IndexesOf(9); Assert.True(data is []);
-        data = span.IndexesOf(9, IntEquality()); Assert.True(data is []);
-        data = span.IndexesOf(IntPredicate(9)); Assert.True(data is []);
+        result = span.IndexesOf(9); Assert.True(result is []);
+        result = span.IndexesOf(9, IntEquality()); Assert.True(result is []);
+        result = span.IndexesOf(IntPredicate(9)); Assert.True(result is []);
 
         span = [1, 2, 3];
-        data = span.IndexesOf(0); Assert.True(data is []);
-        data = span.IndexesOf(0, IntEquality()); Assert.True(data is []);
-        data = span.IndexesOf(IntPredicate(0)); Assert.True(data is []);
+        result = span.IndexesOf(0); Assert.True(result is []);
+        result = span.IndexesOf(0, IntEquality()); Assert.True(result is []);
+        result = span.IndexesOf(IntPredicate(0)); Assert.True(result is []);
 
         span = [1, 0, 2, 0, 4];
-        data = span.IndexesOf(0); Assert.True(data is [1, 3]);
-        data = span.IndexesOf(0, IntEquality()); Assert.True(data is [1, 3]);
-        data = span.IndexesOf(IntPredicate(0)); Assert.True(data is [1, 3]);
+        result = span.IndexesOf(0); Assert.True(result is [1, 3]);
+        result = span.IndexesOf(0, IntEquality()); Assert.True(result is [1, 3]);
+        result = span.IndexesOf(IntPredicate(0)); Assert.True(result is [1, 3]);
     }
 
     [Fact]
     public static void Test_ItemSpan_IndexesOf()
     {
-        List<int> data;
+        List<int> result;
         var span = ItemSpan([]);
-        data = span.IndexesOf(Item(0)); Assert.True(data is []);
-        data = span.IndexesOf(Item(9), ItemEquality()); Assert.True(data is []);
-        data = span.IndexesOf(ItemPredicate(9)); Assert.True(data is []);
+        result = span.IndexesOf(Item(0)); Assert.True(result is []);
+        result = span.IndexesOf(Item(9), ItemEquality()); Assert.True(result is []);
+        result = span.IndexesOf(ItemPredicate(9)); Assert.True(result is []);
 
         span = ItemSpan([new(1), new(2), new(3)]);
-        data = span.IndexesOf(Item(0)); Assert.True(data is []);
-        data = span.IndexesOf(Item(0), ItemEquality()); Assert.True(data is []);
-        data = span.IndexesOf(ItemPredicate(0)); Assert.True(data is []);
+        result = span.IndexesOf(Item(0)); Assert.True(result is []);
+        result = span.IndexesOf(Item(0), ItemEquality()); Assert.True(result is []);
+        result = span.IndexesOf(ItemPredicate(0)); Assert.True(result is []);
 
         span = ItemSpan([new(1), new(0), new(2), new(0), new(4)]);
-        data = span.IndexesOf(Item(0)); Assert.True(data is []);
-        data = span.IndexesOf(Item(0), ItemEquality()); Assert.True(data is [1, 3]);
-        data = span.IndexesOf(ItemPredicate(0)); Assert.True(data is [1, 3]);
+        result = span.IndexesOf(Item(0)); Assert.True(result is []);
+        result = span.IndexesOf(Item(0), ItemEquality()); Assert.True(result is [1, 3]);
+        result = span.IndexesOf(ItemPredicate(0)); Assert.True(result is [1, 3]);
     }
 
     // ----------------------------------------------------
@@ -167,83 +167,86 @@ public static partial class Test_ReadOnlySpanExtensions
     [Fact]
     public static void Test_IntSpan_Contains()
     {
-        bool data;
+        bool result;
         var span = IntSpan([]);
-        data = span.Contains(9); Assert.False(data);
-        data = span.Contains(9, IntEquality()); Assert.False(data);
-        data = span.Contains(IntPredicate(9)); Assert.False(data);
+        result = span.Contains(9); Assert.False(result);
+        result = span.Contains(9, IntEquality()); Assert.False(result);
+        result = span.Contains(IntPredicate(9)); Assert.False(result);
 
         span = [1, 2, 3];
-        data = span.Contains(0); Assert.False(data);
-        data = span.Contains(0, IntEquality()); Assert.False(data);
-        data = span.Contains(IntPredicate(0)); Assert.False(data);
+        result = span.Contains(0); Assert.False(result);
+        result = span.Contains(0, IntEquality()); Assert.False(result);
+        result = span.Contains(IntPredicate(0)); Assert.False(result);
 
         span = [1, 0, 2, 0, 4];
-        data = span.Contains(0); Assert.True(data);
-        data = span.Contains(0, IntEquality()); Assert.True(data);
-        data = span.Contains(IntPredicate(0)); Assert.True(data);
+        result = span.Contains(0); Assert.True(result);
+        result = span.Contains(0, IntEquality()); Assert.True(result);
+        result = span.Contains(IntPredicate(0)); Assert.True(result);
     }
 
     [Fact]
     public static void Test_ItemSpan_Contains()
     {
-        bool data;
+        bool result;
         var span = ItemSpan([]);
-        data = span.Contains(Item(0)); Assert.False(data);
-        data = span.Contains(Item(9), ItemEquality()); Assert.False(data);
-        data = span.Contains(ItemPredicate(9)); Assert.False(data);
+        result = span.Contains(Item(0)); Assert.False(result);
+        result = span.Contains(Item(9), ItemEquality()); Assert.False(result);
+        result = span.Contains(ItemPredicate(9)); Assert.False(result);
 
         span = ItemSpan([new(1), new(2), new(3)]);
-        data = span.Contains(Item(0)); Assert.False(data);
-        data = span.Contains(Item(0), ItemEquality()); Assert.False(data);
-        data = span.Contains(ItemPredicate(0)); Assert.False(data);
+        result = span.Contains(Item(0)); Assert.False(result);
+        result = span.Contains(Item(0), ItemEquality()); Assert.False(result);
+        result = span.Contains(ItemPredicate(0)); Assert.False(result);
 
         span = ItemSpan([new(1), new(0), new(2), new(0), new(4)]);
-        data = span.Contains(Item(0)); Assert.False(data); // Reference type!
-        data = span.Contains(Item(0), ItemEquality()); Assert.True(data);
-        data = span.Contains(ItemPredicate(0)); Assert.True(data);
+        result = span.Contains(Item(0)); Assert.False(result); // Reference type!
+        result = span.Contains(Item(0), ItemEquality()); Assert.True(result);
+        result = span.Contains(ItemPredicate(0)); Assert.True(result);
     }
+}
 
-    // ----------------------------------------------------
+// ========================================================
 #if NETSTANDARD2_0
+public static partial class Test_ReadOnlySpanExtensions
+{
     //[Fact]
     //public static void Test_IntSpan_()
     //{
-    //    bool data;
+    //    bool result;
     //    var span = IntSpan([]);
-    //    data = span.Contains(9); Assert.False(data);
-    //    data = span.Contains(9, IntEquality()); Assert.False(data);
-    //    data = span.Contains(IntPredicate(9)); Assert.False(data);
+    //    result = span.Contains(9); Assert.False(result);
+    //    result = span.Contains(9, IntEquality()); Assert.False(result);
+    //    result = span.Contains(IntPredicate(9)); Assert.False(result);
 
     //    span = [1, 2, 3];
-    //    data = span.Contains(0); Assert.False(data);
-    //    data = span.Contains(0, IntEquality()); Assert.False(data);
-    //    data = span.Contains(IntPredicate(0)); Assert.False(data);
+    //    result = span.Contains(0); Assert.False(result);
+    //    result = span.Contains(0, IntEquality()); Assert.False(result);
+    //    result = span.Contains(IntPredicate(0)); Assert.False(result);
 
     //    span = [1, 0, 2, 0, 4];
-    //    data = span.Contains(0); Assert.True(data);
-    //    data = span.Contains(0, IntEquality()); Assert.True(data);
-    //    data = span.Contains(IntPredicate(0)); Assert.True(data);
+    //    result = span.Contains(0); Assert.True(result);
+    //    result = span.Contains(0, IntEquality()); Assert.True(result);
+    //    result = span.Contains(IntPredicate(0)); Assert.True(result);
     //}
 
     //[Fact]
     //public static void Test_ItemSpan_()
     //{
-    //    bool data;
+    //    bool result;
     //    var span = ItemSpan([]);
-    //    data = span.Contains(Item(0)); Assert.False(data);
-    //    data = span.Contains(Item(9), ItemEquality()); Assert.False(data);
-    //    data = span.Contains(ItemPredicate(9)); Assert.False(data);
+    //    result = span.Contains(Item(0)); Assert.False(result);
+    //    result = span.Contains(Item(9), ItemEquality()); Assert.False(result);
+    //    result = span.Contains(ItemPredicate(9)); Assert.False(result);
 
     //    span = ItemSpan([new(1), new(2), new(3)]);
-    //    data = span.Contains(Item(0)); Assert.False(data);
-    //    data = span.Contains(Item(0), ItemEquality()); Assert.False(data);
-    //    data = span.Contains(ItemPredicate(0)); Assert.False(data);
+    //    result = span.Contains(Item(0)); Assert.False(result);
+    //    result = span.Contains(Item(0), ItemEquality()); Assert.False(result);
+    //    result = span.Contains(ItemPredicate(0)); Assert.False(result);
 
     //    span = ItemSpan([new(1), new(0), new(2), new(0), new(4)]);
-    //    data = span.Contains(Item(0)); Assert.False(data); // Reference type!
-    //    data = span.Contains(Item(0), ItemEquality()); Assert.True(data);
-    //    data = span.Contains(ItemPredicate(0)); Assert.True(data);
+    //    result = span.Contains(Item(0)); Assert.False(result); // Reference type!
+    //    result = span.Contains(Item(0), ItemEquality()); Assert.True(result);
+    //    result = span.Contains(ItemPredicate(0)); Assert.True(result);
     //}
-#endif
 }
+#endif

@@ -15,6 +15,8 @@ public
 #endif
 static partial class ReadOnlySpanExtensions
 {
+    // ----------------------------------------------------
+
 #if NETSTANDARD2_0
     /// <summary>
     /// Returns the index of the first ocurrence of the given value.
@@ -30,10 +32,8 @@ static partial class ReadOnlySpanExtensions
     [SuppressMessage("", "IDE0075")]
     public static int IndexOf<T>(this ReadOnlySpan<T> source, T value)
     {
-        return source.IndexOf(x =>
-            value is IComparable<T> comparable ? comparable.CompareTo(x) == 0 :
-            value is IEquatable<T> equatable ? equatable.Equals(x) :
-            false);
+        var predicate = InnerEquality(value);
+        return source.IndexOf(predicate);
     }
 #endif
 
@@ -84,10 +84,8 @@ static partial class ReadOnlySpanExtensions
     [SuppressMessage("", "IDE0075")]
     public static int LastIndexOf<T>(this ReadOnlySpan<T> source, T value)
     {
-        return source.LastIndexOf(x =>
-            value is IComparable<T> comparable ? comparable.CompareTo(x) == 0 :
-            value is IEquatable<T> equatable ? equatable.Equals(x) :
-            false);
+        var predicate = InnerEquality(value);
+        return source.LastIndexOf(predicate);
     }
 #endif
 
@@ -134,10 +132,8 @@ static partial class ReadOnlySpanExtensions
     [SuppressMessage("", "IDE0075")]
     public static List<int> IndexesOf<T>(this ReadOnlySpan<T> source, T value)
     {
-        return source.IndexesOf(x =>
-            value is IComparable<T> comparable ? comparable.CompareTo(x) == 0 :
-            value is IEquatable<T> equatable ? equatable.Equals(x) :
-            false);
+        var predicate = InnerEquality(value);
+        return source.IndexesOf(predicate);
     }
 
     /// <summary>
