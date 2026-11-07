@@ -32,7 +32,7 @@ static partial class ReadOnlySpanExtensions
     [SuppressMessage("", "IDE0075")]
     public static int IndexOf<T>(this ReadOnlySpan<T> source, T value)
     {
-        var predicate = InnerEquality(value);
+        var predicate = PredicateEquality(value);
         return source.IndexOf(predicate);
     }
 #endif
@@ -84,7 +84,7 @@ static partial class ReadOnlySpanExtensions
     [SuppressMessage("", "IDE0075")]
     public static int LastIndexOf<T>(this ReadOnlySpan<T> source, T value)
     {
-        var predicate = InnerEquality(value);
+        var predicate = PredicateEquality(value);
         return source.LastIndexOf(predicate);
     }
 #endif
@@ -131,7 +131,7 @@ static partial class ReadOnlySpanExtensions
     /// <returns></returns>
     public static List<int> IndexesOf<T>(this ReadOnlySpan<T> source, T value)
     {
-        var predicate = InnerEquality(value);
+        var predicate = PredicateEquality(value);
         return source.IndexesOf(predicate);
     }
 

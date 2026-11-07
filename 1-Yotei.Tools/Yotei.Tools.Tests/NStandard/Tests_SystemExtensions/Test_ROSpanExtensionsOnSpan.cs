@@ -94,43 +94,76 @@ public static partial class Test_ReadOnlySpanExtensions
         values = ItemSpan([new(1), new(2), new(3)]);
         result = span.SequenceCompareTo(values, ItemComparer()); Assert.Equal(-1, result);
     }
+
+    [Fact]
+    public static void Test_ItemSpan_SequenceEqual()
+    {
+        bool result;
+        var span = ItemSpan([]);
+        var values = ItemSpan([]);
+        result = span.SequenceEqual(values); Assert.True(result);
+        result = span.SequenceEqual(values, ItemEquality()); Assert.True(result);
+
+        span = ItemSpan([new(1), new(2), new(3)]);
+        values = ItemSpan([new(1), new(2), new(3)]);
+        result = span.SequenceEqual(values); Assert.False(result); // Reference type!
+        result = span.SequenceEqual(values, ItemEquality()); Assert.True(result);
+
+        values = ItemSpan([new(1), new(2)]);
+        result = span.SequenceEqual(values); Assert.False(result);
+        result = span.SequenceEqual(values, ItemEquality()); Assert.False(result);
+
+        values = ItemSpan([new(1), new(2), new(3), new(4)]);
+        result = span.SequenceEqual(values); Assert.False(result);
+        result = span.SequenceEqual(values, ItemEquality()); Assert.False(result);
+
+        span = ItemSpan([new(1), new(2), new(4)]);
+        values = ItemSpan([new(1), new(2), new(3)]);
+        result = span.SequenceEqual(values); Assert.False(result);
+        result = span.SequenceEqual(values, ItemEquality()); Assert.False(result);
+
+        span = ItemSpan([new(1), new(2), new(2)]);
+        values = ItemSpan([new(1), new(2), new(3)]);
+        result = span.SequenceEqual(values); Assert.False(result);
+        result = span.SequenceEqual(values, ItemEquality()); Assert.False(result);
+    }
 }
 
 // ========================================================
 #if NETSTANDARD2_0
 public static partial class Test_ReadOnlySpanExtensions
 {
-    //[Fact]
-    //public static void Test_ItemSpan_()
-    //{
-    //    int result;
-    //    var span = ItemSpan([]);
-    //    var values = ItemSpan([]);
-    //    result = span.SequenceCompareTo(values); Assert.Equal(0, result);
-    //    result = span.SequenceCompareTo(values, ItemComparer()); Assert.Equal(0, result);
+    [Fact]
+    public static void Test_ItemSpan_()
+    {
+        //bool result;
+        //var span = ItemSpan([]);
+        //var values = ItemSpan([]);
+        //result = span.SequenceEqual(values); Assert.True(result);
+        //result = span.SequenceEqual(values, ItemEquality()); Assert.True(result);
 
-    //    span = ItemSpan([new(1)]);
-    //    values = ItemSpan([new(1)]);
-    //    try { result = span.SequenceCompareTo(values); Assert.Fail(""); }
-    //    catch (ArgumentException e) when (e.Message.Contains("IComparable")) { }
+        //span = ItemSpan([new(1), new(2), new(3)]);
+        //values = ItemSpan([new(1), new(2), new(3)]);
+        //result = span.SequenceEqual(values); Assert.False(result); // Reference type!
+        //result = span.SequenceEqual(values, ItemEquality()); Assert.True(result);
 
-    //    span = ItemSpan([new(1), new(2), new(3)]);
-    //    values = ItemSpan([new(1), new(2), new(3)]);
-    //    result = span.SequenceCompareTo(values, ItemComparer()); Assert.Equal(0, result);
+        //values = ItemSpan([new(1), new(2)]);
+        //result = span.SequenceEqual(values); Assert.False(result);
+        //result = span.SequenceEqual(values, ItemEquality()); Assert.False(result);
 
-    //    values = ItemSpan([new(1), new(2)]);
-    //    result = span.SequenceCompareTo(values, ItemComparer()); Assert.Equal(+1, result);
+        //values = ItemSpan([new(1), new(2), new(3), new(4)]);
+        //result = span.SequenceEqual(values); Assert.False(result);
+        //result = span.SequenceEqual(values, ItemEquality()); Assert.False(result);
 
-    //    values = ItemSpan([new(1), new(2), new(3), new(4)]);
-    //    result = span.SequenceCompareTo(values, ItemComparer()); Assert.Equal(-1, result);
+        //span = ItemSpan([new(1), new(2), new(4)]);
+        //values = ItemSpan([new(1), new(2), new(3)]);
+        //result = span.SequenceEqual(values); Assert.False(result);
+        //result = span.SequenceEqual(values, ItemEquality()); Assert.False(result);
 
-    //    span = ItemSpan([new(1), new(2), new(4)]);
-    //    values = ItemSpan([new(1), new(2), new(3)]);
-    //    result = span.SequenceCompareTo(values, ItemComparer()); Assert.Equal(+1, result);
-
-    //    span = ItemSpan([new(1), new(2), new(2)]);
-    //    values = ItemSpan([new(1), new(2), new(3)]);
-    //    result = span.SequenceCompareTo(values, ItemComparer()); Assert.Equal(-1, result);
-    //}
+        //span = ItemSpan([new(1), new(2), new(2)]);
+        //values = ItemSpan([new(1), new(2), new(3)]);
+        //result = span.SequenceEqual(values); Assert.False(result);
+        //result = span.SequenceEqual(values, ItemEquality()); Assert.False(result);
+    }
 }
 #endif

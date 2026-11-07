@@ -30,7 +30,8 @@ static partial class ReadOnlySpanExtensions
 
 #if NETSTANDARD2_0
     /// <summary>
-    /// Searches for the first index of any of the given values, using the given comparer.
+    /// Searches for the first index of any of the given values, using the given elements'
+    /// comparer.
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="source"></param>
@@ -70,7 +71,7 @@ static partial class ReadOnlySpanExtensions
 
 #if NETSTANDARD2_0
     /// <summary>
-    /// Searches for the last index of any of the given values, using the given comparer.
+    /// Searches for the last index of any of the given values, using the given element's comparer.
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="source"></param>
@@ -111,7 +112,8 @@ static partial class ReadOnlySpanExtensions
 
 #if NETSTANDARD2_0
     /// <summary>
-    /// Determines if the span contains any of any of the given values, using the given comparer.
+    /// Determines if the span contains any of any of the given values, using the given elements'
+    /// comparer.
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="source"></param>
@@ -145,7 +147,8 @@ static partial class ReadOnlySpanExtensions
 
 #if NETSTANDARD2_0
     /// <summary>
-    /// Determines the order of the span relative to the sequence of values. Returns:
+    /// Determines the order of the span relative to the sequence of values, using the given
+    /// elements' comparer. Returns:
     /// <br/>- Less than 0: span precedes the values' sequence.
     /// <br/>- Equal to 0: span equals the values' sequence.
     /// <br/>- Greater than 0: span follows the values' sequence.
@@ -173,6 +176,54 @@ static partial class ReadOnlySpanExtensions
             var result = comparer.Compare(xvalue, yvalue); if (result != 0) return result;
         }
         return 0;
+    }
+#endif
+
+    // ----------------------------------------------------
+
+#if NETSTANDARD2_0
+    /// <summary>
+    /// Determines if the span shall be considered equal to the values' sequence
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <returns></returns>
+    public static bool SequenceEqual<T>(this ReadOnlySpan<T> source, ReadOnlySpan<T> values)
+    {
+        var comparer = new EqualityComparer<T>();
+        return source.SequenceEqual(values, comparer);
+    }
+#endif
+
+#if NETSTANDARD2_0
+    /// <summary>
+    /// Determines if the span shall be considered equal to the values' sequence, using the given
+    /// elements' comparer.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static bool SequenceEqual<T>(
+        this ReadOnlySpan<T> source, ReadOnlySpan<T> values, IEqualityComparer<T> comparer)
+    {
+        comparer.ThrowWhenNull();
+
+        var xlen = source.Length;
+        var ylen = values.Length;
+
+        if (xlen < ylen) return false;
+        if (xlen > ylen) return false;
+
+        for (int i = 0; i < xlen; i++)
+        {
+            var xvalue = source[i];
+            var yvalue = values[i];
+            var result = comparer.Equals(xvalue, yvalue); if (!result) return false;
+        }
+        return true;
     }
 #endif
 }

@@ -19,7 +19,7 @@ static partial class ReadOnlySpanExtensions
     /// Returns a predicate that tests for equality against the given value.
     /// </summary>
     [SuppressMessage("", "IDE0075")]
-    static Predicate<T> InnerEquality<T>(T value) => x =>
+    static Predicate<T> PredicateEquality<T>(T value) => x =>
         value is IEquatable<T> equatable ? equatable.Equals(x) :
         value is IComparable<T> comparable ? comparable.CompareTo(x) == 0 :
         false;
