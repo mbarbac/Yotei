@@ -122,4 +122,57 @@ static partial class ReadOnlySpanExtensions
         this ReadOnlySpan<T> source, ReadOnlySpan<T> values, IEqualityComparer<T> comparer)
         => source.IndexOfAny(values, comparer) >= 0;
 #endif
+
+    // ----------------------------------------------------
+
+#if NETSTANDARD2_0
+    /// <summary>
+    /// Determines the order of the span relative to the sequence of values.
+    /// <br/>- Less than 0: span precedes the values' sequence.
+    /// <br/>- Equal to 0: span equals the values' sequence.
+    /// <br/>- Greater than 0: span follows the values' sequence.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <returns></returns>
+    public static int SequenceCompareTo<T>(this ReadOnlySpan<T> source, ReadOnlySpan<T> values)
+    {
+        var comparer = new ValueComparer<T>();
+        return source.SequenceCompareTo(values, comparer);
+    }
+#endif
+
+#if NETSTANDARD2_0
+    /// <summary>
+    /// Determines the order of the span relative to the sequence of values. Returns:
+    /// <br/>- Less than 0: span precedes the values' sequence.
+    /// <br/>- Equal to 0: span equals the values' sequence.
+    /// <br/>- Greater than 0: span follows the values' sequence.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static int SequenceCompareTo<T>(
+        this ReadOnlySpan<T> source, ReadOnlySpan<T> values, IComparer<T> comparer)
+    {
+        comparer.ThrowWhenNull();
+
+        var xlen = source.Length;
+        var ylen = values.Length;
+
+        if (xlen < ylen) return -1;
+        if (xlen > ylen) return +1;
+
+        for (int i = 0; i < xlen; i++)
+        {
+            var xvalue = source[i];
+            var yvalue = values[i];
+            var result = comparer.Compare(xvalue, yvalue); if (result != 0) return result;
+        }
+        return 0;
+    }
+#endif
 }

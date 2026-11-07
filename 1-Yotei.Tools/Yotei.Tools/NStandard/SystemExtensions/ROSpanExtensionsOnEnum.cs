@@ -109,4 +109,38 @@ static partial class ReadOnlySpanExtensions
         this ReadOnlySpan<T> source, IEnumerable<T> values, IEqualityComparer<T> comparer)
         => source.IndexOfAny(values, comparer) >= 0;
 #endif
+
+    // ----------------------------------------------------
+
+#if NETSTANDARD2_0
+    /// <summary>
+    /// Determines the order of the span relative to the sequence of values. Returns:
+    /// <br/>- Less than 0: span precedes the values' sequence.
+    /// <br/>- Equal to 0: span equals the values' sequence.
+    /// <br/>- Greater than 0: span follows the values' sequence.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static int SequenceCompareTo<T>(
+        this ReadOnlySpan<T> source, IEnumerable<T> values, IComparer<T> comparer)
+    {
+        values.ThrowWhenNull();
+        comparer.ThrowWhenNull();
+
+        using var iter = values.GetEnumerator();
+        for (int i = 0; i < source.Length; i++)
+        {
+            if (!iter.MoveNext()) return +1;
+
+            var xvalue = source[i];
+            var yvalue = iter.Current;
+            var result = comparer.Compare(xvalue, yvalue); if (result != 0) return result;
+        }
+        if (iter.MoveNext()) return -1;
+        return 0;
+    }
+#endif
 }

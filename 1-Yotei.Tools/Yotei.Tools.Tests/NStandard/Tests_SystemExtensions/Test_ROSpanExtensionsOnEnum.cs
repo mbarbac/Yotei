@@ -59,10 +59,45 @@ public static partial class Test_ReadOnlySpanExtensions
         result = span.ContainsAny(values); Assert.True(result);
         result = span.ContainsAny(values, IntEquality()); Assert.True(result);
     }
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_IntSpan_SequenceCompareTo()
+    {
+        int result;
+        var span = IntSpan([]);
+        var values = Array.Empty<int>();
+        result = span.SequenceCompareTo(values); Assert.Equal(0, result);
+        result = span.SequenceCompareTo(values, IntComparer()); Assert.Equal(0, result);
+
+        span = IntSpan([1, 2, 3]);
+        values = [1, 2, 3];
+        result = span.SequenceCompareTo(values); Assert.Equal(0, result);
+        result = span.SequenceCompareTo(values, IntComparer()); Assert.Equal(0, result);
+
+        values = [1, 2];
+        result = span.SequenceCompareTo(values); Assert.Equal(+1, result);
+        result = span.SequenceCompareTo(values, IntComparer()); Assert.Equal(+1, result);
+
+        values = [1, 2, 3, 4];
+        result = span.SequenceCompareTo(values); Assert.Equal(-1, result);
+        result = span.SequenceCompareTo(values, IntComparer()); Assert.Equal(-1, result);
+
+        span = IntSpan([1, 2, 4]);
+        values = [1, 2, 3];
+        result = span.SequenceCompareTo(values); Assert.Equal(+1, result);
+        result = span.SequenceCompareTo(values, IntComparer()); Assert.Equal(+1, result);
+
+        span = IntSpan([1, 2, 2]);
+        values = [1, 2, 3];
+        result = span.SequenceCompareTo(values); Assert.Equal(-1, result);
+        result = span.SequenceCompareTo(values, IntComparer()); Assert.Equal(-1, result);
+    }
 }
 
 // ========================================================
-#if !NETSTANDARD2_0
+#if NETSTANDARD2_0
 public static partial class Test_ReadOnlySpanExtensions
 {
     //[Fact]
@@ -71,16 +106,31 @@ public static partial class Test_ReadOnlySpanExtensions
     //    int result;
     //    var span = IntSpan([]);
     //    var values = Array.Empty<int>();
-    //    result = span.IndexOfAny(values); Assert.Equal(-1, result);
-    //    result = span.IndexOfAny(values, IntEquality()); Assert.Equal(-1, result);
+    //    result = span.SequenceCompareTo(values); Assert.Equal(0, result);
+    //    result = span.SequenceCompareTo(values, IntComparer()); Assert.Equal(0, result);
 
-    //    values = [9, 8, 2];
-    //    result = span.IndexOfAny(values); Assert.Equal(-1, result);
-    //    result = span.IndexOfAny(values, IntEquality()); Assert.Equal(-1, result);
+    //    span = IntSpan([1, 2, 3]);
+    //    values = [1, 2, 3];
+    //    result = span.SequenceCompareTo(values); Assert.Equal(0, result);
+    //    result = span.SequenceCompareTo(values, IntComparer()); Assert.Equal(0, result);
 
-    //    span = [1, 2, 3, 4];
-    //    result = span.IndexOfAny(values); Assert.Equal(1, result);
-    //    result = span.IndexOfAny(values, IntEquality()); Assert.Equal(1, result);
+    //    values = [1, 2];
+    //    result = span.SequenceCompareTo(values); Assert.Equal(+1, result);
+    //    result = span.SequenceCompareTo(values, IntComparer()); Assert.Equal(+1, result);
+
+    //    values = [1, 2, 3, 4];
+    //    result = span.SequenceCompareTo(values); Assert.Equal(-1, result);
+    //    result = span.SequenceCompareTo(values, IntComparer()); Assert.Equal(-1, result);
+
+    //    span = IntSpan([1, 2, 4]);
+    //    values = [1, 2, 3];
+    //    result = span.SequenceCompareTo(values); Assert.Equal(+1, result);
+    //    result = span.SequenceCompareTo(values, IntComparer()); Assert.Equal(+1, result);
+
+    //    span = IntSpan([1, 2, 2]);
+    //    values = [1, 2, 3];
+    //    result = span.SequenceCompareTo(values); Assert.Equal(-1, result);
+    //    result = span.SequenceCompareTo(values, IntComparer()); Assert.Equal(-1, result);
     //}
 }
 #endif
