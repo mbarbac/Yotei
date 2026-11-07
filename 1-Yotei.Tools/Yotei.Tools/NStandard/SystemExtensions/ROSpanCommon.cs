@@ -18,6 +18,7 @@ static partial class ReadOnlySpanExtensions
     /// <summary>
     /// Returns a predicate that tests for equality against the given value.
     /// </summary>
+    [SuppressMessage("", "IDE0075")]
     static Predicate<T> InnerEquality<T>(T value) => x =>
         value is IEquatable<T> equatable ? equatable.Equals(x) :
         value is IComparable<T> comparable ? comparable.CompareTo(x) == 0 :
@@ -26,32 +27,22 @@ static partial class ReadOnlySpanExtensions
     // ----------------------------------------------------
 
     /// <summary>
-    /// Used to instantiate an appropriate comparer that either uses the given one, or tries to
-    /// use the type's own capabilities.
+    /// Represents a value comparer that either uses the type's capabilities, or the comparer
+    /// provided as its argument.
     /// </summary>
-    readonly struct InnerComparer<T> : IComparer<T>, IEqualityComparer<T>
+    readonly struct ValueComparer<T> : IComparer<T>
     {
-        readonly IComparer<T>? _PureComparer;
-        readonly bool _ThrowTypeException;
+        readonly IComparer<T>? _Comparer;
 
         /// <summary>
         /// Initializes a new instance that only uses the type's capabilities.
         /// </summary>
-        public InnerComparer(bool throwTypeException = false)
-        {
-            _PureComparer = null;
-            _ThrowTypeException = false;
-        }
+        public ValueComparer() => _Comparer = null;
 
         /// <summary>
         /// Initializes a new instance that uses the given comparer.
         /// </summary>
-        /// <param name="comparer"></param>
-        public InnerComparer(IComparer<T> comparer, bool throwTypeException = false)
-        {
-            _PureComparer = comparer.ThrowWhenNull();
-            _ThrowTypeException = throwTypeException;
-        }
+        public ValueComparer(IComparer<T> comparer) => _Comparer = comparer.ThrowWhenNull();
 
         /// <summary>
         /// <inheritdoc/>
@@ -59,7 +50,7 @@ static partial class ReadOnlySpanExtensions
         public int Compare([AllowNull] T x, [AllowNull] T y)
         {
             // A comparer was given...
-            if (_PureComparer is not null) return _PureComparer.Compare(x, y);
+            if (_Comparer is not null) return _Comparer.Compare(x, y);
             
             // Comparisons against null...
             if (x is null && y is null) return 0;
@@ -90,6 +81,38 @@ static partial class ReadOnlySpanExtensions
                 .WithData(x)
                 .WithData(y);
         }
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Represents an equality comparer that either uses the type's capabilities, or the comparer
+    /// provided as its argument.
+    /// </summary>
+    readonly struct EqualityComparer<T> : IEqualityComparer<T>
+    {
+        readonly IEqualityComparer<T>? _Comparer;
+        readonly bool _ThrowTypeException;
+
+        /// <summary>
+        /// Initiliazes a new instance that uses the type's capabilities.
+        /// </summary>
+        public EqualityComparer()
+        {
+            _Comparer = null;
+            _ThrowTypeException = false;
+        }
+
+        /// <summary>
+        /// Initializes a new instance that uses the given comparer. If no comparison can be
+        /// performed, the comparer either returns <c>false</c>, or throws a type exception if
+        /// such is requested.
+        /// </summary>
+        public EqualityComparer(IEqualityComparer<T> comparer, bool throwTypeException = false)
+        {
+            _Comparer = comparer.ThrowWhenNull();
+            _ThrowTypeException = throwTypeException;
+        }
 
         /// <summary>
         /// <inheritdoc/>
@@ -97,11 +120,7 @@ static partial class ReadOnlySpanExtensions
         public bool Equals(T? x, T? y)
         {
             // A comparer was given...
-            if (_PureComparer is not null)
-            {
-                var data = _PureComparer.Compare(x, y);
-                return data == 0;
-            }
+            if (_Comparer is not null) return _Comparer.Equals(x, y);
 
             // Comparisons against null...
             if (x is null && y is null) return true;

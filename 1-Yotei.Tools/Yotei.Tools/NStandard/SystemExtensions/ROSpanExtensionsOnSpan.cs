@@ -23,7 +23,7 @@ static partial class ReadOnlySpanExtensions
     /// <returns></returns>
     public static int IndexOfAny<T>(this ReadOnlySpan<T> source, ReadOnlySpan<T> values)
     {
-        var comparer = new InnerComparer<T>();
+        var comparer = new EqualityComparer<T>();
         return source.IndexOfAny(values, comparer);
     }
 #endif
@@ -63,7 +63,7 @@ static partial class ReadOnlySpanExtensions
     /// <returns></returns>
     public static int LastIndexOfAny<T>(this ReadOnlySpan<T> source, ReadOnlySpan<T> values)
     {
-        var comparer = new InnerComparer<T>();
+        var comparer = new EqualityComparer<T>();
         return source.LastIndexOfAny(values, comparer);
     }
 #endif
@@ -104,7 +104,7 @@ static partial class ReadOnlySpanExtensions
     public static bool ContainsAny<T>(
         this ReadOnlySpan<T> source, ReadOnlySpan<T> values)
     {
-        var comparer = new InnerComparer<T>();
+        var comparer = new EqualityComparer<T>();
         return source.IndexOfAny(values, comparer) >= 0;
     }
 #endif

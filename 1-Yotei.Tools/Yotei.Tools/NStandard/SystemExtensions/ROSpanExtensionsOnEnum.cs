@@ -91,7 +91,7 @@ static partial class ReadOnlySpanExtensions
     public static bool ContainsAny<T>(
         this ReadOnlySpan<T> source, IEnumerable<T> values)
     {
-        var comparer = new InnerComparer<T>();
+        var comparer = new EqualityComparer<T>();
         return source.IndexOfAny(values, comparer) >= 0;
     }
 #endif

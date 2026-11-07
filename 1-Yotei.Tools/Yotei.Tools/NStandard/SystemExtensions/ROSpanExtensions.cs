@@ -129,7 +129,6 @@ static partial class ReadOnlySpanExtensions
     /// <param name="source"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    [SuppressMessage("", "IDE0075")]
     public static List<int> IndexesOf<T>(this ReadOnlySpan<T> source, T value)
     {
         var predicate = InnerEquality(value);
