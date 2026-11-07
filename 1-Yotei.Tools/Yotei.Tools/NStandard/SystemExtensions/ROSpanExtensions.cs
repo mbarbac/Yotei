@@ -205,4 +205,240 @@ static partial class ReadOnlySpanExtensions
     /// <returns></returns>
     public static bool Contains<T>(
         this ReadOnlySpan<T> source, Predicate<T> predicate) => source.IndexOf(predicate) >= 0;
+
+    // ----------------------------------------------------
+
+#if NETSTANDARD2_0
+    /// <summary>
+    /// Determines if the span starts with the given value.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public static bool StartsWith<T>(
+        this ReadOnlySpan<T> source, T value)
+        => source.Length > 0 && source.IndexOf(value) == 0;
+#endif
+
+#if NETSTANDARD2_0
+    /// <summary>
+    /// Determines if the span starts with the given value, using the given elements' comparer.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static bool StartsWith<T>(
+        this ReadOnlySpan<T> source, T value, IEqualityComparer<T> comparer)
+        => source.Length > 0 && source.IndexOf(value, comparer) == 0;
+#endif
+
+    /// <summary>
+    /// Determines whether the span starts with a value that matches the given predicate.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="predicate"></param>
+    /// <returns></returns>
+    public static bool StartsWith<T>(
+        this ReadOnlySpan<T> source, Predicate<T> predicate)
+        => source.Length > 0 && source.IndexOf(predicate) == 0;
+
+    // ----------------------------------------------------
+
+#if NETSTANDARD2_0
+    /// <summary>
+    /// Determines if the span ends with the given value.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public static bool EndsWith<T>(
+        this ReadOnlySpan<T> source, T value)
+        => source.Length > 0 && source.IndexOf(value) == source.Length - 1;
+#endif
+
+#if NETSTANDARD2_0
+    /// <summary>
+    /// Determines if the span ends with the given value, using the given elements' comparer.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static bool EndsWith<T>(
+        this ReadOnlySpan<T> source, T value, IEqualityComparer<T> comparer)
+        => source.Length > 0 && source.IndexOf(value, comparer) == source.Length - 1;
+#endif
+
+    /// <summary>
+    /// Determines whether the span ends with a value that matches the given predicate.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="predicate"></param>
+    /// <returns></returns>
+    public static bool EndsWith<T>(
+        this ReadOnlySpan<T> source, Predicate<T> predicate)
+        => source.Length > 0 && source.IndexOf(predicate) == source.Length - 1;
+
+    // ----------------------------------------------------
+
+#if NETSTANDARD2_0
+    /// <summary>
+    /// Returns the index of the first value that IS NOT the given one.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public static int IndexOfAnyExcept<T>(this ReadOnlySpan<T> source, T value)
+    {
+        var comparer = new EqualityComparer<T>();
+        return source.IndexOfAnyExcept(value, comparer);
+    }
+#endif
+
+#if NETSTANDARD2_0
+    /// <summary>
+    /// Returns the index of the first value that IS NOT the given one, using the given elements'
+    /// comparer.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static int IndexOfAnyExcept<T>(
+        this ReadOnlySpan<T> source, T value, IEqualityComparer<T> comparer)
+    {
+        comparer.ThrowWhenNull();
+
+        for (int i = 0; i < source.Length; i++) if (!comparer.Equals(value, source[i])) return i;
+        return -1;
+    }
+#endif
+
+    /// <summary>
+    /// Returns the index of the first value that DOES NOT match the given predicate, or -1 if any.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="predicate"></param>
+    /// <returns></returns>
+    public static int IndexOfAnyExcept<T>(this ReadOnlySpan<T> source, Predicate<T> predicate)
+    {
+        predicate.ThrowWhenNull();
+
+        for (int i = 0; i < source.Length; i++) if (!predicate(source[i])) return i;
+        return -1;
+    }
+
+    // ----------------------------------------------------
+
+#if NETSTANDARD2_0
+    /// <summary>
+    /// Returns the index of the last value that IS NOT the given one.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public static int LastIndexOfAnyExcept<T>(this ReadOnlySpan<T> source, T value)
+    {
+        var comparer = new EqualityComparer<T>();
+        return source.LastIndexOfAnyExcept(value, comparer);
+    }
+#endif
+
+#if NETSTANDARD2_0
+    /// <summary>
+    /// Returns the index of the last value that IS NOT the given one, using the given elements'
+    /// comparer.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static int LastIndexOfAnyExcept<T>(
+        this ReadOnlySpan<T> source, T value, IEqualityComparer<T> comparer)
+    {
+        comparer.ThrowWhenNull();
+
+        for (int i = source.Length - 1; i >= 0; i--) if (!comparer.Equals(value, source[i])) return i;
+        return -1;
+    }
+#endif
+
+    /// <summary>
+    /// Returns the index of the last value that DOES NOT match the given predicate, or -1 if any.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="predicate"></param>
+    /// <returns></returns>
+    public static int LastIndexOfAnyExcept<T>(this ReadOnlySpan<T> source, Predicate<T> predicate)
+    {
+        predicate.ThrowWhenNull();
+
+        for (int i = source.Length - 1; i >= 0; i--) if (!predicate(source[i])) return i;
+        return -1;
+    }
+
+    // ----------------------------------------------------
+
+#if NETSTANDARD2_0
+    /// <summary>
+    /// Determines if the span contains any values except the given one
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public static bool ContainsAnyExcept<T>(this ReadOnlySpan<T> source, T value)
+    {
+        var comparer = new EqualityComparer<T>();
+        return source.ContainsAnyExcept(value, comparer);
+    }
+#endif
+
+#if NETSTANDARD2_0
+    /// <summary>
+    /// Determines if the span contains any values except the given one, using the given elements'
+    /// comparer.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static bool ContainsAnyExcept<T>(
+        this ReadOnlySpan<T> source, T value, IEqualityComparer<T> comparer)
+    {
+        comparer.ThrowWhenNull();
+
+        for (int i = source.Length - 1; i >= 0; i--) if (!comparer.Equals(value, source[i])) return true;
+        return false;
+    }
+#endif
+
+    /// <summary>
+    /// Determines if the span contains any values except the ones that match the given predicate.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="predicate"></param>
+    /// <returns></returns>
+    public static bool ContainsAnyExcept<T>(this ReadOnlySpan<T> source, Predicate<T> predicate)
+    {
+        predicate.ThrowWhenNull();
+
+        for (int i = source.Length - 1; i >= 0; i--) if (!predicate(source[i])) return true;
+        return false;
+    }
 }

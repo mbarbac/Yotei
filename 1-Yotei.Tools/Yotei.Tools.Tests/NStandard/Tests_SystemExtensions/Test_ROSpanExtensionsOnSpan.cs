@@ -7,7 +7,7 @@ namespace Yotei.Tools.Tests;
 public static partial class Test_ReadOnlySpanExtensions
 {
     [Fact]
-    public static void Test_ItemSpan_IndexOfAny()
+    public static void Test_ItemSpanOn_IndexOfAny()
     {
         int result;
         var span = ItemSpan([]);
@@ -25,7 +25,7 @@ public static partial class Test_ReadOnlySpanExtensions
     }
 
     [Fact]
-    public static void Test_ItemSpan_LastIndexOfAny()
+    public static void Test_ItemSpanOn_LastIndexOfAny()
     {
         int result;
         var span = ItemSpan([]);
@@ -43,7 +43,7 @@ public static partial class Test_ReadOnlySpanExtensions
     }
 
     [Fact]
-    public static void Test_ItemSpan_ContainsAny()
+    public static void Test_ItemSpanOn_ContainsAny()
     {
         bool result;
         var span = ItemSpan([]);
@@ -63,7 +63,7 @@ public static partial class Test_ReadOnlySpanExtensions
     // ----------------------------------------------------
 
     [Fact]
-    public static void Test_ItemSpan_SequenceCompareTo()
+    public static void Test_ItemSpanOn_SequenceCompareTo()
     {
         int result;
         var span = ItemSpan([]);
@@ -96,7 +96,7 @@ public static partial class Test_ReadOnlySpanExtensions
     }
 
     [Fact]
-    public static void Test_ItemSpan_SequenceEqual()
+    public static void Test_ItemSpanOn_SequenceEqual()
     {
         bool result;
         var span = ItemSpan([]);
@@ -134,7 +134,7 @@ public static partial class Test_ReadOnlySpanExtensions
 public static partial class Test_ReadOnlySpanExtensions
 {
     [Fact]
-    public static void Test_ItemSpan_()
+    public static void Test_ItemSpanOn_()
     {
         //bool result;
         //var span = ItemSpan([]);
