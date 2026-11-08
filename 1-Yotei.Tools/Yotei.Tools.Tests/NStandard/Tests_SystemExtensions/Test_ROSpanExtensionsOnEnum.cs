@@ -7,7 +7,7 @@ namespace Yotei.Tools.Tests;
 public static partial class Test_ReadOnlySpanExtensions
 {
     [Fact]
-    public static void Test_IntSpanOn_IndexOfAny()
+    public static void Test_SpanOnEnum_IndexOfAny()
     {
         int result;
         var span = IntSpan([]);
@@ -25,7 +25,7 @@ public static partial class Test_ReadOnlySpanExtensions
     }
 
     [Fact]
-    public static void Test_IntSpanOn_LastIndexOfAny()
+    public static void Test_SpanOnEnum_LastIndexOfAny()
     {
         int result;
         var span = IntSpan([]);
@@ -43,7 +43,7 @@ public static partial class Test_ReadOnlySpanExtensions
     }
 
     [Fact]
-    public static void Test_IntSpanOn_ContainsAny()
+    public static void Test_SpanOnEnum_ContainsAny()
     {
         bool result;
         var span = IntSpan([]);
@@ -63,7 +63,7 @@ public static partial class Test_ReadOnlySpanExtensions
     // ----------------------------------------------------
 
     [Fact]
-    public static void Test_IntSpanOn_SequenceCompareTo()
+    public static void Test_SpanOnEnum_SequenceCompareTo()
     {
         int result;
         var span = IntSpan([]);
@@ -96,7 +96,7 @@ public static partial class Test_ReadOnlySpanExtensions
     }
 
     [Fact]
-    public static void Test_IntSpanOn_SequenceEqual()
+    public static void Test_SpanOnEnum_SequenceEqual()
     {
         bool result;
         var span = IntSpan([]);
@@ -127,43 +127,52 @@ public static partial class Test_ReadOnlySpanExtensions
         result = span.SequenceEqual(values); Assert.False(result);
         result = span.SequenceEqual(values, IntEquality()); Assert.False(result);
     }
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_SpanOnEnum_StartsWithAny()
+    {
+        bool result;
+        var span = IntSpan([]);
+        var values = Array.Empty<int>();
+        result = span.StartsWithAny(values); Assert.False(result);
+        result = span.StartsWithAny(values, IntEquality()); Assert.False(result);
+
+        values = [8, 9];
+        result = span.StartsWithAny(values); Assert.False(result);
+        result = span.StartsWithAny(values, IntEquality()); Assert.False(result);
+
+        span = IntSpan([1, 2]);
+        values = [8, 9, 1];
+        result = span.StartsWithAny(values); Assert.True(result);
+        result = span.StartsWithAny(values, IntEquality()); Assert.True(result);
+    }
+
+    [Fact]
+    public static void Test_SpanOnEnum_EndsWithAny()
+    {
+        bool result;
+        var span = IntSpan([]);
+        var values = Array.Empty<int>();
+        result = span.EndsWithAny(values); Assert.False(result);
+        result = span.EndsWithAny(values, IntEquality()); Assert.False(result);
+
+        values = [8, 9];
+        result = span.EndsWithAny(values); Assert.False(result);
+        result = span.EndsWithAny(values, IntEquality()); Assert.False(result);
+
+        span = IntSpan([1, 2]);
+        values = [8, 9, 2];
+        result = span.EndsWithAny(values); Assert.True(result);
+        result = span.EndsWithAny(values, IntEquality()); Assert.True(result);
+    }
 }
 
 // ========================================================
 #if !NETSTANDARD2_0
 public static partial class Test_ReadOnlySpanExtensions
 {
-    [Fact]
-    public static void Test_IntSpanOn_()
-    {
-        //bool result;
-        //var span = IntSpan([]);
-        //var values = Array.Empty<int>();
-        //result = span.SequenceEqual(values); Assert.True(result);
-        //result = span.SequenceEqual(values, IntEquality()); Assert.True(result);
-
-        //span = IntSpan([1, 2, 3]);
-        //values = [1, 2, 3];
-        //result = span.SequenceEqual(values); Assert.True(result);
-        //result = span.SequenceEqual(values, IntEquality()); Assert.True(result);
-
-        //values = [1, 2];
-        //result = span.SequenceEqual(values); Assert.False(result);
-        //result = span.SequenceEqual(values, IntEquality()); Assert.False(result);
-
-        //values = [1, 2, 3, 4];
-        //result = span.SequenceEqual(values); Assert.False(result);
-        //result = span.SequenceEqual(values, IntEquality()); Assert.False(result);
-
-        //span = IntSpan([1, 2, 4]);
-        //values = [1, 2, 3];
-        //result = span.SequenceEqual(values); Assert.False(result);
-        //result = span.SequenceEqual(values, IntEquality()); Assert.False(result);
-
-        //span = IntSpan([1, 2, 2]);
-        //values = [1, 2, 3];
-        //result = span.SequenceEqual(values); Assert.False(result);
-        //result = span.SequenceEqual(values, IntEquality()); Assert.False(result);
-    }
+    
 }
 #endif

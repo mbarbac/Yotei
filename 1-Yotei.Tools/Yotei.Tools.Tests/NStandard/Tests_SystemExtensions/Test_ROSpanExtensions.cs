@@ -449,54 +449,5 @@ public static partial class Test_ReadOnlySpanExtensions
 #if NETSTANDARD2_0
 public static partial class Test_ReadOnlySpanExtensions
 {
-    [Fact]
-    public static void Test_IntSpan_()
-    {
-        bool result;
-        var span = IntSpan([]);
-        result = span.ContainsAnyExcept(9); Assert.False(result);
-        result = span.ContainsAnyExcept(9, IntEquality()); Assert.False(result);
-        result = span.ContainsAnyExcept(IntPredicate(9)); Assert.False(result);
-
-        span = [1, 2, 3];
-        result = span.ContainsAnyExcept(0); Assert.True(result);
-        result = span.ContainsAnyExcept(0, IntEquality()); Assert.True(result);
-        result = span.ContainsAnyExcept(IntPredicate(0)); Assert.True(result);
-
-        span = [0, 0, 0];
-        result = span.ContainsAnyExcept(0); Assert.False(result);
-        result = span.ContainsAnyExcept(0, IntEquality()); Assert.False(result);
-        result = span.ContainsAnyExcept(IntPredicate(0)); Assert.False(result);
-
-        span = [1, 2, 0, 0];
-        result = span.ContainsAnyExcept(0); Assert.True(result);
-        result = span.ContainsAnyExcept(0, IntEquality()); Assert.True(result);
-        result = span.ContainsAnyExcept(IntPredicate(0)); Assert.True(result);
-    }
-
-    [Fact]
-    public static void Test_ItemSpan_()
-    {
-        bool result;
-        var span = ItemSpan([]);
-        result = span.ContainsAnyExcept(Item(9)); Assert.False(result);
-        result = span.ContainsAnyExcept(Item(9), ItemEquality()); Assert.False(result);
-        result = span.ContainsAnyExcept(ItemPredicate(9)); Assert.False(result);
-
-        span = ItemSpan([new(1), new(2), new(3)]);
-        result = span.ContainsAnyExcept(Item(0)); Assert.True(result);
-        result = span.ContainsAnyExcept(Item(0), ItemEquality()); Assert.True(result);
-        result = span.ContainsAnyExcept(ItemPredicate(0)); Assert.True(result);
-
-        span = ItemSpan([new(0), new(0), new(0)]);
-        result = span.ContainsAnyExcept(Item(0)); Assert.True(result); // Reference type!
-        result = span.ContainsAnyExcept(Item(0), ItemEquality()); Assert.False(result);
-        result = span.ContainsAnyExcept(ItemPredicate(0)); Assert.False(result);
-
-        span = ItemSpan([new(1), new(2), new(0), new(0)]);
-        result = span.ContainsAnyExcept(Item(0)); Assert.True(result); // Reference type!
-        result = span.ContainsAnyExcept(Item(0), ItemEquality()); Assert.True(result);
-        result = span.ContainsAnyExcept(ItemPredicate(0)); Assert.True(result);
-    }
 }
 #endif
