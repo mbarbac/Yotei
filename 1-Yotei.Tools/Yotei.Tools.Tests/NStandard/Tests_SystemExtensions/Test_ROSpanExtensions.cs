@@ -16,25 +16,20 @@ public static partial class Test_ReadOnlySpanExtensions
     static Item<int> Item(int value) => new(value);
     static ReadOnlySpan<Item<int>> ItemSpan(Item<int>[] values) => values.AsSpan();
     static Predicate<Item<int>> ItemPredicate(int value) => x => x.Value == value;
-    static IEqualityComparer<Item<int>> ItemEquality() => new ItemEqualityComparer();
-    static IComparer<Item<int>> ItemComparer() => Comparer<Item<int>>.Create((x, y) =>
+    static IEqualityComparer<Item<int>> ItemEquality() => EqualityComparerEx.New<Item<int>>((x, y) =>
+    {
+        if (x is null && y is null) return true;
+        if (x is null) return false;
+        if (y is null) return false;
+        return x.Value == y.Value;
+    });
+    static IComparer<Item<int>> ItemComparer() => ComparerEx.New<Item<int>>((x, y) =>
     {
         if (x is null && y is null) return 0;
         if (x is null) return -1;
         if (y is null) return +1;
         return x.Value.CompareTo(y.Value);
     });
-
-    readonly struct ItemEqualityComparer : IEqualityComparer<Item<int>>
-    {
-        public bool Equals(Item<int>? x, Item<int>? y)
-        {
-            if (x is null && y is null) return true;
-            if (x is null || y is null) return false;
-            return x.Value == y.Value;
-        }
-        public int GetHashCode([DisallowNull] Item<int> obj) => obj.Value.GetHashCode();
-    }
 
     // ----------------------------------------------------
 

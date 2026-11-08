@@ -15,114 +15,48 @@ static partial class ReadOnlySpanExtensions
 {
 #if NETSTANDARD2_0
     /// <summary>
-    /// Searches for the first index of any of the given values.
+    /// Determines if the span shall be considered equal to the values' sequence
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="source"></param>
     /// <param name="values"></param>
     /// <returns></returns>
-    public static int IndexOfAny<T>(this ReadOnlySpan<T> source, ReadOnlySpan<T> values)
+    public static bool SequenceEqual<T>(this ReadOnlySpan<T> source, ReadOnlySpan<T> values)
     {
-        var comparer = new EqualityComparer<T>();
-        return source.IndexOfAny(values, comparer);
+        var comparer = EqualityComparerEx.New<T>();
+        return source.SequenceEqual(values, comparer);
     }
 #endif
 
 #if NETSTANDARD2_0
     /// <summary>
-    /// Searches for the first index of any of the given values, using the given elements'
-    /// comparer.
+    /// Determines if the span shall be considered equal to the values' sequence, using the given
+    /// elements' comparer.
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="source"></param>
     /// <param name="values"></param>
     /// <param name="comparer"></param>
     /// <returns></returns>
-    public static int IndexOfAny<T>(
+    public static bool SequenceEqual<T>(
         this ReadOnlySpan<T> source, ReadOnlySpan<T> values, IEqualityComparer<T> comparer)
     {
         comparer.ThrowWhenNull();
 
-        for (int i = 0; i < source.Length; i++)
+        var xlen = source.Length;
+        var ylen = values.Length;
+
+        if (xlen < ylen) return false;
+        if (xlen > ylen) return false;
+
+        for (int i = 0; i < xlen; i++)
         {
-            var item = source[i];
-            foreach (var value in values) if (comparer.Equals(item, value)) return i;
+            var xvalue = source[i];
+            var yvalue = values[i];
+            var result = comparer.Equals(xvalue, yvalue); if (!result) return false;
         }
-        return -1;
+        return true;
     }
-#endif
-
-    // ----------------------------------------------------
-
-#if NETSTANDARD2_0
-    /// <summary>
-    /// Searches for the last index of any of the given values.
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="source"></param>
-    /// <param name="values"></param>
-    /// <returns></returns>
-    public static int LastIndexOfAny<T>(this ReadOnlySpan<T> source, ReadOnlySpan<T> values)
-    {
-        var comparer = new EqualityComparer<T>();
-        return source.LastIndexOfAny(values, comparer);
-    }
-#endif
-
-#if NETSTANDARD2_0
-    /// <summary>
-    /// Searches for the last index of any of the given values, using the given element's comparer.
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="source"></param>
-    /// <param name="values"></param>
-    /// <param name="comparer"></param>
-    /// <returns></returns>
-    public static int LastIndexOfAny<T>(
-        this ReadOnlySpan<T> source, ReadOnlySpan<T> values, IEqualityComparer<T> comparer)
-    {
-        comparer.ThrowWhenNull();
-
-        for (int i = source.Length - 1; i >= 0; i--)
-        {
-            var item = source[i];
-            foreach (var value in values) if (comparer.Equals(item, value)) return i;
-        }
-        return -1;
-    }
-#endif
-
-    // ----------------------------------------------------
-
-#if NETSTANDARD2_0
-    /// <summary>
-    /// Determines if the span contains any of any of the given values.
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="source"></param>
-    /// <param name="values"></param>
-    /// <returns></returns>
-    public static bool ContainsAny<T>(
-        this ReadOnlySpan<T> source, ReadOnlySpan<T> values)
-    {
-        var comparer = new EqualityComparer<T>();
-        return source.IndexOfAny(values, comparer) >= 0;
-    }
-#endif
-
-#if NETSTANDARD2_0
-    /// <summary>
-    /// Determines if the span contains any of any of the given values, using the given elements'
-    /// comparer.
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="source"></param>
-    /// <param name="values"></param>
-    /// <param name="comparer"></param>
-    /// <returns></returns>
-    public static bool ContainsAny<T>(
-        this ReadOnlySpan<T> source, ReadOnlySpan<T> values, IEqualityComparer<T> comparer)
-        => source.IndexOfAny(values, comparer) >= 0;
 #endif
 
     // ----------------------------------------------------
@@ -140,7 +74,7 @@ static partial class ReadOnlySpanExtensions
     /// <returns></returns>
     public static int SequenceCompareTo<T>(this ReadOnlySpan<T> source, ReadOnlySpan<T> values)
     {
-        var comparer = new ValueComparer<T>();
+        var comparer = ComparerEx.New<T>();
         return source.SequenceCompareTo(values, comparer);
     }
 #endif
@@ -183,48 +117,114 @@ static partial class ReadOnlySpanExtensions
 
 #if NETSTANDARD2_0
     /// <summary>
-    /// Determines if the span shall be considered equal to the values' sequence
+    /// Searches for the first index of any of the given values.
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="source"></param>
     /// <param name="values"></param>
     /// <returns></returns>
-    public static bool SequenceEqual<T>(this ReadOnlySpan<T> source, ReadOnlySpan<T> values)
+    public static int IndexOfAny<T>(this ReadOnlySpan<T> source, ReadOnlySpan<T> values)
     {
-        var comparer = new EqualityComparer<T>();
-        return source.SequenceEqual(values, comparer);
+        var comparer = EqualityComparerEx.New<T>();
+        return source.IndexOfAny(values, comparer);
     }
 #endif
 
 #if NETSTANDARD2_0
     /// <summary>
-    /// Determines if the span shall be considered equal to the values' sequence, using the given
-    /// elements' comparer.
+    /// Searches for the first index of any of the given values, using the given elements'
+    /// comparer.
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="source"></param>
     /// <param name="values"></param>
     /// <param name="comparer"></param>
     /// <returns></returns>
-    public static bool SequenceEqual<T>(
+    public static int IndexOfAny<T>(
         this ReadOnlySpan<T> source, ReadOnlySpan<T> values, IEqualityComparer<T> comparer)
     {
         comparer.ThrowWhenNull();
 
-        var xlen = source.Length;
-        var ylen = values.Length;
-
-        if (xlen < ylen) return false;
-        if (xlen > ylen) return false;
-
-        for (int i = 0; i < xlen; i++)
+        for (int i = 0; i < source.Length; i++)
         {
-            var xvalue = source[i];
-            var yvalue = values[i];
-            var result = comparer.Equals(xvalue, yvalue); if (!result) return false;
+            var item = source[i];
+            foreach (var value in values) if (comparer.Equals(item, value)) return i;
         }
-        return true;
+        return -1;
     }
+#endif
+
+    // ----------------------------------------------------
+
+#if NETSTANDARD2_0
+    /// <summary>
+    /// Searches for the last index of any of the given values.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <returns></returns>
+    public static int LastIndexOfAny<T>(this ReadOnlySpan<T> source, ReadOnlySpan<T> values)
+    {
+        var comparer = EqualityComparerEx.New<T>();
+        return source.LastIndexOfAny(values, comparer);
+    }
+#endif
+
+#if NETSTANDARD2_0
+    /// <summary>
+    /// Searches for the last index of any of the given values, using the given element's comparer.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static int LastIndexOfAny<T>(
+        this ReadOnlySpan<T> source, ReadOnlySpan<T> values, IEqualityComparer<T> comparer)
+    {
+        comparer.ThrowWhenNull();
+
+        for (int i = source.Length - 1; i >= 0; i--)
+        {
+            var item = source[i];
+            foreach (var value in values) if (comparer.Equals(item, value)) return i;
+        }
+        return -1;
+    }
+#endif
+
+    // ----------------------------------------------------
+
+#if NETSTANDARD2_0
+    /// <summary>
+    /// Determines if the span contains any of any of the given values.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <returns></returns>
+    public static bool ContainsAny<T>(
+        this ReadOnlySpan<T> source, ReadOnlySpan<T> values)
+    {
+        var comparer = EqualityComparerEx.New<T>();
+        return source.IndexOfAny(values, comparer) >= 0;
+    }
+#endif
+
+#if NETSTANDARD2_0
+    /// <summary>
+    /// Determines if the span contains any of any of the given values, using the given elements'
+    /// comparer.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static bool ContainsAny<T>(
+        this ReadOnlySpan<T> source, ReadOnlySpan<T> values, IEqualityComparer<T> comparer)
+        => source.IndexOfAny(values, comparer) >= 0;
 #endif
 
     // ----------------------------------------------------
@@ -238,7 +238,7 @@ static partial class ReadOnlySpanExtensions
     /// <returns></returns>
     public static bool StartsWithAny<T>(this ReadOnlySpan<T> source, ReadOnlySpan<T> values)
     {
-        var comparer = new EqualityComparer<T>();
+        var comparer = EqualityComparerEx.New<T>();
         return source.StartsWithAny(values, comparer);
     }
 
@@ -275,7 +275,7 @@ static partial class ReadOnlySpanExtensions
     /// <returns></returns>
     public static bool EndsWithAny<T>(this ReadOnlySpan<T> source, ReadOnlySpan<T> values)
     {
-        var comparer = new EqualityComparer<T>();
+        var comparer = EqualityComparerEx.New<T>();
         return source.EndsWithAny(values, comparer);
     }
 

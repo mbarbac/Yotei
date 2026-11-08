@@ -32,7 +32,7 @@ static partial class ReadOnlySpanExtensions
     [SuppressMessage("", "IDE0075")]
     public static int IndexOf<T>(this ReadOnlySpan<T> source, T value)
     {
-        var predicate = PredicateEquality(value);
+        var predicate = PredicateEx.ValueEquality<T>(value);
         return source.IndexOf(predicate);
     }
 #endif
@@ -84,7 +84,7 @@ static partial class ReadOnlySpanExtensions
     [SuppressMessage("", "IDE0075")]
     public static int LastIndexOf<T>(this ReadOnlySpan<T> source, T value)
     {
-        var predicate = PredicateEquality(value);
+        var predicate = PredicateEx.ValueEquality<T>(value);
         return source.LastIndexOf(predicate);
     }
 #endif
@@ -131,7 +131,7 @@ static partial class ReadOnlySpanExtensions
     /// <returns></returns>
     public static List<int> IndexesOf<T>(this ReadOnlySpan<T> source, T value)
     {
-        var predicate = PredicateEquality(value);
+        var predicate = PredicateEx.ValueEquality<T>(value);
         return source.IndexesOf(predicate);
     }
 
@@ -298,7 +298,7 @@ static partial class ReadOnlySpanExtensions
     /// <returns></returns>
     public static int IndexOfAnyExcept<T>(this ReadOnlySpan<T> source, T value)
     {
-        var comparer = new EqualityComparer<T>();
+        var comparer = EqualityComparerEx.New<T>();
         return source.IndexOfAnyExcept(value, comparer);
     }
 #endif
@@ -350,7 +350,7 @@ static partial class ReadOnlySpanExtensions
     /// <returns></returns>
     public static int LastIndexOfAnyExcept<T>(this ReadOnlySpan<T> source, T value)
     {
-        var comparer = new EqualityComparer<T>();
+        var comparer = EqualityComparerEx.New<T>();
         return source.LastIndexOfAnyExcept(value, comparer);
     }
 #endif
@@ -402,7 +402,7 @@ static partial class ReadOnlySpanExtensions
     /// <returns></returns>
     public static bool ContainsAnyExcept<T>(this ReadOnlySpan<T> source, T value)
     {
-        var comparer = new EqualityComparer<T>();
+        var comparer = EqualityComparerEx.New<T>();
         return source.ContainsAnyExcept(value, comparer);
     }
 #endif

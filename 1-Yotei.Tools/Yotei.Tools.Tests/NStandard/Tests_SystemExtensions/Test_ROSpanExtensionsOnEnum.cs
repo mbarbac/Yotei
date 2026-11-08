@@ -7,6 +7,46 @@ namespace Yotei.Tools.Tests;
 public static partial class Test_ReadOnlySpanExtensions
 {
     [Fact]
+    public static void Test_SpanOnEnum_StartsWithAny()
+    {
+        bool result;
+        var span = IntSpan([]);
+        var values = Array.Empty<int>();
+        result = span.StartsWithAny(values); Assert.False(result);
+        result = span.StartsWithAny(values, IntEquality()); Assert.False(result);
+
+        values = [8, 9];
+        result = span.StartsWithAny(values); Assert.False(result);
+        result = span.StartsWithAny(values, IntEquality()); Assert.False(result);
+
+        span = IntSpan([1, 2]);
+        values = [8, 9, 1];
+        result = span.StartsWithAny(values); Assert.True(result);
+        result = span.StartsWithAny(values, IntEquality()); Assert.True(result);
+    }
+
+    [Fact]
+    public static void Test_SpanOnEnum_EndsWithAny()
+    {
+        bool result;
+        var span = IntSpan([]);
+        var values = Array.Empty<int>();
+        result = span.EndsWithAny(values); Assert.False(result);
+        result = span.EndsWithAny(values, IntEquality()); Assert.False(result);
+
+        values = [8, 9];
+        result = span.EndsWithAny(values); Assert.False(result);
+        result = span.EndsWithAny(values, IntEquality()); Assert.False(result);
+
+        span = IntSpan([1, 2]);
+        values = [8, 9, 2];
+        result = span.EndsWithAny(values); Assert.True(result);
+        result = span.EndsWithAny(values, IntEquality()); Assert.True(result);
+    }
+
+    // ----------------------------------------------------
+
+    [Fact]
     public static void Test_SpanOnEnum_IndexOfAny()
     {
         int result;
@@ -126,46 +166,6 @@ public static partial class Test_ReadOnlySpanExtensions
         values = [1, 2, 3];
         result = span.SequenceEqual(values); Assert.False(result);
         result = span.SequenceEqual(values, IntEquality()); Assert.False(result);
-    }
-
-    // ----------------------------------------------------
-
-    [Fact]
-    public static void Test_SpanOnEnum_StartsWithAny()
-    {
-        bool result;
-        var span = IntSpan([]);
-        var values = Array.Empty<int>();
-        result = span.StartsWithAny(values); Assert.False(result);
-        result = span.StartsWithAny(values, IntEquality()); Assert.False(result);
-
-        values = [8, 9];
-        result = span.StartsWithAny(values); Assert.False(result);
-        result = span.StartsWithAny(values, IntEquality()); Assert.False(result);
-
-        span = IntSpan([1, 2]);
-        values = [8, 9, 1];
-        result = span.StartsWithAny(values); Assert.True(result);
-        result = span.StartsWithAny(values, IntEquality()); Assert.True(result);
-    }
-
-    [Fact]
-    public static void Test_SpanOnEnum_EndsWithAny()
-    {
-        bool result;
-        var span = IntSpan([]);
-        var values = Array.Empty<int>();
-        result = span.EndsWithAny(values); Assert.False(result);
-        result = span.EndsWithAny(values, IntEquality()); Assert.False(result);
-
-        values = [8, 9];
-        result = span.EndsWithAny(values); Assert.False(result);
-        result = span.EndsWithAny(values, IntEquality()); Assert.False(result);
-
-        span = IntSpan([1, 2]);
-        values = [8, 9, 2];
-        result = span.EndsWithAny(values); Assert.True(result);
-        result = span.EndsWithAny(values, IntEquality()); Assert.True(result);
     }
 }
 
