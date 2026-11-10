@@ -483,6 +483,100 @@ public static partial class Test_ReadOnlySpanExtensions
         target = source.TrimStart(Item(1), ItemEquality()); Assert.True(target.SequenceEqual(expected, ItemEquality()));
         target = source.TrimStart(ItemPredicate(1)); Assert.True(target.SequenceEqual(expected, ItemEquality()));
     }
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_IntSpan_TryFind()
+    {
+        ReadOnlySpan<int> span;
+        int value;
+
+        span = [];
+        Assert.False(span.TryFind(x => x != 0, out value));
+
+        span = [1, 2, 3];
+        Assert.True(span.TryFind(x => x > 1, out value));
+        Assert.Equal(2, value);
+    }
+
+    [Fact]
+    public static void Test_ItemSpan_TryFind()
+    {
+        ReadOnlySpan<Item<int>> span;
+        Item<int> value;
+
+        span = [];
+        Assert.False(span.TryFind(x => x.Value != 0, out value));
+
+        span = ItemSpan([new(1), new(2), new(3)]);
+        Assert.True(span.TryFind(x => x.Value > 1, out value));
+        Assert.Equal(2, value.Value);
+    }
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_IntSpan_TryFindLast()
+    {
+        ReadOnlySpan<int> span;
+        int value;
+
+        span = [];
+        Assert.False(span.TryFindLast(x => x != 0, out value));
+
+        span = [1, 2, 3];
+        Assert.True(span.TryFindLast(x => x > 1, out value));
+        Assert.Equal(3, value);
+    }
+
+    [Fact]
+    public static void Test_ItemSpan_TryFindLast()
+    {
+        ReadOnlySpan<Item<int>> span;
+        Item<int> value;
+
+        span = [];
+        Assert.False(span.TryFindLast(x => x.Value != 0, out value));
+
+        span = ItemSpan([new(1), new(2), new(3)]);
+        Assert.True(span.TryFindLast(x => x.Value > 1, out value));
+        Assert.Equal(3, value.Value);
+    }
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_IntSpan_TryFindAll()
+    {
+        ReadOnlySpan<int> span;
+        List<int> values;
+
+        span = [];
+        Assert.False(span.TryFindAll(x => x != 0, out values));
+
+        span = [1, 2, 3];
+        Assert.True(span.TryFindAll(x => x > 1, out values));
+        Assert.Equal(2, values.Count);
+        Assert.Equal(2, values[0]);
+        Assert.Equal(3, values[1]);
+    }
+
+    [Fact]
+    public static void Test_ItemSpan_TryFindAll()
+    {
+        ReadOnlySpan<Item<int>> span;
+        List<Item<int>> values;
+
+        span = [];
+        Assert.False(span.TryFindAll(x => x.Value != 0, out values));
+
+        span = ItemSpan([new(1), new(2), new(3)]);
+        Assert.True(span.TryFindAll(x => x.Value > 1, out values));
+        Assert.Equal(2, values.Count);
+        Assert.Equal(2, values[0].Value);
+        Assert.Equal(3, values[1].Value);
+    }
 }
 
 // ========================================================

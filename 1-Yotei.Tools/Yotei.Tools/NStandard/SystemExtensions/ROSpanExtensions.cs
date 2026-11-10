@@ -584,4 +584,83 @@ static partial class ReadOnlySpanExtensions
     {
         return source.TrimStart(predicate).TrimEnd(predicate);
     }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Tries to find the first ocurrence in the span that matches the given value.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="predicate"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public static bool TryFind<T>(
+        this ReadOnlySpan<T> source, Predicate<T> predicate, out T value)
+    {
+        predicate.ThrowWhenNull();
+
+        for (int i = 0; i < source.Length; i++)
+        {
+            var item = source[i];
+            if (predicate(item))
+            {
+                value = item;
+                return true;
+            }
+        }
+
+        value = default!;
+        return false;
+    }
+
+    /// <summary>
+    /// Tries to find the last ocurrence in the span that matches the given value.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="predicate"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public static bool TryFindLast<T>(
+        this ReadOnlySpan<T> source, Predicate<T> predicate, out T value)
+    {
+        predicate.ThrowWhenNull();
+
+        for (int i = source.Length - 1; i >= 0; i--)
+        {
+            var item = source[i];
+            if (predicate(item))
+            {
+                value = item;
+                return true;
+            }
+        }
+
+        value = default!;
+        return false;
+    }
+
+    /// <summary>
+    /// Tries to find all ocurrences in the span that match the given value.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="predicate"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public static bool TryFindAll<T>(
+        this ReadOnlySpan<T> source, Predicate<T> predicate, out List<T> values)
+    {
+        predicate.ThrowWhenNull();
+
+        values = [];
+        for (int i = 0; i < source.Length; i++)
+        {
+            var item = source[i];
+            if (predicate(item)) values.Add(item);
+        }
+
+        return values.Count > 0;
+    }
 }
