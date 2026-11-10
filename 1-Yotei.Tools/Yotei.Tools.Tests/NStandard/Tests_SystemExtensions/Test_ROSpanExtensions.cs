@@ -438,10 +438,55 @@ public static partial class Test_ReadOnlySpanExtensions
         result = span.ContainsAnyExcept(Item(0), ItemEquality()); Assert.True(result);
         result = span.ContainsAnyExcept(ItemPredicate(0)); Assert.True(result);
     }
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_IntSpan_TrimStart()
+    {
+        ReadOnlySpan<int> source;
+        ReadOnlySpan<int> target;
+
+        source = IntSpan([]);
+        target = source.TrimStart(9); Assert.True(target.IsEmpty);
+        target = source.TrimStart(9, IntEquality()); Assert.True(target.IsEmpty);
+        target = source.TrimStart(IntPredicate(9)); Assert.True(target.IsEmpty);
+
+        source = IntSpan([1, 2, 3]);
+        target = source.TrimStart(0); Assert.True(target.SequenceEqual(source));
+        target = source.TrimStart(0, IntEquality()); Assert.True(target.SequenceEqual(source));
+        target = source.TrimStart(IntPredicate(0)); Assert.True(target.SequenceEqual(source));
+
+        target = source.TrimStart(1); Assert.True(target is [2, 3]);
+        target = source.TrimStart(1, IntEquality()); Assert.True(target is [2, 3]);
+        target = source.TrimStart(IntPredicate(1)); Assert.True(target is [2, 3]);
+    }
+
+    [Fact]
+    public static void Test_ItemSpan_TrimStart()
+    {
+        ReadOnlySpan<Item<int>> source;
+        ReadOnlySpan<Item<int>> target;
+
+        source = ItemSpan([]);
+        target = source.TrimStart(Item(9)); Assert.True(target.IsEmpty);
+        target = source.TrimStart(Item(9), ItemEquality()); Assert.True(target.IsEmpty);
+        target = source.TrimStart(ItemPredicate(9)); Assert.True(target.IsEmpty);
+
+        source = ItemSpan([new(1), new(2), new(3)]);
+        target = source.TrimStart(Item(0)); Assert.True(target.SequenceEqual(source, ItemEquality()));
+        target = source.TrimStart(Item(0), ItemEquality()); Assert.True(target.SequenceEqual(source, ItemEquality()));
+        target = source.TrimStart(ItemPredicate(0)); Assert.True(target.SequenceEqual(source, ItemEquality()));
+
+        var expected = ItemSpan([new(2), new(3)]);
+        target = source.TrimStart(Item(1)); Assert.False(target.SequenceEqual(expected, ItemEquality()));
+        target = source.TrimStart(Item(1), ItemEquality()); Assert.True(target.SequenceEqual(expected, ItemEquality()));
+        target = source.TrimStart(ItemPredicate(1)); Assert.True(target.SequenceEqual(expected, ItemEquality()));
+    }
 }
 
 // ========================================================
-#if NETSTANDARD2_0
+#if !NETSTANDARD2_0__
 public static partial class Test_ReadOnlySpanExtensions
 {
 }
