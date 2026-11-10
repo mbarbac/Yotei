@@ -578,10 +578,3 @@ public static partial class Test_ReadOnlySpanExtensions
         Assert.Equal(3, values[1].Value);
     }
 }
-
-// ========================================================
-#if !NETSTANDARD2_0__
-public static partial class Test_ReadOnlySpanExtensions
-{
-}
-#endif
