@@ -1,6 +1,4 @@
-﻿#pragma warning disable IDE0079
-#pragma warning disable CA1859
-
+﻿#pragma warning disable IDE0079, CA1859, IDE0018
 namespace Yotei.Tools.Tests;
 
 // ========================================================
@@ -482,6 +480,97 @@ public static partial class Test_ReadOnlySpanExtensions
         target = source.TrimStart(Item(1)); Assert.False(target.SequenceEqual(expected, ItemEquality()));
         target = source.TrimStart(Item(1), ItemEquality()); Assert.True(target.SequenceEqual(expected, ItemEquality()));
         target = source.TrimStart(ItemPredicate(1)); Assert.True(target.SequenceEqual(expected, ItemEquality()));
+    }
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_IntSpan_TrimEnd()
+    {
+        ReadOnlySpan<int> source;
+        ReadOnlySpan<int> target;
+
+        source = IntSpan([]);
+        target = source.TrimEnd(9); Assert.True(target.IsEmpty);
+        target = source.TrimEnd(9, IntEquality()); Assert.True(target.IsEmpty);
+        target = source.TrimEnd(IntPredicate(9)); Assert.True(target.IsEmpty);
+
+        source = IntSpan([1, 2, 3]);
+        target = source.TrimEnd(0); Assert.True(target.SequenceEqual(source));
+        target = source.TrimEnd(0, IntEquality()); Assert.True(target.SequenceEqual(source));
+        target = source.TrimEnd(IntPredicate(0)); Assert.True(target.SequenceEqual(source));
+
+        target = source.TrimEnd(3); Assert.True(target is [1, 2]);
+        target = source.TrimEnd(3, IntEquality()); Assert.True(target is [1, 2]);
+        target = source.TrimEnd(IntPredicate(3)); Assert.True(target is [1, 2]);
+    }
+
+    [Fact]
+    public static void Test_ItemSpan_TrimEnd()
+    {
+        ReadOnlySpan<Item<int>> source;
+        ReadOnlySpan<Item<int>> target;
+
+        source = ItemSpan([]);
+        target = source.TrimEnd(Item(9)); Assert.True(target.IsEmpty);
+        target = source.TrimEnd(Item(9), ItemEquality()); Assert.True(target.IsEmpty);
+        target = source.TrimEnd(ItemPredicate(9)); Assert.True(target.IsEmpty);
+
+        source = ItemSpan([new(1), new(2), new(3)]);
+        target = source.TrimEnd(Item(0)); Assert.True(target.SequenceEqual(source, ItemEquality()));
+        target = source.TrimEnd(Item(0), ItemEquality()); Assert.True(target.SequenceEqual(source, ItemEquality()));
+        target = source.TrimEnd(ItemPredicate(0)); Assert.True(target.SequenceEqual(source, ItemEquality()));
+
+        var expected = ItemSpan([new(1), new(2)]);
+        target = source.TrimEnd(Item(3)); Assert.False(target.SequenceEqual(expected, ItemEquality()));
+        target = source.TrimEnd(Item(3), ItemEquality()); Assert.True(target.SequenceEqual(expected, ItemEquality()));
+        target = source.TrimEnd(ItemPredicate(3)); Assert.True(target.SequenceEqual(expected, ItemEquality()));
+    }
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_IntSpan_Trim()
+    {
+        ReadOnlySpan<int> source;
+        ReadOnlySpan<int> target;
+
+        source = IntSpan([]);
+        target = source.Trim(9); Assert.True(target.IsEmpty);
+        target = source.Trim(9, IntEquality()); Assert.True(target.IsEmpty);
+        target = source.Trim(IntPredicate(9)); Assert.True(target.IsEmpty);
+
+        source = IntSpan([1, 2, 3]);
+        target = source.Trim(0); Assert.True(target.SequenceEqual(source));
+        target = source.Trim(0, IntEquality()); Assert.True(target.SequenceEqual(source));
+        target = source.Trim(IntPredicate(0)); Assert.True(target.SequenceEqual(source));
+
+        source = IntSpan([9, 1, 2, 9]);
+        target = source.Trim(9); Assert.True(target is [1, 2]);
+        target = source.Trim(9, IntEquality()); Assert.True(target is [1, 2]);
+        target = source.Trim(IntPredicate(9)); Assert.True(target is [1, 2]);
+    }
+
+    [Fact]
+    public static void Test_ItemSpan_Trim()
+    {
+        ReadOnlySpan<Item<int>> source;
+        ReadOnlySpan<Item<int>> target;
+
+        source = ItemSpan([]);
+        target = source.Trim(Item(9)); Assert.True(target.IsEmpty);
+        target = source.Trim(Item(9), ItemEquality()); Assert.True(target.IsEmpty);
+        target = source.Trim(ItemPredicate(9)); Assert.True(target.IsEmpty);
+
+        source = ItemSpan([new(9), new(1), new(2), new(9)]);
+        target = source.Trim(Item(5)); Assert.True(target.SequenceEqual(source, ItemEquality()));
+        target = source.Trim(Item(5), ItemEquality()); Assert.True(target.SequenceEqual(source, ItemEquality()));
+        target = source.Trim(ItemPredicate(5)); Assert.True(target.SequenceEqual(source, ItemEquality()));
+
+        var expected = ItemSpan([new(1), new(2)]);
+        target = source.Trim(Item(9)); Assert.False(target.SequenceEqual(expected, ItemEquality()));
+        target = source.Trim(Item(9), ItemEquality()); Assert.True(target.SequenceEqual(expected, ItemEquality()));
+        target = source.Trim(ItemPredicate(9)); Assert.True(target.SequenceEqual(expected, ItemEquality()));
     }
 
     // ----------------------------------------------------

@@ -235,4 +235,52 @@ public static partial class Inherit_SpanExtensions
         target = source.TrimStart(values); Assert.False(target.SequenceEqual(expected, ItemEquality()));
         target = source.TrimStart(values, ItemEquality()); Assert.True(target.SequenceEqual(expected, ItemEquality()));
     }
+
+    [Fact]
+    public static void Inherit_SpanOnSpan_TrimEnd()
+    {
+        Span<Item<int>> values = [];
+        Span<Item<int>> source = [];
+        var target = source.TrimEnd(values); Assert.True(target.IsEmpty);
+        target = source.TrimEnd(values, ItemEquality()); Assert.True(target.IsEmpty);
+
+        values = ItemSpan([new(1), new(2)]);
+        target = source.TrimEnd(values); Assert.True(target.IsEmpty);
+        target = source.TrimEnd(values, ItemEquality()); Assert.True(target.IsEmpty);
+
+        source = ItemSpan([new(1), new(2)]);
+        values = [];
+        target = source.TrimEnd(values); Assert.False(target.IsEmpty);
+        target = source.TrimEnd(values, ItemEquality()); Assert.False(target.IsEmpty);
+
+        source = ItemSpan([new(1), new(2), new(3)]);
+        values = ItemSpan([new(3)]);
+        var expected = ItemSpan([new(1), new(2)]);
+        target = source.TrimEnd(values); Assert.False(target.SequenceEqual(expected, ItemEquality()));
+        target = source.TrimEnd(values, ItemEquality()); Assert.True(target.SequenceEqual(expected, ItemEquality()));
+    }
+
+    [Fact]
+    public static void Inherit_SpanOnSpan_Trim()
+    {
+        Span<Item<int>> values = [];
+        Span<Item<int>> source = [];
+        var target = source.Trim(values); Assert.True(target.IsEmpty);
+        target = source.Trim(values, ItemEquality()); Assert.True(target.IsEmpty);
+
+        values = ItemSpan([new(1), new(2)]);
+        target = source.Trim(values); Assert.True(target.IsEmpty);
+        target = source.Trim(values, ItemEquality()); Assert.True(target.IsEmpty);
+
+        source = ItemSpan([new(1), new(2)]);
+        values = [];
+        target = source.Trim(values); Assert.False(target.IsEmpty);
+        target = source.Trim(values, ItemEquality()); Assert.False(target.IsEmpty);
+
+        source = ItemSpan([new(1), new(2), new(3), new(1)]);
+        values = ItemSpan([new(1)]);
+        var expected = ItemSpan([new(2), new(3)]);
+        target = source.Trim(values); Assert.False(target.SequenceEqual(expected, ItemEquality()));
+        target = source.Trim(values, ItemEquality()); Assert.True(target.SequenceEqual(expected, ItemEquality()));
+    }
 }

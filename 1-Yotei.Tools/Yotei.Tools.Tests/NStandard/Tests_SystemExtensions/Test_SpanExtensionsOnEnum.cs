@@ -223,7 +223,7 @@ public static partial class Inherit_SpanExtensions
     // ----------------------------------------------------
 
     [Fact]
-    public static void Inherit_SpanOnEnum_TrimStart()
+    public static void Test_SpanOnEnum_TrimStart()
     {
         int[] values;
         Span<int> source;

@@ -1,5 +1,5 @@
 ﻿#pragma warning disable IDE0079
-#pragma warning disable CA1859
+#pragma warning disable CA1859, IDE0018
 
 namespace Yotei.Tools.Tests;
 
@@ -487,7 +487,6 @@ public static partial class Inherit_SpanExtensions
 
     // ----------------------------------------------------
 
-    [SuppressMessage("", "IDE0018")]
     [Fact]
     public static void Inherit_IntSpan_TryFind()
     {
@@ -502,7 +501,6 @@ public static partial class Inherit_SpanExtensions
         Assert.Equal(2, value);
     }
 
-    [SuppressMessage("", "IDE0018")]
     [Fact]
     public static void Inherit_ItemSpan_TryFind()
     {
@@ -519,7 +517,6 @@ public static partial class Inherit_SpanExtensions
 
     // ----------------------------------------------------
 
-    [SuppressMessage("", "IDE0018")]
     [Fact]
     public static void Inherit_IntSpan_TryFindLast()
     {
@@ -534,7 +531,6 @@ public static partial class Inherit_SpanExtensions
         Assert.Equal(3, value);
     }
 
-    [SuppressMessage("", "IDE0018")]
     [Fact]
     public static void Inherit_ItemSpan_TryFindLast()
     {
@@ -551,7 +547,6 @@ public static partial class Inherit_SpanExtensions
 
     // ----------------------------------------------------
 
-    [SuppressMessage("", "IDE0018")]
     [Fact]
     public static void Inherit_IntSpan_TryFindAll()
     {
@@ -568,7 +563,6 @@ public static partial class Inherit_SpanExtensions
         Assert.Equal(3, values[1]);
     }
 
-    [SuppressMessage("", "IDE0018")]
     [Fact]
     public static void Inherit_ItemSpan_TryFindAll()
     {
