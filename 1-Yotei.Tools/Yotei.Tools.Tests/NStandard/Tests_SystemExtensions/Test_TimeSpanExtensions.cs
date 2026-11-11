@@ -35,7 +35,7 @@ public static class Test_TimeSpanExtensions
     public static void Test_ValidateTimeout_Negative_Must_Fail()
     {
         var span = TimeSpan.FromMilliseconds(-2);
-        try { _ = span.ValidatedTimeout; Assert.Fail(); }
+        try { _ = span.ValidatedTimeout; Assert.Fail(""); }
         catch (ArgumentOutOfRangeException) { }
     }
 }
