@@ -538,7 +538,6 @@ public static class Test_ArrayExtensions
 
     // ----------------------------------------------------
 
-    //[Enforced]
     [Fact]
     public static void Test_ResizeHead()
     {
@@ -558,7 +557,6 @@ public static class Test_ArrayExtensions
         Assert.Equal(4, target[4]);
     }
 
-    //[Enforced]
     [Fact]
     public static void Test_ResizeTail()
     {
@@ -576,5 +574,220 @@ public static class Test_ArrayExtensions
         Assert.Equal(3, target[2]);
         Assert.Equal(4, target[3]);
         Assert.Equal(99, target[4]);
+    }
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_Add()
+    {
+        var source = Array.Empty<int>();
+        var target = source.Add(1);
+        Assert.NotSame(source, target);
+        Assert.Single(target);
+        Assert.Equal(1, target[0]);
+    }
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_AddRange()
+    {
+        var source = Array.Empty<int>();
+        var target = source.AddRange([]);
+        Assert.NotSame(source, target);
+        Assert.Empty(target);
+
+        target = source.AddRange([1, 2]);
+        Assert.NotSame(source, target);
+        Assert.Equal(2, target.Length);
+        Assert.Equal(1, target[0]);
+        Assert.Equal(2, target[1]);
+    }
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_Insert()
+    {
+        var source = Array.Empty<int>();
+        var target = source.Insert(0, 1);
+        Assert.NotSame(source, target);
+        Assert.Single(target);
+        Assert.Equal(1, target[0]);
+
+        source = target;
+        target = source.Insert(1, 2);
+        Assert.NotSame(source, target);
+        Assert.Equal(2, target.Length);
+        Assert.Equal(1, target[0]);
+        Assert.Equal(2, target[1]);
+
+        try { source.Insert(-1, 99); Assert.Fail(""); } catch (ArgumentOutOfRangeException) { }
+        try { source.Insert(3, 99); Assert.Fail(""); } catch (ArgumentOutOfRangeException) { }
+    }
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_InsertRange()
+    {
+        var source = Array.Empty<int>();
+        var target = source.InsertRange(0, []);
+        Assert.NotSame(source, target);
+        Assert.Empty(target);
+
+        target = source.InsertRange(0, [1, 2]);
+        Assert.NotSame(source, target);
+        Assert.Equal(2, target.Length);
+        Assert.Equal(1, target[0]);
+        Assert.Equal(2, target[1]);
+
+        source = target;
+        target = source.InsertRange(1, [3]);
+        Assert.NotSame(source, target);
+        Assert.Equal(3, target.Length);
+        Assert.Equal(1, target[0]);
+        Assert.Equal(3, target[1]);
+        Assert.Equal(2, target[2]);
+    }
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_RemoveAt()
+    {
+        var source = Array.Empty<int>();
+        var target = Array.Empty<int>();
+        try { source.RemoveAt(0); Assert.Fail(""); } catch (ArgumentOutOfRangeException) { }
+
+        source = [1];
+        target = source.RemoveAt(0);
+        Assert.NotSame(source, target);
+        Assert.Empty(target);
+
+        source = [1, 2, 3];
+        target = source.RemoveAt(1);
+        Assert.NotSame(source, target);
+        Assert.Equal(2, target.Length);
+        Assert.Equal(1, target[0]);
+        Assert.Equal(3, target[1]);
+
+        try { source.RemoveAt(-1); Assert.Fail(""); } catch (ArgumentOutOfRangeException) { }
+        try { source.RemoveAt(3); Assert.Fail(""); } catch (ArgumentOutOfRangeException) { }
+    }
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_RemoveRange()
+    {
+        var source = Array.Empty<int>();
+        var target = source.RemoveRange(0, 0);
+        Assert.NotSame(source, target);
+        Assert.Empty(target);
+
+        source = [1, 2, 3, 4];
+        target = source.RemoveRange(0, 2);
+        Assert.NotSame(source, target);
+        Assert.Equal(2, target.Length);
+        Assert.Equal(3, target[0]);
+        Assert.Equal(4, target[1]);
+
+        target = source.RemoveRange(0, 4);
+        Assert.NotSame(source, target);
+        Assert.Empty(target);
+
+        try { source.RemoveRange(-1, 0); Assert.Fail(""); } catch (ArgumentOutOfRangeException) { }
+        try { source.RemoveRange(0, -1); Assert.Fail(""); } catch (ArgumentOutOfRangeException) { }
+        try { source.RemoveRange(0, 5); Assert.Fail(""); } catch (ArgumentOutOfRangeException) { }
+        try { source.RemoveRange(1, 4); Assert.Fail(""); } catch (ArgumentOutOfRangeException) { }
+        try { source.RemoveRange(2, 3); Assert.Fail(""); } catch (ArgumentOutOfRangeException) { }
+        try { source.RemoveRange(3, 2); Assert.Fail(""); } catch (ArgumentOutOfRangeException) { }
+        try { source.RemoveRange(4, 1); Assert.Fail(""); } catch (ArgumentOutOfRangeException) { }
+        try { source.RemoveRange(5, 0); Assert.Fail(""); } catch (ArgumentOutOfRangeException) { }
+    }
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_Remove_Value()
+    {
+        var source = Array.Empty<int>();
+        var target = source.Remove(9);
+        Assert.NotSame(source, target);
+        Assert.Empty(target);
+
+        source = [1, 2, 3, 1];
+        target = source.Remove(1);
+        Assert.NotSame(source, target);
+        Assert.Equal(3, target.Length);
+        Assert.Equal(2, target[0]);
+        Assert.Equal(3, target[1]);
+        Assert.Equal(1, target[2]);
+
+        target = source.RemoveLast(1);
+        Assert.NotSame(source, target);
+        Assert.Equal(3, target.Length);
+        Assert.Equal(1, target[0]);
+        Assert.Equal(2, target[1]);
+        Assert.Equal(3, target[2]);
+
+        target = source.RemoveAll(1);
+        Assert.NotSame(source, target);
+        Assert.Equal(2, target.Length);
+        Assert.Equal(2, target[0]);
+        Assert.Equal(3, target[1]);
+    }
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_Remove_Predicate()
+    {
+        var source = Array.Empty<int>();
+        var target = source.Remove(9);
+        Assert.NotSame(source, target);
+        Assert.Empty(target);
+
+        source = [1, 2, 3, 1];
+        target = source.Remove(x => x == 1);
+        Assert.NotSame(source, target);
+        Assert.Equal(3, target.Length);
+        Assert.Equal(2, target[0]);
+        Assert.Equal(3, target[1]);
+        Assert.Equal(1, target[2]);
+
+        target = source.RemoveLast(x => x == 1);
+        Assert.NotSame(source, target);
+        Assert.Equal(3, target.Length);
+        Assert.Equal(1, target[0]);
+        Assert.Equal(2, target[1]);
+        Assert.Equal(3, target[2]);
+
+        target = source.RemoveAll(x => x == 1);
+        Assert.NotSame(source, target);
+        Assert.Equal(2, target.Length);
+        Assert.Equal(2, target[0]);
+        Assert.Equal(3, target[1]);
+    }
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_Clear()
+    {
+        var source = Array.Empty<int>();
+        var target = source.Clear();
+        Assert.NotSame(source, target);
+        Assert.Empty(target);
+
+        source = [1, 2, 3];
+        target = source.Clear();
+        Assert.NotSame(source, target);
+        Assert.Equal(3, target.Length);
+        Assert.Equal(0, target[0]);
+        Assert.Equal(0, target[1]);
+        Assert.Equal(0, target[2]);
     }
 }

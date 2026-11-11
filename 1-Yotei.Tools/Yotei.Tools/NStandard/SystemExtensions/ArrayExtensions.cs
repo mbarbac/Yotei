@@ -1,5 +1,4 @@
 ﻿#if NETSTANDARD2_0
-#pragma warning disable IDE0079, CS0436
 #endif
 
 namespace Yotei.Tools;
@@ -271,7 +270,6 @@ static class ArrayExtensions
         /// <param name="index"></param>
         /// <param name="value"></param>
         /// <returns></returns>
-        [SuppressMessage("", "CA1512")]
         public T[] Insert(int index, T value)
         {
             if (index < 0) throw new ArgumentOutOfRangeException(
@@ -338,7 +336,7 @@ static class ArrayExtensions
                 nameof(index),
                 "Index cannot be negative.").WithData(index);
 
-            if (index > source.Length) throw new ArgumentOutOfRangeException(
+            if (index >= source.Length) throw new ArgumentOutOfRangeException(
                 nameof(index),
                 "Index bigger than length.").WithData(index);
 
@@ -392,7 +390,7 @@ static class ArrayExtensions
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        public T[] Remove(T value) => throw null;
+        public T[] Remove(T value) => source.Remove(value, EqualityComparerEx.New<T>());
 
         /// <summary>
         /// Returns a new array where the first ocurrence of the given element, using the given
@@ -401,14 +399,18 @@ static class ArrayExtensions
         /// <param name="value"></param>
         /// <param name="comparer"></param>
         /// <returns></returns>
-        public T[] Remove(T value, IEqualityComparer<T> comparer) => throw null;
+        public T[] Remove(T value, IEqualityComparer<T> comparer)
+        {
+            comparer.ThrowWhenNull();
+            return source.Remove(x => comparer.Equals(x, value));
+        }
 
         /// <summary>
         /// Returns a new array where the last ocurrence of the given element has been removed.
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        public T[] RemoveLast(T value) => throw null;
+        public T[] RemoveLast(T value) => source.RemoveLast(value, EqualityComparerEx.New<T>());
 
         /// <summary>
         /// Returns a new array where the last ocurrence of the given element, using the given
@@ -417,14 +419,18 @@ static class ArrayExtensions
         /// <param name="value"></param>
         /// <param name="comparer"></param>
         /// <returns></returns>
-        public T[] RemoveLast(T value, IEqualityComparer<T> comparer) => throw null;
+        public T[] RemoveLast(T value, IEqualityComparer<T> comparer)
+        {
+            comparer.ThrowWhenNull();
+            return source.RemoveLast(x => comparer.Equals(x, value));
+        }
 
         /// <summary>
         /// Returns a new array where all ocurrences of the given element have been removed.
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        public T[] RemoveAll(T value) => throw null;
+        public T[] RemoveAll(T value) => source.RemoveAll(value, EqualityComparerEx.New<T>());
 
         /// <summary>
         /// Returns a new array where all ocurrences of the given element, using the given
@@ -433,7 +439,11 @@ static class ArrayExtensions
         /// <param name="value"></param>
         /// <param name="comparer"></param>
         /// <returns></returns>
-        public T[] RemoveAll(T value, IEqualityComparer<T> comparer) => throw null;
+        public T[] RemoveAll(T value, IEqualityComparer<T> comparer)
+        {
+            comparer.ThrowWhenNull();
+            return source.RemoveAll(x => comparer.Equals(x, value));
+        }
 
         /// <summary>
         /// Returns a new array where the first element that matches the given predicate has been
@@ -441,7 +451,13 @@ static class ArrayExtensions
         /// </summary>
         /// <param name="predicate"></param>
         /// <returns></returns>
-        public T[] Remove(Predicate<T> predicate) => throw null;
+        public T[] Remove(Predicate<T> predicate)
+        {
+            predicate.ThrowWhenNull();
+
+            var index = source.Length == 0 ? -1 : source.IndexOf(predicate);
+            return index >= 0 ? source.RemoveAt(index) : (T[])source.Clone();
+        }
 
         /// <summary>
         /// Returns a new array where the last element that matches the given predicate has been
@@ -449,7 +465,13 @@ static class ArrayExtensions
         /// </summary>
         /// <param name="predicate"></param>
         /// <returns></returns>
-        public T[] RemoveLast(Predicate<T> predicate) => throw null;
+        public T[] RemoveLast(Predicate<T> predicate)
+        {
+            predicate.ThrowWhenNull();
+
+            var index = source.Length == 0 ? -1 : source.LastIndexOf(predicate);
+            return index >= 0 ? source.RemoveAt(index) : (T[])source.Clone();
+        }
 
         /// <summary>
         /// Returns a new array where all elements that match the given predicate have been
@@ -457,7 +479,17 @@ static class ArrayExtensions
         /// </summary>
         /// <param name="predicate"></param>
         /// <returns></returns>
-        public T[] RemoveAll(Predicate<T> predicate) => throw null;
+        public T[] RemoveAll(Predicate<T> predicate)
+        {
+            predicate.ThrowWhenNull();
+
+            List<T> result = []; for (int i = 0; i < source.Length; i++)
+            {
+                var item = source[i];
+                if (!predicate(item)) result.Add(item);
+            }
+            return [.. result];
+        }
 
         /// <summary>
         /// Returns a new instance where all its elements have been cleared by setting them to
@@ -468,8 +500,6 @@ static class ArrayExtensions
         public T[] Clear(T value = default!)
         {
             var len = source.Length;
-            if (len == 0) return [];
-
             var target = new T[len]; for (int i = 0; i < len; i++) target[i] = value;
             return target;
         }

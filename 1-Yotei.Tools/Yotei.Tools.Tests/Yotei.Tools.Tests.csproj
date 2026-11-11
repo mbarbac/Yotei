@@ -7,9 +7,10 @@
 		<ImplicitUsings>disable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<IsPackable>false</IsPackable>
-		<NoWarn>IDE0130</NoWarn>
+		<NoWarn>IDE0130;xUnit2033</NoWarn>
 	</PropertyGroup>
 	<!--IDE0130: Namespace does not match folder structure-->
+	<!--xUnit2033: Mandatory use of Assert.Single returned value-->
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
