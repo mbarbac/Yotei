@@ -231,5 +231,75 @@ static partial class StringSpanExtensions
         public bool Contains(
             StringSpan value, IEqualityComparer<string> comparer)
             => source.IndexOf(value, comparer) >= 0;
+
+        // ------------------------------------------------
+
+        /// <summary>
+        /// Determines if the span starts with the given value.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="ignoreCase"></param>
+        /// <returns></returns>
+        public bool StartsWith(
+            StringSpan value, bool ignoreCase)
+            => source.IndexOf(value, ignoreCase) == 0;
+
+        /// <summary>
+        /// Determines if the span starts with the given value.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="comparer"></param>
+        /// <returns></returns>
+        public bool StartsWith(
+            StringSpan value, IEqualityComparer<char> comparer)
+            => source.IndexOf(value, comparer) == 0;
+
+        /// <summary>
+        /// Determines if the span starts with the given value.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="comparer"></param>
+        /// <returns></returns>
+        public bool StartsWith(
+            StringSpan value, IEqualityComparer<string> comparer)
+            => source.IndexOf(value, comparer) == 0;
+
+        // ------------------------------------------------
+
+        /// <summary>
+        /// Determines if the span ends with the given value.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="ignoreCase"></param>
+        /// <returns></returns>
+        public bool EndsWith(
+            StringSpan value, bool ignoreCase)
+            => source.Length > 0
+            && value.Length > 0
+            && source.IndexOf(value, ignoreCase) == (source.Length - value.Length);
+
+        /// <summary>
+        /// Determines if the span ends with the given value.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="comparer"></param>
+        /// <returns></returns>
+        public bool EndsWith(
+            StringSpan value, IEqualityComparer<char> comparer)
+            => source.Length > 0
+            && value.Length > 0
+            && source.IndexOf(value, comparer) == (source.Length - value.Length);
+
+        /// <summary>
+        /// Determines if the span ends with the given value.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="comparer"></param>
+        /// <returns></returns>
+        public bool EndsWith(
+            StringSpan value, IEqualityComparer<string> comparer)
+            => source.Length > 0
+            && value.Length > 0
+            && source.IndexOf(value, comparer) == (source.Length - value.Length);
     }
 }

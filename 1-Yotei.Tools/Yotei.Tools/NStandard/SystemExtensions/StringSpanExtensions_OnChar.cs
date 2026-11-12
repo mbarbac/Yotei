@@ -191,5 +191,73 @@ static partial class StringSpanExtensions
         /// <returns></returns>
         public bool Contains(
             char value, StringComparison comparison) => source.IndexOf(value, comparison) >= 0;
+
+        // ------------------------------------------------
+
+        /// <summary>
+        /// Determines if the span starts with the given value.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="ignoreCase"></param>
+        /// <returns></returns>
+        public bool StartsWith(char value, bool ignoreCase)
+            => source.Length > 0
+            && value.Equals(source[0], ignoreCase);
+
+        /// <summary>
+        /// Determines if the span starts with the given value.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="comparer"></param>
+        /// <returns></returns>
+        public bool StartsWith(
+            char value, StringComparer comparer)
+            => source.Length > 0
+            && value.Equals(source[0], comparer);
+
+        /// <summary>
+        /// Determines if the span starts with the given value.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="comparison"></param>
+        /// <returns></returns>
+        public bool StartsWith(
+            char value, StringComparison comparison)
+            => source.Length > 0
+            && value.Equals(source[0], comparison);
+
+        // ------------------------------------------------
+
+        /// <summary>
+        /// Determines if the span ends with the given value.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="ignoreCase"></param>
+        /// <returns></returns>
+        public bool EndsWith(char value, bool ignoreCase)
+            => source.Length > 0
+            && value.Equals(source[^1], ignoreCase);
+
+        /// <summary>
+        /// Determines if the span ends with the given value.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="comparer"></param>
+        /// <returns></returns>
+        public bool EndsWith(
+            char value, StringComparer comparer)
+            => source.Length > 0
+            && value.Equals(source[^1], comparer);
+
+        /// <summary>
+        /// Determines if the span ends with the given value.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="comparison"></param>
+        /// <returns></returns>
+        public bool EndsWith(
+            char value, StringComparison comparison)
+            => source.Length > 0
+            && value.Equals(source[^1], comparison);
     }
 }
