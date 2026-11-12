@@ -19,10 +19,9 @@ static partial class StringSpanExtensions
     {
         int IndexOf(char value, Func<char, char, bool> predicate)
         {
-            if (source.Length > 0)
-                for (int i = 0; i < source.Length; i++)
-                    if (predicate(source[i], value)) return i;
-            
+            for (int i = 0; i < source.Length; i++)
+                if (predicate(source[i], value)) return i;
+
             return -1;
         }
 
@@ -45,7 +44,7 @@ static partial class StringSpanExtensions
         /// <param name="comparer"></param>
         /// <returns></returns>
         public int IndexOf(
-            char value, StringComparer comparer)
+            char value, IEqualityComparer<string> comparer)
             => source.IndexOf(value, (x, y) => x.Equals(y, comparer));
 
         /// <summary>
@@ -63,10 +62,9 @@ static partial class StringSpanExtensions
 
         int LastIndexOf(char value, Func<char, char, bool> predicate)
         {
-            if (source.Length > 0)
-                for (int i = source.Length - 1; i >= 0; i--)
-                    if (predicate(source[i], value)) return i;
-            
+            for (int i = source.Length - 1; i >= 0; i--)
+                if (predicate(source[i], value)) return i;
+
             return -1;
         }
 
@@ -89,7 +87,7 @@ static partial class StringSpanExtensions
         /// <param name="comparer"></param>
         /// <returns></returns>
         public int LastIndexOf(
-            char value, StringComparer comparer)
+            char value, IEqualityComparer<string> comparer)
             => source.LastIndexOf(value, (x, y) => x.Equals(y, comparer));
 
         /// <summary>
@@ -109,9 +107,8 @@ static partial class StringSpanExtensions
         {
             List<int> nums = [];
 
-            if (source.Length > 0)
-                for (int i = 0; i < source.Length; i++)
-                    if (predicate(source[i], value)) nums.Add(i);
+            for (int i = 0; i < source.Length; i++)
+                if (predicate(source[i], value)) nums.Add(i);
 
             return nums;
         }
@@ -259,5 +256,125 @@ static partial class StringSpanExtensions
             char value, StringComparison comparison)
             => source.Length > 0
             && value.Equals(source[^1], comparison);
+
+        // ------------------------------------------------
+
+        int IndexOfAny(IEnumerable<char> values, Func<char, char, bool> predicate)
+        {
+            values.ThrowWhenNull();
+
+            for (int i = 0; i < source.Length; i++)
+            {
+                foreach (var value in values)
+                    if (predicate(value, source[i])) return i;
+            }
+            return -1;
+        }
+
+        /// <summary>
+        /// Returns the index of the first ocurrence of any of the given values.
+        /// </summary>
+        /// <param name="values"></param>
+        /// <param name="ignoreCase"></param>
+        /// <returns></returns>
+        public int IndexOfAny(
+            IEnumerable<char> values, bool ignoreCase)
+            => source.IndexOfAny(values, (x, y) => x.Equals(y, ignoreCase));
+
+        /// <summary>
+        /// Returns the index of the first ocurrence of any of the given values.
+        /// </summary>
+        /// <param name="values"></param>
+        /// <param name="comparer"></param>
+        /// <returns></returns>
+        public int IndexOfAny(
+            IEnumerable<char> values, IEqualityComparer<string> comparer)
+            => source.IndexOfAny(values, (x, y) => x.Equals(y, comparer));
+
+        /// <summary>
+        /// Returns the index of the first ocurrence of any of the given values.
+        /// </summary>
+        /// <param name="values"></param>
+        /// <param name="comparison"></param>
+        /// <returns></returns>
+        public int IndexOfAny(
+            IEnumerable<char> values, StringComparison comparison)
+            => source.IndexOfAny(values, (x, y) => x.Equals(y, comparison));
+
+        // ------------------------------------------------
+
+        int LastIndexOfAny(IEnumerable<char> values, Func<char, char, bool> predicate)
+        {
+            values.ThrowWhenNull();
+
+            for (int i = source.Length - 1; i >= 0; i--)
+            {
+                foreach (var value in values)
+                    if (predicate(value, source[i])) return i;
+            }
+            return -1;
+        }
+
+        /// <summary>
+        /// Returns the index of the first ocurrence of any of the given values.
+        /// </summary>
+        /// <param name="values"></param>
+        /// <param name="ignoreCase"></param>
+        /// <returns></returns>
+        public int LastIndexOfAny(
+            IEnumerable<char> values, bool ignoreCase)
+            => source.LastIndexOfAny(values, (x, y) => x.Equals(y, ignoreCase));
+
+        /// <summary>
+        /// Returns the index of the first ocurrence of any of the given values.
+        /// </summary>
+        /// <param name="values"></param>
+        /// <param name="comparer"></param>
+        /// <returns></returns>
+        public int LastIndexOfAny(
+            IEnumerable<char> values, IEqualityComparer<string> comparer)
+            => source.LastIndexOfAny(values, (x, y) => x.Equals(y, comparer));
+
+        /// <summary>
+        /// Returns the index of the first ocurrence of any of the given values.
+        /// </summary>
+        /// <param name="values"></param>
+        /// <param name="comparison"></param>
+        /// <returns></returns>
+        public int LastIndexOfAny(
+            IEnumerable<char> values, StringComparison comparison)
+            => source.LastIndexOfAny(values, (x, y) => x.Equals(y, comparison));
+
+        // ------------------------------------------------
+
+        /// <summary>
+        /// Determines if the span contains any of the given values.
+        /// </summary>
+        /// <param name="values"></param>
+        /// <param name="ignoreCase"></param>
+        /// <returns></returns>
+        public bool ContainsAny(
+            IEnumerable<char> values, bool ignoreCase)
+            => source.IndexOfAny(values, ignoreCase) >= 0;
+
+        /// <summary>
+        /// Determines if the span contains any of the given values.
+        /// </summary>
+        /// <param name="values"></param>
+        /// <param name="comparer"></param>
+        /// <returns></returns>
+        public bool ContainsAny(
+            IEnumerable<char> values, IEqualityComparer<string> comparer)
+            => source.IndexOfAny(values, comparer) >= 0;
+
+        /// <summary>
+        /// Determines if the span contains any of the given values.
+        /// </summary>
+        /// <param name="values"></param>
+        /// <param name="comparison"></param>
+        /// <returns></returns>
+        public bool ContainsAny(
+            IEnumerable<char> values, StringComparison comparison)
+            => source.IndexOfAny(values, comparison) >= 0;
     }
 }
