@@ -4,9 +4,9 @@
 public static partial class Test_StringSpanExtensions
 {
     [Fact]
-    public static void Test_OnChar_IndexOf()
+    public static void Test_OnString_IndexOf()
     {
-        var value = 'x';
+        var value = "xy";
         var source = "".AsSpan();
         Assert.Equal(-1, source.IndexOf(value));
         Assert.Equal(-1, source.IndexOf(value, ignoreCase: true));
@@ -21,18 +21,25 @@ public static partial class Test_StringSpanExtensions
         Assert.Equal(-1, source.IndexOf(value, StringComparer.OrdinalIgnoreCase));
         Assert.Equal(-1, source.IndexOf(value, StringComparison.OrdinalIgnoreCase));
 
-        source = "--X--x".AsSpan();
+        source = "--XY-xy-".AsSpan();
         Assert.Equal(5, source.IndexOf(value));
         Assert.Equal(2, source.IndexOf(value, ignoreCase: true));
         Assert.Equal(5, source.IndexOf(value, char.CharComparer()));
         Assert.Equal(2, source.IndexOf(value, StringComparer.OrdinalIgnoreCase));
         Assert.Equal(2, source.IndexOf(value, StringComparison.OrdinalIgnoreCase));
+
+        source = "xab";
+        Assert.Equal(-1, source.IndexOf(value));
+        Assert.Equal(-1, source.IndexOf(value, ignoreCase: true));
+        Assert.Equal(-1, source.IndexOf(value, char.CharComparer()));
+        Assert.Equal(-1, source.IndexOf(value, StringComparer.OrdinalIgnoreCase));
+        Assert.Equal(-1, source.IndexOf(value, StringComparison.OrdinalIgnoreCase));
     }
 
     [Fact]
-    public static void Test_OnChar_LastIndexOf()
+    public static void Test_OnString_LastIndexOf()
     {
-        var value = 'x';
+        var value = "xy";
         var source = "".AsSpan();
         Assert.Equal(-1, source.LastIndexOf(value));
         Assert.Equal(-1, source.LastIndexOf(value, ignoreCase: true));
@@ -47,19 +54,26 @@ public static partial class Test_StringSpanExtensions
         Assert.Equal(-1, source.LastIndexOf(value, StringComparer.OrdinalIgnoreCase));
         Assert.Equal(-1, source.LastIndexOf(value, StringComparison.OrdinalIgnoreCase));
 
-        source = "-x--X-".AsSpan();
+        source = "-xy--XY-".AsSpan();
         Assert.Equal(1, source.LastIndexOf(value));
-        Assert.Equal(4, source.LastIndexOf(value, ignoreCase: true));
+        Assert.Equal(5, source.LastIndexOf(value, ignoreCase: true));
         Assert.Equal(1, source.LastIndexOf(value, char.CharComparer()));
-        Assert.Equal(4, source.LastIndexOf(value, StringComparer.OrdinalIgnoreCase));
-        Assert.Equal(4, source.LastIndexOf(value, StringComparison.OrdinalIgnoreCase));
+        Assert.Equal(5, source.LastIndexOf(value, StringComparer.OrdinalIgnoreCase));
+        Assert.Equal(5, source.LastIndexOf(value, StringComparison.OrdinalIgnoreCase));
+
+        source = "abx";
+        Assert.Equal(-1, source.LastIndexOf(value));
+        Assert.Equal(-1, source.LastIndexOf(value, ignoreCase: true));
+        Assert.Equal(-1, source.LastIndexOf(value, char.CharComparer()));
+        Assert.Equal(-1, source.LastIndexOf(value, StringComparer.OrdinalIgnoreCase));
+        Assert.Equal(-1, source.LastIndexOf(value, StringComparison.OrdinalIgnoreCase));
     }
 
     [Fact]
-    public static void Test_OnChar_IndexesOf()
+    public static void Test_OnString_IndexesOf()
     {
         List<int> nums;
-        var value = 'x';
+        var value = "xy";
         var source = "".AsSpan();
         nums = source.IndexesOf(value); Assert.Empty(nums);
         nums = source.IndexesOf(value, ignoreCase: true); Assert.Empty(nums);
@@ -74,18 +88,25 @@ public static partial class Test_StringSpanExtensions
         nums = source.IndexesOf(value, StringComparer.OrdinalIgnoreCase); Assert.Empty(nums);
         nums = source.IndexesOf(value, StringComparison.OrdinalIgnoreCase); Assert.Empty(nums);
 
-        source = "-X-x-";
-        nums = source.IndexesOf(value); Assert.True(nums is [3]);
-        nums = source.IndexesOf(value, ignoreCase: true); Assert.True(nums is [1, 3]);
-        nums = source.IndexesOf(value, char.CharComparer()); Assert.True(nums is [3]);
-        nums = source.IndexesOf(value, StringComparer.OrdinalIgnoreCase); Assert.True(nums is [1, 3]);
-        nums = source.IndexesOf(value, StringComparison.OrdinalIgnoreCase); Assert.True(nums is [1, 3]);
+        source = "-XY-xy-";
+        nums = source.IndexesOf(value); Assert.True(nums is [4]);
+        nums = source.IndexesOf(value, ignoreCase: true); Assert.True(nums is [1, 4]);
+        nums = source.IndexesOf(value, char.CharComparer()); Assert.True(nums is [4]);
+        nums = source.IndexesOf(value, StringComparer.OrdinalIgnoreCase); Assert.True(nums is [1, 4]);
+        nums = source.IndexesOf(value, StringComparison.OrdinalIgnoreCase); Assert.True(nums is [1, 4]);
+
+        source = "abx";
+        nums = source.IndexesOf(value); Assert.Empty(nums);
+        nums = source.IndexesOf(value, ignoreCase: true); Assert.Empty(nums);
+        nums = source.IndexesOf(value, char.CharComparer()); Assert.Empty(nums);
+        nums = source.IndexesOf(value, StringComparer.OrdinalIgnoreCase); Assert.Empty(nums);
+        nums = source.IndexesOf(value, StringComparison.OrdinalIgnoreCase); Assert.Empty(nums);
     }
 
     [Fact]
-    public static void Test_OnChar_Contains()
+    public static void Test_OnString_Contains()
     {
-        var value = 'x';
+        var value = "xy";
         var source = "".AsSpan();
         Assert.False(source.Contains(value));
         Assert.False(source.Contains(value, ignoreCase: true));
@@ -100,20 +121,27 @@ public static partial class Test_StringSpanExtensions
         Assert.False(source.Contains(value, StringComparer.OrdinalIgnoreCase));
         Assert.False(source.Contains(value, StringComparison.OrdinalIgnoreCase));
 
-        source = "-X-".AsSpan();
+        source = "-XY-".AsSpan();
         Assert.False(source.Contains(value));
         Assert.True(source.Contains(value, ignoreCase: true));
         Assert.False(source.Contains(value, char.CharComparer()));
         Assert.True(source.Contains(value, StringComparer.OrdinalIgnoreCase));
         Assert.True(source.Contains(value, StringComparison.OrdinalIgnoreCase));
+
+        source = "abx";
+        Assert.False(source.Contains(value));
+        Assert.False(source.Contains(value, ignoreCase: true));
+        Assert.False(source.Contains(value, char.CharComparer()));
+        Assert.False(source.Contains(value, StringComparer.OrdinalIgnoreCase));
+        Assert.False(source.Contains(value, StringComparison.OrdinalIgnoreCase));
     }
 
     // ----------------------------------------------------
 
     [Fact]
-    public static void Test_OnChar_StartsWith()
+    public static void Test_OnString_StartsWith()
     {
-        var value = 'x';
+        var value = "xy";
         var source = "".AsSpan();
         Assert.False(source.StartsWith(value));
         Assert.False(source.StartsWith(value, ignoreCase: true));
@@ -128,18 +156,25 @@ public static partial class Test_StringSpanExtensions
         Assert.False(source.StartsWith(value, StringComparer.OrdinalIgnoreCase));
         Assert.False(source.StartsWith(value, StringComparison.OrdinalIgnoreCase));
 
-        source = "X--".AsSpan();
+        source = "XY--".AsSpan();
         Assert.False(source.StartsWith(value));
         Assert.True(source.StartsWith(value, ignoreCase: true));
         Assert.False(source.StartsWith(value, char.CharComparer()));
         Assert.True(source.StartsWith(value, StringComparer.OrdinalIgnoreCase));
         Assert.True(source.StartsWith(value, StringComparison.OrdinalIgnoreCase));
+
+        source = "xab";
+        Assert.False(source.StartsWith(value));
+        Assert.False(source.StartsWith(value, ignoreCase: true));
+        Assert.False(source.StartsWith(value, char.CharComparer()));
+        Assert.False(source.StartsWith(value, StringComparer.OrdinalIgnoreCase));
+        Assert.False(source.StartsWith(value, StringComparison.OrdinalIgnoreCase));
     }
 
     [Fact]
-    public static void Test_OnChar_EndsWith()
+    public static void Test_OnString_EndsWith()
     {
-        var value = 'x';
+        var value = "xy";
         var source = "".AsSpan();
         Assert.False(source.EndsWith(value));
         Assert.False(source.EndsWith(value, ignoreCase: true));
@@ -154,91 +189,62 @@ public static partial class Test_StringSpanExtensions
         Assert.False(source.EndsWith(value, StringComparer.OrdinalIgnoreCase));
         Assert.False(source.EndsWith(value, StringComparison.OrdinalIgnoreCase));
 
-        source = "--X".AsSpan();
+        source = "--XY".AsSpan();
         Assert.False(source.EndsWith(value));
         Assert.True(source.EndsWith(value, ignoreCase: true));
         Assert.False(source.EndsWith(value, char.CharComparer()));
         Assert.True(source.EndsWith(value, StringComparer.OrdinalIgnoreCase));
         Assert.True(source.EndsWith(value, StringComparison.OrdinalIgnoreCase));
+
+        source = "abx";
+        Assert.False(source.EndsWith(value));
+        Assert.False(source.EndsWith(value, ignoreCase: true));
+        Assert.False(source.EndsWith(value, char.CharComparer()));
+        Assert.False(source.EndsWith(value, StringComparer.OrdinalIgnoreCase));
+        Assert.False(source.EndsWith(value, StringComparison.OrdinalIgnoreCase));
     }
 
     // ----------------------------------------------------
 
     [Fact]
-    public static void Test_OnChar_IndexOfAny()
+    public static void Test_OnString_TrimStart()
     {
-        char[] values = ['x', 'y', 'z'];
-        var source = "".AsSpan();
-        Assert.Equal(-1, source.IndexOfAny(values));
-        Assert.Equal(-1, source.IndexOfAny(values, ignoreCase: true));
-        Assert.Equal(-1, source.IndexOfAny(values, char.CharComparer()));
-        Assert.Equal(-1, source.IndexOfAny(values, StringComparer.OrdinalIgnoreCase));
-        Assert.Equal(-1, source.IndexOfAny(values, StringComparison.OrdinalIgnoreCase));
+        var source = "xyabc".AsSpan();
+        var values = new char[] { '1', '2' };
+        var target = source.TrimStart(values); Assert.Equal("xyabc", target.ToString());
 
-        source = "abc";
-        Assert.Equal(-1, source.IndexOfAny(values));
-        Assert.Equal(-1, source.IndexOfAny(values, ignoreCase: true));
-        Assert.Equal(-1, source.IndexOfAny(values, char.CharComparer()));
-        Assert.Equal(-1, source.IndexOfAny(values, StringComparer.OrdinalIgnoreCase));
-        Assert.Equal(-1, source.IndexOfAny(values, StringComparison.OrdinalIgnoreCase));
-
-        source = "-Z-x-".AsSpan();
-        Assert.Equal(3, source.IndexOfAny(values));
-        Assert.Equal(1, source.IndexOfAny(values, ignoreCase: true));
-        Assert.Equal(3, source.IndexOfAny(values, char.CharComparer()));
-        Assert.Equal(1, source.IndexOfAny(values, StringComparer.OrdinalIgnoreCase));
-        Assert.Equal(1, source.IndexOfAny(values, StringComparison.OrdinalIgnoreCase));
+        values = ['X', 'Y'];
+        target = source.TrimStart(values, char.CharComparer()); Assert.Equal("xyabc", target.ToString());
+        target = source.TrimStart(values, ignoreCase: true); Assert.Equal("abc", target.ToString());
+        target = source.TrimStart(values, StringComparer.OrdinalIgnoreCase); Assert.Equal("abc", target.ToString());
+        target = source.TrimStart(values, StringComparison.OrdinalIgnoreCase); Assert.Equal("abc", target.ToString());
     }
 
     [Fact]
-    public static void Test_OnChar_LastIndexOfAny()
+    public static void Test_OnString_TrimEnd()
     {
-        char[] values = ['x', 'y', 'z'];
-        var source = "".AsSpan();
-        Assert.Equal(-1, source.LastIndexOfAny(values));
-        Assert.Equal(-1, source.LastIndexOfAny(values, ignoreCase: true));
-        Assert.Equal(-1, source.LastIndexOfAny(values, char.CharComparer()));
-        Assert.Equal(-1, source.LastIndexOfAny(values, StringComparer.OrdinalIgnoreCase));
-        Assert.Equal(-1, source.LastIndexOfAny(values, StringComparison.OrdinalIgnoreCase));
+        var source = "abcxy".AsSpan();
+        var values = new char[] { '1', '2' };
+        var target = source.TrimEnd(values); Assert.Equal("abcxy", target.ToString());
 
-        source = "abc";
-        Assert.Equal(-1, source.LastIndexOfAny(values));
-        Assert.Equal(-1, source.LastIndexOfAny(values, ignoreCase: true));
-        Assert.Equal(-1, source.LastIndexOfAny(values, char.CharComparer()));
-        Assert.Equal(-1, source.LastIndexOfAny(values, StringComparer.OrdinalIgnoreCase));
-        Assert.Equal(-1, source.LastIndexOfAny(values, StringComparison.OrdinalIgnoreCase));
-
-        source = "-x-Y-".AsSpan();
-        Assert.Equal(1, source.LastIndexOfAny(values));
-        Assert.Equal(3, source.LastIndexOfAny(values, ignoreCase: true));
-        Assert.Equal(1, source.LastIndexOfAny(values, char.CharComparer()));
-        Assert.Equal(3, source.LastIndexOfAny(values, StringComparer.OrdinalIgnoreCase));
-        Assert.Equal(3, source.LastIndexOfAny(values, StringComparison.OrdinalIgnoreCase));
+        values = ['X', 'Y'];
+        target = source.TrimEnd(values, char.CharComparer()); Assert.Equal("abcxy", target.ToString());
+        target = source.TrimEnd(values, ignoreCase: true); Assert.Equal("abc", target.ToString());
+        target = source.TrimEnd(values, StringComparer.OrdinalIgnoreCase); Assert.Equal("abc", target.ToString());
+        target = source.TrimEnd(values, StringComparison.OrdinalIgnoreCase); Assert.Equal("abc", target.ToString());
     }
 
     [Fact]
-    public static void Test_OnChar_ContainsAny()
+    public static void Test_OnString_Trim()
     {
-        char[] values = ['x', 'y', 'z'];
-        var source = "".AsSpan();
-        Assert.False(source.ContainsAny(values));
-        Assert.False(source.ContainsAny(values, ignoreCase: true));
-        Assert.False(source.ContainsAny(values, char.CharComparer()));
-        Assert.False(source.ContainsAny(values, StringComparer.OrdinalIgnoreCase));
-        Assert.False(source.ContainsAny(values, StringComparison.OrdinalIgnoreCase));
+        var source = "xyabcxy".AsSpan();
+        var values = new char[] { '1', '2' };
+        var target = source.Trim(values); Assert.Equal("xyabcxy", target.ToString());
 
-        source = "abc";
-        Assert.False(source.ContainsAny(values));
-        Assert.False(source.ContainsAny(values, ignoreCase: true));
-        Assert.False(source.ContainsAny(values, char.CharComparer()));
-        Assert.False(source.ContainsAny(values, StringComparer.OrdinalIgnoreCase));
-        Assert.False(source.ContainsAny(values, StringComparison.OrdinalIgnoreCase));
-
-        source = "-Y-".AsSpan();
-        Assert.False(source.ContainsAny(values));
-        Assert.True(source.ContainsAny(values, ignoreCase: true));
-        Assert.False(source.ContainsAny(values, char.CharComparer()));
-        Assert.True(source.ContainsAny(values, StringComparer.OrdinalIgnoreCase));
-        Assert.True(source.ContainsAny(values, StringComparison.OrdinalIgnoreCase));
+        values = ['X', 'Y'];
+        target = source.Trim(values, char.CharComparer()); Assert.Equal("xyabcxy", target.ToString());
+        target = source.Trim(values, ignoreCase: true); Assert.Equal("abc", target.ToString());
+        target = source.Trim(values, StringComparer.OrdinalIgnoreCase); Assert.Equal("abc", target.ToString());
+        target = source.Trim(values, StringComparison.OrdinalIgnoreCase); Assert.Equal("abc", target.ToString());
     }
 }

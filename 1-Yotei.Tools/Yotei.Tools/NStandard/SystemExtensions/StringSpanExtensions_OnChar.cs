@@ -376,5 +376,92 @@ static partial class StringSpanExtensions
         public bool ContainsAny(
             IEnumerable<char> values, StringComparison comparison)
             => source.IndexOfAny(values, comparison) >= 0;
+
+        // ------------------------------------------------
+
+        /// <summary>
+        /// Removes from the span all leading ocurrences of the given value.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="ignoreCase"></param>
+        /// <returns></returns>
+        public StringSpan TrimStart(char value, bool ignoreCase)
+            => source.TrimStart(value, char.CharComparer(ignoreCase));
+
+        /// <summary>
+        /// Removes from the span all leading ocurrences of the given value.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="comparer"></param>
+        /// <returns></returns>
+        public StringSpan TrimStart(char value, IEqualityComparer<string> comparer)
+            => source.TrimStart(value, char.CharComparer(comparer));
+
+        /// <summary>
+        /// Removes from the span all leading ocurrences of the given value.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="comparison"></param>
+        /// <returns></returns>
+        public StringSpan TrimStart(char value, StringComparison comparison)
+            => source.TrimStart(value, char.CharComparer(comparison));
+
+        // ------------------------------------------------
+
+        /// <summary>
+        /// Removes from the span all trailing ocurrences of the given value.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="ignoreCase"></param>
+        /// <returns></returns>
+        public StringSpan TrimEnd(char value, bool ignoreCase)
+            => source.TrimEnd(value, char.CharComparer(ignoreCase));
+
+        /// <summary>
+        /// Removes from the span all trailing ocurrences of the given value.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="comparer"></param>
+        /// <returns></returns>
+        public StringSpan TrimEnd(char value, IEqualityComparer<string> comparer)
+            => source.TrimEnd(value, char.CharComparer(comparer));
+
+        /// <summary>
+        /// Removes from the span all trailing ocurrences of the given value.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="comparison"></param>
+        /// <returns></returns>
+        public StringSpan TrimEnd(char value, StringComparison comparison)
+            => source.TrimEnd(value, char.CharComparer(comparison));
+
+        // ------------------------------------------------
+
+        /// <summary>
+        /// Removes from the span all leading and trailing ocurrences of the given value.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="ignoreCase"></param>
+        /// <returns></returns>
+        public StringSpan Trim(char value, bool ignoreCase)
+            => source.Trim(value, char.CharComparer(ignoreCase));
+
+        /// <summary>
+        /// Removes from the span all leading and trailing ocurrences of the given value.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="comparer"></param>
+        /// <returns></returns>
+        public StringSpan Trim(char value, IEqualityComparer<string> comparer)
+            => source.Trim(value, char.CharComparer(comparer));
+
+        /// <summary>
+        /// Removes from the span all leading and trailing ocurrences of the given value.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="comparison"></param>
+        /// <returns></returns>
+        public StringSpan Trim(char value, StringComparison comparison)
+            => source.Trim(value, char.CharComparer(comparison));
     }
 }

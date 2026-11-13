@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<Configurations>Debug;Release;Local</Configurations>
+		<TargetFramework>net10.0</TargetFramework>
+		<LangVersion>preview</LangVersion>
+		<ImplicitUsings>disable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<IsPackable>false</IsPackable>
+		<NoWarn>IDE0130;xUnit2033</NoWarn>
+	</PropertyGroup>
+	<!--IDE0130: Namespace does not match folder structure-->
+	<!--xUnit2033: Mandatory use of Assert.Single returned value-->
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
+		<PackageReference Include="xunit.v3" Version="4.0.2" />
+		<PackageReference Include="xunit.runner.visualstudio" Version="4.0.1">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="coverlet.collector" Version="10.1.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />
+		<ProjectReference Include="..\Experimental\Experimental.csproj" />
+	</ItemGroup>
+
+</Project>
