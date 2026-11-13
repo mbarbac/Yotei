@@ -32,6 +32,12 @@ static class StringExtensions
             }
             return sb.ToString();
         }
+
+        /// <summary>
+        /// Returns a new string builder based upon the contents of this one.
+        /// </summary>
+        /// <returns></returns>
+        public StringBuilder ToBuilder() => new(source);
     }
 
     extension(string? source)

@@ -287,4 +287,45 @@ public static partial class Test_StringBuilderExtensions
         target = source.Trim('X', StringComparer.OrdinalIgnoreCase); Assert.Equal("abc", target.ToString());
         target = source.Trim('X', StringComparison.OrdinalIgnoreCase); Assert.Equal("abc", target.ToString());
     }
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_OnChar_Remove()
+    {
+        var source = new StringBuilder();
+        var target = source.Remove('x'); Assert.Empty(target.ToString());
+
+        source = new("-x-x-"); target = source.Remove('X'); Assert.Equal("-x-x-", target.ToString());
+        source = new("-x-x-"); target = source.Remove('X', ignoreCase: true); Assert.Equal("--x-", target.ToString());
+        source = new("-x-x-"); target = source.Remove('X', char.CharComparer()); Assert.Equal("-x-x-", target.ToString());
+        source = new("-x-x-"); target = source.Remove('X', StringComparer.OrdinalIgnoreCase); Assert.Equal("--x-", target.ToString());
+        source = new("-x-x-"); target = source.Remove('X', StringComparison.OrdinalIgnoreCase); Assert.Equal("--x-", target.ToString());
+    }
+
+    [Fact]
+    public static void Test_OnChar_RemoveLast()
+    {
+        var source = new StringBuilder();
+        var target = source.RemoveLast('x'); Assert.Empty(target.ToString());
+
+        source = new("-x-x-"); target = source.RemoveLast('X'); Assert.Equal("-x-x-", target.ToString());
+        source = new("-x-x-"); target = source.RemoveLast('X', ignoreCase: true); Assert.Equal("-x--", target.ToString());
+        source = new("-x-x-"); target = source.RemoveLast('X', char.CharComparer()); Assert.Equal("-x-x-", target.ToString());
+        source = new("-x-x-"); target = source.RemoveLast('X', StringComparer.OrdinalIgnoreCase); Assert.Equal("-x--", target.ToString());
+        source = new("-x-x-"); target = source.RemoveLast('X', StringComparison.OrdinalIgnoreCase); Assert.Equal("-x--", target.ToString());
+    }
+
+    [Fact]
+    public static void Test_OnChar_RemoveAll()
+    {
+        var source = new StringBuilder();
+        var target = source.RemoveAll('x'); Assert.Empty(target.ToString());
+
+        source = new("-x-x-"); target = source.RemoveAll('X'); Assert.Equal("-x-x-", target.ToString());
+        source = new("-x-x-"); target = source.RemoveAll('X', ignoreCase: true); Assert.Equal("---", target.ToString());
+        source = new("-x-x-"); target = source.RemoveAll('X', char.CharComparer()); Assert.Equal("-x-x-", target.ToString());
+        source = new("-x-x-"); target = source.RemoveAll('X', StringComparer.OrdinalIgnoreCase); Assert.Equal("---", target.ToString());
+        source = new("-x-x-"); target = source.RemoveAll('X', StringComparison.OrdinalIgnoreCase); Assert.Equal("---", target.ToString());
+    }
 }

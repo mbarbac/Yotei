@@ -677,5 +677,223 @@ static partial class StringBuilderExtensions
         public StringBuilder Trim(
             char value, StringComparison comparison)
             => source.TrimStart(value, comparison).TrimEnd(value, comparison);
+
+        // ------------------------------------------------
+
+        /// <summary>
+        /// Removes from the builder the first ocurrence of the given value.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public StringBuilder Remove(char value)
+        {
+            var index = source.IndexOf(value);
+            if (index >= 0) source.Remove(index, 1);
+            return source;
+        }
+
+        /// <summary>
+        /// Removes from the builder the first ocurrence of the given value.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="ignoreCase"></param>
+        /// <returns></returns>
+        public StringBuilder Remove(char value, bool ignoreCase)
+        {
+            var index = source.IndexOf(value, ignoreCase);
+            if (index >= 0) source.Remove(index, 1);
+            return source;
+        }
+
+        /// <summary>
+        /// Removes from the builder the first ocurrence of the given value.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="comparer"></param>
+        /// <returns></returns>
+        public StringBuilder Remove(char value, IEqualityComparer<char> comparer)
+        {
+            var index = source.IndexOf(value, comparer);
+            if (index >= 0) source.Remove(index, 1);
+            return source;
+        }
+
+        /// <summary>
+        /// Removes from the builder the first ocurrence of the given value.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="comparer"></param>
+        /// <returns></returns>
+        public StringBuilder Remove(char value, IEqualityComparer<string> comparer)
+        {
+            var index = source.IndexOf(value, comparer);
+            if (index >= 0) source.Remove(index, 1);
+            return source;
+        }
+
+        /// <summary>
+        /// Removes from the builder the first ocurrence of the given value.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="comparison"></param>
+        /// <returns></returns>
+        public StringBuilder Remove(char value, StringComparison comparison)
+        {
+            var index = source.IndexOf(value, comparison);
+            if (index >= 0) source.Remove(index, 1);
+            return source;
+        }
+
+        // ------------------------------------------------
+
+        /// <summary>
+        /// Removes from the builder the last ocurrence of the given value.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public StringBuilder RemoveLast(char value)
+        {
+            var index = source.LastIndexOf(value);
+            if (index >= 0) source.Remove(index, 1);
+            return source;
+        }
+
+        /// <summary>
+        /// RemoveLasts from the builder the last ocurrence of the given value.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="ignoreCase"></param>
+        /// <returns></returns>
+        public StringBuilder RemoveLast(char value, bool ignoreCase)
+        {
+            var index = source.LastIndexOf(value, ignoreCase);
+            if (index >= 0) source.Remove(index, 1);
+            return source;
+        }
+
+        /// <summary>
+        /// RemoveLasts from the builder the last ocurrence of the given value.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="comparer"></param>
+        /// <returns></returns>
+        public StringBuilder RemoveLast(char value, IEqualityComparer<char> comparer)
+        {
+            var index = source.LastIndexOf(value, comparer);
+            if (index >= 0) source.Remove(index, 1);
+            return source;
+        }
+
+        /// <summary>
+        /// RemoveLasts from the builder the last ocurrence of the given value.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="comparer"></param>
+        /// <returns></returns>
+        public StringBuilder RemoveLast(char value, IEqualityComparer<string> comparer)
+        {
+            var index = source.LastIndexOf(value, comparer);
+            if (index >= 0) source.Remove(index, 1);
+            return source;
+        }
+
+        /// <summary>
+        /// RemoveLasts from the builder the last ocurrence of the given value.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="comparison"></param>
+        /// <returns></returns>
+        public StringBuilder RemoveLast(char value, StringComparison comparison)
+        {
+            var index = source.LastIndexOf(value, comparison);
+            if (index >= 0) source.Remove(index, 1);
+            return source;
+        }
+
+        // ------------------------------------------------
+
+        /// <summary>
+        /// Removes from the builder all ocurrences of the given value.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public StringBuilder RemoveAll(char value)
+        {
+            while (true)
+            {
+                var index = source.IndexOf(value);
+                if (index >= 0) source.Remove(index, 1);
+                else break;
+            }
+            return source;
+        }
+
+        /// <summary>
+        /// Removes from the builder all ocurrences of the given value.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="ignoreCase"></param>
+        /// <returns></returns>
+        public StringBuilder RemoveAll(char value, bool ignoreCase)
+        {
+            while (true)
+            {
+                var index = source.IndexOf(value, ignoreCase);
+                if (index >= 0) source.Remove(index, 1);
+                else break;
+            }
+            return source;
+        }
+
+        /// <summary>
+        /// Removes from the builder all ocurrences of the given value.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="comparer"></param>
+        /// <returns></returns>
+        public StringBuilder RemoveAll(char value, IEqualityComparer<char> comparer)
+        {
+            while (true)
+            {
+                var index = source.IndexOf(value, comparer);
+                if (index >= 0) source.Remove(index, 1);
+                else break;
+            }
+            return source;
+        }
+
+        /// <summary>
+        /// Removes from the builder all ocurrences of the given value.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="comparer"></param>
+        /// <returns></returns>
+        public StringBuilder RemoveAll(char value, IEqualityComparer<string> comparer)
+        {
+            while (true)
+            {
+                var index = source.IndexOf(value, comparer);
+                if (index >= 0) source.Remove(index, 1);
+                else break;
+            }
+            return source;
+        }
+
+        /// <summary>
+        /// Removes from the builder all ocurrences of the given value.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="comparison"></param>
+        /// <returns></returns>
+        public StringBuilder RemoveAll(char value, StringComparison comparison)
+        {
+            while (true)
+            {
+                var index = source.IndexOf(value, comparison);
+                if (index >= 0) source.Remove(index, 1);
+                else break;
+            }
+            return source;
+        }
     }
 }
