@@ -13,6 +13,30 @@ public
 #endif
 static class CharExtensions
 {
+    extension(char)
+    {
+#if NETSTANDARD2_0
+        /// <summary>
+        /// Determines if the given value is a standard ASCII letter or not.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        [SuppressMessage("", "IDE0078")]
+        public static bool IsAsciiLetter(char value)
+            => (value >= 'A' && value <= 'Z') || (value >= 'a' && value <= 'z');
+#endif
+
+#if NETSTANDARD2_0
+        /// <summary>
+        /// Determines if the given value is a standard ASCII digit or not.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        [SuppressMessage("", "IDE0078")]
+        public static bool IsAsciiDigit(char value) => (value >= '0' && value <= '9')
+#endif
+    }
+
     extension(char source)
     {
         /// <summary>
