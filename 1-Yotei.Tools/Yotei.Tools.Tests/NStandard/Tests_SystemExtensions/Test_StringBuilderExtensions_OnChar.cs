@@ -240,51 +240,51 @@ public static partial class Test_StringBuilderExtensions
     [Fact]
     public static void Test_OnChar_TrimStart()
     {
-        var source = new StringBuilder(" abc ");
-        //var target = source.TrimStart(); Assert.Equal("abc ", target.ToString());
+        StringBuilder source;
+        StringBuilder target;
 
         source = new("xabc");
-        //target = source.TrimStart('X'); Assert.Equal("xabc", target.ToString());
-        //target = source.TrimStart('X', char.CharComparer()); Assert.Equal("xabc", target.ToString());
+        target = source.TrimStart('X'); Assert.Equal("xabc", target.ToString());
+        target = source.TrimStart('X', char.CharComparer()); Assert.Equal("xabc", target.ToString());
 
         source = new("xxxabc");
-        //target = source.TrimStart('x'); Assert.Equal("abc", target.ToString());
-        //target = source.TrimStart('X', ignoreCase: true); Assert.Equal("abc", target.ToString());
-        //target = source.TrimStart('X', StringComparer.OrdinalIgnoreCase); Assert.Equal("abc", target.ToString());
-        //target = source.TrimStart('X', StringComparison.OrdinalIgnoreCase); Assert.Equal("abc", target.ToString());
+        target = source.TrimStart('x'); Assert.Equal("abc", target.ToString());
+        target = source.TrimStart('X', ignoreCase: true); Assert.Equal("abc", target.ToString());
+        target = source.TrimStart('X', StringComparer.OrdinalIgnoreCase); Assert.Equal("abc", target.ToString());
+        target = source.TrimStart('X', StringComparison.OrdinalIgnoreCase); Assert.Equal("abc", target.ToString());
     }
 
     [Fact]
     public static void Test_OnChar_TrimEnd()
     {
-        var source = new StringBuilder(" abc ");
-        //var target = source.TrimEnd(); Assert.Equal(" abc", target.ToString());
+        StringBuilder source;
+        StringBuilder target;
 
         source = new("abcx");
-        //target = source.TrimEnd('X'); Assert.Equal("abcx", target.ToString());
-        //target = source.TrimEnd('X', char.CharComparer()); Assert.Equal("abcx", target.ToString());
+        target = source.TrimEnd('X'); Assert.Equal("abcx", target.ToString());
+        target = source.TrimEnd('X', char.CharComparer()); Assert.Equal("abcx", target.ToString());
 
         source = new("abcxxx");
-        //target = source.TrimEnd('x'); Assert.Equal("abc", target.ToString());
-        //target = source.TrimEnd('X', ignoreCase: true); Assert.Equal("abc", target.ToString());
-        //target = source.TrimEnd('X', StringComparer.OrdinalIgnoreCase); Assert.Equal("abc", target.ToString());
-        //target = source.TrimEnd('X', StringComparison.OrdinalIgnoreCase); Assert.Equal("abc", target.ToString());
+        target = source.TrimEnd('x'); Assert.Equal("abc", target.ToString());
+        target = source.TrimEnd('X', ignoreCase: true); Assert.Equal("abc", target.ToString());
+        target = source.TrimEnd('X', StringComparer.OrdinalIgnoreCase); Assert.Equal("abc", target.ToString());
+        target = source.TrimEnd('X', StringComparison.OrdinalIgnoreCase); Assert.Equal("abc", target.ToString());
     }
 
     [Fact]
     public static void Test_OnChar_Trim()
     {
-        var source = new StringBuilder(" abc ");
-        //var target = source.Trim(); Assert.Equal("abc", target.ToString());
+        StringBuilder source;
+        StringBuilder target;
 
         source = new("xabcx");
-        //target = source.Trim('X'); Assert.Equal("xabcx", target.ToString());
-        //target = source.Trim('X', char.CharComparer()); Assert.Equal("xabcx", target.ToString());
+        target = source.Trim('X'); Assert.Equal("xabcx", target.ToString());
+        target = source.Trim('X', char.CharComparer()); Assert.Equal("xabcx", target.ToString());
 
         source = new("xxxabcxxx");
-        //target = source.Trim('x'); Assert.Equal("abc", target.ToString());
-        //target = source.Trim('X', ignoreCase: true); Assert.Equal("abc", target.ToString());
-        //target = source.Trim('X', StringComparer.OrdinalIgnoreCase); Assert.Equal("abc", target.ToString());
-        //target = source.Trim('X', StringComparison.OrdinalIgnoreCase); Assert.Equal("abc", target.ToString());
+        target = source.Trim('x'); Assert.Equal("abc", target.ToString());
+        target = source.Trim('X', ignoreCase: true); Assert.Equal("abc", target.ToString());
+        target = source.Trim('X', StringComparer.OrdinalIgnoreCase); Assert.Equal("abc", target.ToString());
+        target = source.Trim('X', StringComparison.OrdinalIgnoreCase); Assert.Equal("abc", target.ToString());
     }
 }

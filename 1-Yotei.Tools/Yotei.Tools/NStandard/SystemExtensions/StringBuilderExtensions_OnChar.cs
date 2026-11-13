@@ -509,95 +509,173 @@ static partial class StringBuilderExtensions
             IEnumerable<char> values, StringComparison comparison)
             => source.IndexOfAny(values, comparison) >= 0;
 
-        /*
-         
-
         // ------------------------------------------------
 
+        StringBuilder TrimStart(char value, Func<char, char, bool> predicate)
+        {
+            while (source.Length > 0)
+            {
+                var item = source[0];
+                if (predicate(value, item)) source.Remove(0, 1);
+                else break;
+            }
+            return source;
+        }
+
         /// <summary>
-        /// Removes from the span all leading ocurrences of the given value.
+        /// Removes from the builder all leading ocurrences of the given value.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public StringBuilder TrimStart(char value) => source.TrimStart(value, (x, y) => x == y);
+
+        /// <summary>
+        /// Removes from the builder all leading ocurrences of the given value.
         /// </summary>
         /// <param name="value"></param>
         /// <param name="ignoreCase"></param>
         /// <returns></returns>
-        public StringSpan TrimStart(char value, bool ignoreCase)
-            => source.TrimStart(value, char.CharComparer(ignoreCase));
+        public StringBuilder TrimStart(
+            char value, bool ignoreCase)
+            => source.TrimStart(value, (x, y) => x.Equals(y, ignoreCase));
 
         /// <summary>
-        /// Removes from the span all leading ocurrences of the given value.
+        /// Removes from the builder all leading ocurrences of the given value.
         /// </summary>
         /// <param name="value"></param>
         /// <param name="comparer"></param>
         /// <returns></returns>
-        public StringSpan TrimStart(char value, IEqualityComparer<string> comparer)
-            => source.TrimStart(value, char.CharComparer(comparer));
+        public StringBuilder TrimStart(
+            char value, IEqualityComparer<char> comparer)
+            => source.TrimStart(value, (x, y) => comparer.Equals(x, y));
 
         /// <summary>
-        /// Removes from the span all leading ocurrences of the given value.
+        /// Removes from the builder all leading ocurrences of the given value.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="comparer"></param>
+        /// <returns></returns>
+        public StringBuilder TrimStart(
+            char value, IEqualityComparer<string> comparer)
+            => source.TrimStart(value, (x, y) => x.Equals(y, comparer));
+
+        /// <summary>
+        /// Removes from the builder all leading ocurrences of the given value.
         /// </summary>
         /// <param name="value"></param>
         /// <param name="comparison"></param>
         /// <returns></returns>
-        public StringSpan TrimStart(char value, StringComparison comparison)
-            => source.TrimStart(value, char.CharComparer(comparison));
+        public StringBuilder TrimStart(
+            char value, StringComparison comparison)
+            => source.TrimStart(value, (x, y) => x.Equals(y, comparison));
 
         // ------------------------------------------------
 
+        StringBuilder TrimEnd(char value, Func<char, char, bool> predicate)
+        {
+            while (source.Length > 0)
+            {
+                var item = source[^1];
+                if (predicate(value, item)) source.Length--;
+                else break;
+            }
+            return source;
+        }
+
         /// <summary>
-        /// Removes from the span all trailing ocurrences of the given value.
+        /// Removes from the builder all trailing ocurrences of the given value.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public StringBuilder TrimEnd(char value) => source.TrimEnd(value, (x, y) => x == y);
+
+        /// <summary>
+        /// Removes from the builder all trailing ocurrences of the given value.
         /// </summary>
         /// <param name="value"></param>
         /// <param name="ignoreCase"></param>
         /// <returns></returns>
-        public StringSpan TrimEnd(char value, bool ignoreCase)
-            => source.TrimEnd(value, char.CharComparer(ignoreCase));
+        public StringBuilder TrimEnd(
+            char value, bool ignoreCase)
+            => source.TrimEnd(value, (x,y) => x.Equals(y, ignoreCase));
 
         /// <summary>
-        /// Removes from the span all trailing ocurrences of the given value.
+        /// Removes from the builder all trailing ocurrences of the given value.
         /// </summary>
         /// <param name="value"></param>
         /// <param name="comparer"></param>
         /// <returns></returns>
-        public StringSpan TrimEnd(char value, IEqualityComparer<string> comparer)
-            => source.TrimEnd(value, char.CharComparer(comparer));
+        public StringBuilder TrimEnd(
+            char value, IEqualityComparer<char> comparer)
+            => source.TrimEnd(value, (x, y) => comparer.Equals(x, y));
 
         /// <summary>
-        /// Removes from the span all trailing ocurrences of the given value.
+        /// Removes from the builder all trailing ocurrences of the given value.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="comparer"></param>
+        /// <returns></returns>
+        public StringBuilder TrimEnd(
+            char value, IEqualityComparer<string> comparer)
+            => source.TrimEnd(value, (x, y) => x.Equals(y, comparer));
+
+        /// <summary>
+        /// Removes from the builder all trailing ocurrences of the given value.
         /// </summary>
         /// <param name="value"></param>
         /// <param name="comparison"></param>
         /// <returns></returns>
-        public StringSpan TrimEnd(char value, StringComparison comparison)
-            => source.TrimEnd(value, char.CharComparer(comparison));
+        public StringBuilder TrimEnd(
+            char value, StringComparison comparison)
+            => source.TrimEnd(value, (x, y) => x.Equals(y, comparison));
 
         // ------------------------------------------------
 
         /// <summary>
-        /// Removes from the span all leading and trailing ocurrences of the given value.
+        /// Removes from the builder all leading and trailing ocurrences of the given value.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public StringBuilder Trim(char value)
+            => source.TrimStart(value).TrimEnd(value);
+
+        /// <summary>
+        /// Removes from the builder all leading and trailing ocurrences of the given value.
         /// </summary>
         /// <param name="value"></param>
         /// <param name="ignoreCase"></param>
         /// <returns></returns>
-        public StringSpan Trim(char value, bool ignoreCase)
-            => source.Trim(value, char.CharComparer(ignoreCase));
+        public StringBuilder Trim(char value, bool ignoreCase)
+            => source.TrimStart(value, ignoreCase).TrimEnd(value, ignoreCase);
 
         /// <summary>
-        /// Removes from the span all leading and trailing ocurrences of the given value.
+        /// Removes from the builder all leading and trailing ocurrences of the given value.
         /// </summary>
         /// <param name="value"></param>
         /// <param name="comparer"></param>
         /// <returns></returns>
-        public StringSpan Trim(char value, IEqualityComparer<string> comparer)
-            => source.Trim(value, char.CharComparer(comparer));
+        public StringBuilder Trim(
+            char value, IEqualityComparer<char> comparer)
+            => source.TrimStart(value, comparer).TrimEnd(value, comparer);
 
         /// <summary>
-        /// Removes from the span all leading and trailing ocurrences of the given value.
+        /// Removes from the builder all leading and trailing ocurrences of the given value.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="comparer"></param>
+        /// <returns></returns>
+        public StringBuilder Trim(
+            char value, IEqualityComparer<string> comparer)
+            => source.TrimStart(value, comparer).TrimEnd(value, comparer);
+
+        /// <summary>
+        /// Removes from the builder all leading and trailing ocurrences of the given value.
         /// </summary>
         /// <param name="value"></param>
         /// <param name="comparison"></param>
         /// <returns></returns>
-        public StringSpan Trim(char value, StringComparison comparison)
-            => source.Trim(value, char.CharComparer(comparison));
-         */
+        public StringBuilder Trim(
+            char value, StringComparison comparison)
+            => source.TrimStart(value, comparison).TrimEnd(value, comparison);
     }
 }
