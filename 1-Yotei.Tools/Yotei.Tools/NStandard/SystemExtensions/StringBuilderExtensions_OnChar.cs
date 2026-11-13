@@ -334,5 +334,270 @@ static partial class StringBuilderExtensions
             char value, StringComparison comparison)
             => source.Length > 0
             && value.Equals(source[^1], comparison);
+
+        // ------------------------------------------------
+
+        int IndexOfAny(IEnumerable<char> values, Func<char, char, bool> predicate)
+        {
+            values.ThrowWhenNull();
+
+            for (int i = 0; i < source.Length; i++)
+            {
+                foreach (var value in values)
+                    if (predicate(value, source[i])) return i;
+            }
+            return -1;
+        }
+
+        /// <summary>
+        /// Returns the index of the first ocurrence of any of the given values.
+        /// </summary>
+        /// <param name="values"></param>
+        /// <returns></returns>
+        public int IndexOfAny(
+            IEnumerable<char> values)
+            => source.IndexOfAny(values, (x, y) => x == y);
+
+        /// <summary>
+        /// Returns the index of the first ocurrence of any of the given values.
+        /// </summary>
+        /// <param name="values"></param>
+        /// <param name="ignoreCase"></param>
+        /// <returns></returns>
+        public int IndexOfAny(
+            IEnumerable<char> values, bool ignoreCase)
+            => source.IndexOfAny(values, (x, y) => x.Equals(y, ignoreCase));
+
+        /// <summary>
+        /// Returns the index of the first ocurrence of any of the given values.
+        /// </summary>
+        /// <param name="values"></param>
+        /// <param name="comparer"></param>
+        /// <returns></returns>
+        public int IndexOfAny(
+            IEnumerable<char> values, IEqualityComparer<char> comparer)
+            => source.IndexOfAny(values, (x, y) => comparer.Equals(x, y));
+
+        /// <summary>
+        /// Returns the index of the first ocurrence of any of the given values.
+        /// </summary>
+        /// <param name="values"></param>
+        /// <param name="comparer"></param>
+        /// <returns></returns>
+        public int IndexOfAny(
+            IEnumerable<char> values, IEqualityComparer<string> comparer)
+            => source.IndexOfAny(values, (x, y) => x.Equals(y, comparer));
+
+        /// <summary>
+        /// Returns the index of the first ocurrence of any of the given values.
+        /// </summary>
+        /// <param name="values"></param>
+        /// <param name="comparison"></param>
+        /// <returns></returns>
+        public int IndexOfAny(
+            IEnumerable<char> values, StringComparison comparison)
+            => source.IndexOfAny(values, (x, y) => x.Equals(y, comparison));
+
+        // ------------------------------------------------
+
+        int LastIndexOfAny(IEnumerable<char> values, Func<char, char, bool> predicate)
+        {
+            values.ThrowWhenNull();
+
+            for (int i = source.Length - 1; i >= 0; i--)
+            {
+                foreach (var value in values)
+                    if (predicate(value, source[i])) return i;
+            }
+            return -1;
+        }
+
+        /// <summary>
+        /// Returns the index of the first ocurrence of any of the given values.
+        /// </summary>
+        /// <param name="values"></param>
+        /// <returns></returns>
+        public int LastIndexOfAny(
+            IEnumerable<char> values) => source.LastIndexOfAny(values, (x, y) => x == y);
+
+        /// <summary>
+        /// Returns the index of the first ocurrence of any of the given values.
+        /// </summary>
+        /// <param name="values"></param>
+        /// <param name="ignoreCase"></param>
+        /// <returns></returns>
+        public int LastIndexOfAny(
+            IEnumerable<char> values, bool ignoreCase)
+            => source.LastIndexOfAny(values, (x, y) => x.Equals(y, ignoreCase));
+
+        /// <summary>
+        /// Returns the index of the first ocurrence of any of the given values.
+        /// </summary>
+        /// <param name="values"></param>
+        /// <param name="comparer"></param>
+        /// <returns></returns>
+        public int LastIndexOfAny(
+            IEnumerable<char> values, IEqualityComparer<char> comparer)
+            => source.LastIndexOfAny(values, (x, y) => comparer.Equals(x, y));
+
+        /// <summary>
+        /// Returns the index of the first ocurrence of any of the given values.
+        /// </summary>
+        /// <param name="values"></param>
+        /// <param name="comparer"></param>
+        /// <returns></returns>
+        public int LastIndexOfAny(
+            IEnumerable<char> values, IEqualityComparer<string> comparer)
+            => source.LastIndexOfAny(values, (x, y) => x.Equals(y, comparer));
+
+        /// <summary>
+        /// Returns the index of the first ocurrence of any of the given values.
+        /// </summary>
+        /// <param name="values"></param>
+        /// <param name="comparison"></param>
+        /// <returns></returns>
+        public int LastIndexOfAny(
+            IEnumerable<char> values, StringComparison comparison)
+            => source.LastIndexOfAny(values, (x, y) => x.Equals(y, comparison));
+
+        // ------------------------------------------------
+
+        /// <summary>
+        /// Determines if the span contains any of the given values.
+        /// </summary>
+        /// <param name="values"></param>
+        /// <returns></returns>
+        public bool ContainsAny(IEnumerable<char> values) => source.IndexOfAny(values) >= 0;
+
+        /// <summary>
+        /// Determines if the span contains any of the given values.
+        /// </summary>
+        /// <param name="values"></param>
+        /// <param name="ignoreCase"></param>
+        /// <returns></returns>
+        public bool ContainsAny(
+            IEnumerable<char> values, bool ignoreCase)
+            => source.IndexOfAny(values, ignoreCase) >= 0;
+
+        /// <summary>
+        /// Determines if the span contains any of the given values.
+        /// </summary>
+        /// <param name="values"></param>
+        /// <param name="comparer"></param>
+        /// <returns></returns>
+        public bool ContainsAny(
+            IEnumerable<char> values, IEqualityComparer<char> comparer)
+            => source.IndexOfAny(values, comparer) >= 0;
+
+        /// <summary>
+        /// Determines if the span contains any of the given values.
+        /// </summary>
+        /// <param name="values"></param>
+        /// <param name="comparer"></param>
+        /// <returns></returns>
+        public bool ContainsAny(
+            IEnumerable<char> values, IEqualityComparer<string> comparer)
+            => source.IndexOfAny(values, comparer) >= 0;
+
+        /// <summary>
+        /// Determines if the span contains any of the given values.
+        /// </summary>
+        /// <param name="values"></param>
+        /// <param name="comparison"></param>
+        /// <returns></returns>
+        public bool ContainsAny(
+            IEnumerable<char> values, StringComparison comparison)
+            => source.IndexOfAny(values, comparison) >= 0;
+
+        /*
+         
+
+        // ------------------------------------------------
+
+        /// <summary>
+        /// Removes from the span all leading ocurrences of the given value.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="ignoreCase"></param>
+        /// <returns></returns>
+        public StringSpan TrimStart(char value, bool ignoreCase)
+            => source.TrimStart(value, char.CharComparer(ignoreCase));
+
+        /// <summary>
+        /// Removes from the span all leading ocurrences of the given value.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="comparer"></param>
+        /// <returns></returns>
+        public StringSpan TrimStart(char value, IEqualityComparer<string> comparer)
+            => source.TrimStart(value, char.CharComparer(comparer));
+
+        /// <summary>
+        /// Removes from the span all leading ocurrences of the given value.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="comparison"></param>
+        /// <returns></returns>
+        public StringSpan TrimStart(char value, StringComparison comparison)
+            => source.TrimStart(value, char.CharComparer(comparison));
+
+        // ------------------------------------------------
+
+        /// <summary>
+        /// Removes from the span all trailing ocurrences of the given value.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="ignoreCase"></param>
+        /// <returns></returns>
+        public StringSpan TrimEnd(char value, bool ignoreCase)
+            => source.TrimEnd(value, char.CharComparer(ignoreCase));
+
+        /// <summary>
+        /// Removes from the span all trailing ocurrences of the given value.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="comparer"></param>
+        /// <returns></returns>
+        public StringSpan TrimEnd(char value, IEqualityComparer<string> comparer)
+            => source.TrimEnd(value, char.CharComparer(comparer));
+
+        /// <summary>
+        /// Removes from the span all trailing ocurrences of the given value.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="comparison"></param>
+        /// <returns></returns>
+        public StringSpan TrimEnd(char value, StringComparison comparison)
+            => source.TrimEnd(value, char.CharComparer(comparison));
+
+        // ------------------------------------------------
+
+        /// <summary>
+        /// Removes from the span all leading and trailing ocurrences of the given value.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="ignoreCase"></param>
+        /// <returns></returns>
+        public StringSpan Trim(char value, bool ignoreCase)
+            => source.Trim(value, char.CharComparer(ignoreCase));
+
+        /// <summary>
+        /// Removes from the span all leading and trailing ocurrences of the given value.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="comparer"></param>
+        /// <returns></returns>
+        public StringSpan Trim(char value, IEqualityComparer<string> comparer)
+            => source.Trim(value, char.CharComparer(comparer));
+
+        /// <summary>
+        /// Removes from the span all leading and trailing ocurrences of the given value.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="comparison"></param>
+        /// <returns></returns>
+        public StringSpan Trim(char value, StringComparison comparison)
+            => source.Trim(value, char.CharComparer(comparison));
+         */
     }
 }

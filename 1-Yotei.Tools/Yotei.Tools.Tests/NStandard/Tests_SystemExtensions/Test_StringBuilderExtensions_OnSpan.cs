@@ -190,4 +190,54 @@ public static partial class Test_StringBuilderExtensions
         Assert.False(source.EndsWith(value, StringComparer.OrdinalIgnoreCase));
         Assert.False(source.EndsWith(value, StringComparison.OrdinalIgnoreCase));
     }
+
+    // ----------------------------------------------------
+
+    // public static void Test_OnString_IndexOfAny()
+    // public static void Test_OnString_LastIndexOfAny()
+    // public static void Test_OnString_IndexesOfAny()
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_OnString_TrimStart()
+    {
+        var source = new StringBuilder("xyabc");
+        var values = new char[] { '1', '2' };
+        //var target = source.TrimStart(values); Assert.Equal("xyabc", target.ToString());
+
+        values = ['X', 'Y'];
+        //target = source.TrimStart(values, char.CharComparer()); Assert.Equal("xyabc", target.ToString());
+        //target = source.TrimStart(values, ignoreCase: true); Assert.Equal("abc", target.ToString());
+        //target = source.TrimStart(values, StringComparer.OrdinalIgnoreCase); Assert.Equal("abc", target.ToString());
+        //target = source.TrimStart(values, StringComparison.OrdinalIgnoreCase); Assert.Equal("abc", target.ToString());
+    }
+
+    [Fact]
+    public static void Test_OnString_TrimEnd()
+    {
+        var source = new StringBuilder("abcxy");
+        var values = new char[] { '1', '2' };
+        //var target = source.TrimEnd(values); Assert.Equal("abcxy", target.ToString());
+
+        values = ['X', 'Y'];
+        //target = source.TrimEnd(values, char.CharComparer()); Assert.Equal("abcxy", target.ToString());
+        //target = source.TrimEnd(values, ignoreCase: true); Assert.Equal("abc", target.ToString());
+        //target = source.TrimEnd(values, StringComparer.OrdinalIgnoreCase); Assert.Equal("abc", target.ToString());
+        //target = source.TrimEnd(values, StringComparison.OrdinalIgnoreCase); Assert.Equal("abc", target.ToString());
+    }
+
+    [Fact]
+    public static void Test_OnString_Trim()
+    {
+        var source = new StringBuilder("xyabcxy");
+        var values = new char[] { '1', '2' };
+        //var target = source.Trim(values); Assert.Equal("xyabcxy", target.ToString());
+
+        values = ['X', 'Y'];
+        //target = source.Trim(values, char.CharComparer()); Assert.Equal("xyabcxy", target.ToString());
+        //target = source.Trim(values, ignoreCase: true); Assert.Equal("abc", target.ToString());
+        //target = source.Trim(values, StringComparer.OrdinalIgnoreCase); Assert.Equal("abc", target.ToString());
+        //target = source.Trim(values, StringComparison.OrdinalIgnoreCase); Assert.Equal("abc", target.ToString());
+    }
 }

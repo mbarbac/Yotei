@@ -17,6 +17,5 @@ static partial class StringSpanExtensions
 {
     extension(StringSpan source)
     {
-
     }
 }

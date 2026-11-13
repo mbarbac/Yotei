@@ -154,4 +154,137 @@ public static partial class Test_StringBuilderExtensions
         Assert.True(source.EndsWith(value, StringComparer.OrdinalIgnoreCase));
         Assert.True(source.EndsWith(value, StringComparison.OrdinalIgnoreCase));
     }
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_OnChar_IndexOfAny()
+    {
+        char[] values = ['x', 'y', 'z'];
+        var source = new StringBuilder();
+        Assert.Equal(-1, source.IndexOfAny(values));
+        Assert.Equal(-1, source.IndexOfAny(values, ignoreCase: true));
+        Assert.Equal(-1, source.IndexOfAny(values, char.CharComparer()));
+        Assert.Equal(-1, source.IndexOfAny(values, StringComparer.OrdinalIgnoreCase));
+        Assert.Equal(-1, source.IndexOfAny(values, StringComparison.OrdinalIgnoreCase));
+
+        source = new("abc");
+        Assert.Equal(-1, source.IndexOfAny(values));
+        Assert.Equal(-1, source.IndexOfAny(values, ignoreCase: true));
+        Assert.Equal(-1, source.IndexOfAny(values, char.CharComparer()));
+        Assert.Equal(-1, source.IndexOfAny(values, StringComparer.OrdinalIgnoreCase));
+        Assert.Equal(-1, source.IndexOfAny(values, StringComparison.OrdinalIgnoreCase));
+
+        source = new("-Z-x-");
+        Assert.Equal(3, source.IndexOfAny(values));
+        Assert.Equal(1, source.IndexOfAny(values, ignoreCase: true));
+        Assert.Equal(3, source.IndexOfAny(values, char.CharComparer()));
+        Assert.Equal(1, source.IndexOfAny(values, StringComparer.OrdinalIgnoreCase));
+        Assert.Equal(1, source.IndexOfAny(values, StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
+    public static void Test_OnChar_LastIndexOfAny()
+    {
+        char[] values = ['x', 'y', 'z'];
+        var source = new StringBuilder();
+        Assert.Equal(-1, source.LastIndexOfAny(values));
+        Assert.Equal(-1, source.LastIndexOfAny(values, ignoreCase: true));
+        Assert.Equal(-1, source.LastIndexOfAny(values, char.CharComparer()));
+        Assert.Equal(-1, source.LastIndexOfAny(values, StringComparer.OrdinalIgnoreCase));
+        Assert.Equal(-1, source.LastIndexOfAny(values, StringComparison.OrdinalIgnoreCase));
+
+        source = new("abc");
+        Assert.Equal(-1, source.LastIndexOfAny(values));
+        Assert.Equal(-1, source.LastIndexOfAny(values, ignoreCase: true));
+        Assert.Equal(-1, source.LastIndexOfAny(values, char.CharComparer()));
+        Assert.Equal(-1, source.LastIndexOfAny(values, StringComparer.OrdinalIgnoreCase));
+        Assert.Equal(-1, source.LastIndexOfAny(values, StringComparison.OrdinalIgnoreCase));
+
+        source = new("-x-Y-");
+        Assert.Equal(1, source.LastIndexOfAny(values));
+        Assert.Equal(3, source.LastIndexOfAny(values, ignoreCase: true));
+        Assert.Equal(1, source.LastIndexOfAny(values, char.CharComparer()));
+        Assert.Equal(3, source.LastIndexOfAny(values, StringComparer.OrdinalIgnoreCase));
+        Assert.Equal(3, source.LastIndexOfAny(values, StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
+    public static void Test_OnChar_ContainsAny()
+    {
+        char[] values = ['x', 'y', 'z'];
+        var source = new StringBuilder();
+        Assert.False(source.ContainsAny(values));
+        Assert.False(source.ContainsAny(values, ignoreCase: true));
+        Assert.False(source.ContainsAny(values, char.CharComparer()));
+        Assert.False(source.ContainsAny(values, StringComparer.OrdinalIgnoreCase));
+        Assert.False(source.ContainsAny(values, StringComparison.OrdinalIgnoreCase));
+
+        source = new("abc");
+        Assert.False(source.ContainsAny(values));
+        Assert.False(source.ContainsAny(values, ignoreCase: true));
+        Assert.False(source.ContainsAny(values, char.CharComparer()));
+        Assert.False(source.ContainsAny(values, StringComparer.OrdinalIgnoreCase));
+        Assert.False(source.ContainsAny(values, StringComparison.OrdinalIgnoreCase));
+
+        source = new("-Y-");
+        Assert.False(source.ContainsAny(values));
+        Assert.True(source.ContainsAny(values, ignoreCase: true));
+        Assert.False(source.ContainsAny(values, char.CharComparer()));
+        Assert.True(source.ContainsAny(values, StringComparer.OrdinalIgnoreCase));
+        Assert.True(source.ContainsAny(values, StringComparison.OrdinalIgnoreCase));
+    }
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_OnChar_TrimStart()
+    {
+        var source = new StringBuilder(" abc ");
+        //var target = source.TrimStart(); Assert.Equal("abc ", target.ToString());
+
+        source = new("xabc");
+        //target = source.TrimStart('X'); Assert.Equal("xabc", target.ToString());
+        //target = source.TrimStart('X', char.CharComparer()); Assert.Equal("xabc", target.ToString());
+
+        source = new("xxxabc");
+        //target = source.TrimStart('x'); Assert.Equal("abc", target.ToString());
+        //target = source.TrimStart('X', ignoreCase: true); Assert.Equal("abc", target.ToString());
+        //target = source.TrimStart('X', StringComparer.OrdinalIgnoreCase); Assert.Equal("abc", target.ToString());
+        //target = source.TrimStart('X', StringComparison.OrdinalIgnoreCase); Assert.Equal("abc", target.ToString());
+    }
+
+    [Fact]
+    public static void Test_OnChar_TrimEnd()
+    {
+        var source = new StringBuilder(" abc ");
+        //var target = source.TrimEnd(); Assert.Equal(" abc", target.ToString());
+
+        source = new("abcx");
+        //target = source.TrimEnd('X'); Assert.Equal("abcx", target.ToString());
+        //target = source.TrimEnd('X', char.CharComparer()); Assert.Equal("abcx", target.ToString());
+
+        source = new("abcxxx");
+        //target = source.TrimEnd('x'); Assert.Equal("abc", target.ToString());
+        //target = source.TrimEnd('X', ignoreCase: true); Assert.Equal("abc", target.ToString());
+        //target = source.TrimEnd('X', StringComparer.OrdinalIgnoreCase); Assert.Equal("abc", target.ToString());
+        //target = source.TrimEnd('X', StringComparison.OrdinalIgnoreCase); Assert.Equal("abc", target.ToString());
+    }
+
+    [Fact]
+    public static void Test_OnChar_Trim()
+    {
+        var source = new StringBuilder(" abc ");
+        //var target = source.Trim(); Assert.Equal("abc", target.ToString());
+
+        source = new("xabcx");
+        //target = source.Trim('X'); Assert.Equal("xabcx", target.ToString());
+        //target = source.Trim('X', char.CharComparer()); Assert.Equal("xabcx", target.ToString());
+
+        source = new("xxxabcxxx");
+        //target = source.Trim('x'); Assert.Equal("abc", target.ToString());
+        //target = source.Trim('X', ignoreCase: true); Assert.Equal("abc", target.ToString());
+        //target = source.Trim('X', StringComparer.OrdinalIgnoreCase); Assert.Equal("abc", target.ToString());
+        //target = source.Trim('X', StringComparison.OrdinalIgnoreCase); Assert.Equal("abc", target.ToString());
+    }
 }
