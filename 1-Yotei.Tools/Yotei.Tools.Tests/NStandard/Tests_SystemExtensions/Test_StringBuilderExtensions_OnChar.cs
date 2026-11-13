@@ -74,4 +74,84 @@ public static partial class Test_StringBuilderExtensions
         result = source.IndexesOf(value, StringComparer.OrdinalIgnoreCase); Assert.True(result is [1, 3]);
         result = source.IndexesOf(value, StringComparison.OrdinalIgnoreCase); Assert.True(result is [1, 3]);
     }
+
+    [Fact]
+    public static void Test_OnChar_Contains()
+    {
+        var value = 'x';
+        var source = new StringBuilder();
+        Assert.False(source.Contains(value));
+        Assert.False(source.Contains(value, ignoreCase: true));
+        Assert.False(source.Contains(value, char.CharComparer()));
+        Assert.False(source.Contains(value, StringComparer.OrdinalIgnoreCase));
+        Assert.False(source.Contains(value, StringComparison.OrdinalIgnoreCase));
+
+        source = new("---");
+        Assert.False(source.Contains(value));
+        Assert.False(source.Contains(value, ignoreCase: true));
+        Assert.False(source.Contains(value, char.CharComparer()));
+        Assert.False(source.Contains(value, StringComparer.OrdinalIgnoreCase));
+        Assert.False(source.Contains(value, StringComparison.OrdinalIgnoreCase));
+
+        source = new("-X-");
+        Assert.False(source.Contains(value));
+        Assert.True(source.Contains(value, ignoreCase: true));
+        Assert.False(source.Contains(value, char.CharComparer()));
+        Assert.True(source.Contains(value, StringComparer.OrdinalIgnoreCase));
+        Assert.True(source.Contains(value, StringComparison.OrdinalIgnoreCase));
+    }
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_OnChar_StartsWith()
+    {
+        var value = 'x';
+        var source = new StringBuilder();
+        Assert.False(source.StartsWith(value));
+        Assert.False(source.StartsWith(value, ignoreCase: true));
+        Assert.False(source.StartsWith(value, char.CharComparer()));
+        Assert.False(source.StartsWith(value, StringComparer.OrdinalIgnoreCase));
+        Assert.False(source.StartsWith(value, StringComparison.OrdinalIgnoreCase));
+
+        source = new("abc");
+        Assert.False(source.StartsWith(value));
+        Assert.False(source.StartsWith(value, ignoreCase: true));
+        Assert.False(source.StartsWith(value, char.CharComparer()));
+        Assert.False(source.StartsWith(value, StringComparer.OrdinalIgnoreCase));
+        Assert.False(source.StartsWith(value, StringComparison.OrdinalIgnoreCase));
+
+        source = new("X--");
+        Assert.False(source.StartsWith(value));
+        Assert.True(source.StartsWith(value, ignoreCase: true));
+        Assert.False(source.StartsWith(value, char.CharComparer()));
+        Assert.True(source.StartsWith(value, StringComparer.OrdinalIgnoreCase));
+        Assert.True(source.StartsWith(value, StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
+    public static void Test_OnChar_EndsWith()
+    {
+        var value = 'x';
+        var source = new StringBuilder();
+        Assert.False(source.EndsWith(value));
+        Assert.False(source.EndsWith(value, ignoreCase: true));
+        Assert.False(source.EndsWith(value, char.CharComparer()));
+        Assert.False(source.EndsWith(value, StringComparer.OrdinalIgnoreCase));
+        Assert.False(source.EndsWith(value, StringComparison.OrdinalIgnoreCase));
+
+        source = new("abc");
+        Assert.False(source.EndsWith(value));
+        Assert.False(source.EndsWith(value, ignoreCase: true));
+        Assert.False(source.EndsWith(value, char.CharComparer()));
+        Assert.False(source.EndsWith(value, StringComparer.OrdinalIgnoreCase));
+        Assert.False(source.EndsWith(value, StringComparison.OrdinalIgnoreCase));
+
+        source = new("--X");
+        Assert.False(source.EndsWith(value));
+        Assert.True(source.EndsWith(value, ignoreCase: true));
+        Assert.False(source.EndsWith(value, char.CharComparer()));
+        Assert.True(source.EndsWith(value, StringComparer.OrdinalIgnoreCase));
+        Assert.True(source.EndsWith(value, StringComparison.OrdinalIgnoreCase));
+    }
 }

@@ -178,7 +178,7 @@ static partial class StringSpanExtensions
         /// <param name="comparer"></param>
         /// <returns></returns>
         public bool Contains(
-            char value, StringComparer comparer) => source.IndexOf(value, comparer) >= 0;
+            char value, IEqualityComparer<string> comparer) => source.IndexOf(value, comparer) >= 0;
 
         /// <summary>
         /// Determines is the span contains the given value.
@@ -208,7 +208,7 @@ static partial class StringSpanExtensions
         /// <param name="comparer"></param>
         /// <returns></returns>
         public bool StartsWith(
-            char value, StringComparer comparer)
+            char value, IEqualityComparer<string> comparer)
             => source.Length > 0
             && value.Equals(source[0], comparer);
 
