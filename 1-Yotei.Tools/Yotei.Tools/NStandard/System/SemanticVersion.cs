@@ -3,6 +3,9 @@
 #pragma warning disable CS0436
 #endif
 
+using System.ComponentModel.DataAnnotations;
+using System.Runtime.ConstrainedExecution;
+
 namespace Yotei.Tools;
 
 // ========================================================
@@ -66,7 +69,67 @@ record SemanticVersion : IComparable<SemanticVersion>, IEquatable<SemanticVersio
     /// Initializes a new instance with the values obtained from the given one.
     /// </summary>
     /// <param name="value"></param>
-    public SemanticVersion(string value) => throw null;
+    public SemanticVersion(string value) : this()
+    {
+        // Empty is allowed, but not null or blanks-only...
+        value.ThrowWhenNull();
+        if (value.Length == 0) return;
+        value = value.NotNullNotEmpty(trim: true);
+
+        // Must start with a major version...
+        if (!char.IsDigit(value[0])) throw new ArgumentException(
+            "Specification must start with a digit.")
+            .WithData(value);
+
+        // Parsing parts...
+        string meta = "";
+        Major = GetValue(value, out value);
+        if (value.Length > 0) Minor = GetValue(value, out value);
+        if (value.Length > 0) Patch = GetValue(value, out value);
+        if (meta.Length > 0) PreRelease = meta;
+
+        /// <summary>
+        /// Extracts the current int part, and produces the remaining value and metadata.
+        /// </summary>
+        int GetValue(string value, out string remain)
+        {
+            remain = "";
+
+            // Extracts pre-release part...
+            var index = value.IndexOf('-'); if (index >= 0)
+            {
+                meta = value[index..];
+                value = value[..index]; if (value.Length == 0) return 0;
+            }
+
+            // Extracts pre-release part...
+            index = value.IndexOf('+'); if (index >= 0)
+            {
+                meta = value[index..];
+                value = value[..index]; if (value.Length == 0) return 0;
+            }
+
+            // Extracts next part...
+            index = value.IndexOf('.'); if (index >= 0)
+            {
+                remain = value[(index + 1)..];
+                value = value[..index];
+            }
+
+            // Computing value...
+            value = value.NotNullNotEmpty(trim: true);
+
+            if (!value.All(char.IsDigit)) throw new ArgumentException(
+                "Part must be a digits-only one.")
+                .WithData(value);
+
+            if (value.Length > 1 && value[0] == '0') throw new ArgumentException(
+                "Part must not have leading zeroes")
+                .WithData(value);
+
+            return int.TryParse(value, out var r) ? r : 0;
+        }
+    }
 
     /// <summary>
     /// Copy constructor.
@@ -86,22 +149,18 @@ record SemanticVersion : IComparable<SemanticVersion>, IEquatable<SemanticVersio
     /// <inheritdoc/>
     /// </summary>
     /// <returns></returns>
-    public override string ToString()
-    {
-        var str = $"{Major}.{Minor}";
-        if (Patch > 0) str += $".{Patch}";
-        if (!PreRelease.IsEmpty) str += PreRelease.ToString();
-        return str;
-    }
+    public override string ToString() => ToString(false);
 
     /// <summary>
-    /// Returns a string that represents this object with its three parts, despite the patch one
-    /// is zero or not.
+    /// Returns a string that represents this object, with an enforced <see cref="Patch"/> part
+    /// or not as requested.
     /// </summary>
+    /// <param name="patch"></param>
     /// <returns></returns>
-    public string To3String()
+    public string ToString(bool patch)
     {
-        var str = $"{Major}.{Minor}.{Patch}";
+        var str = $"{Major}.{Minor}";
+        if (Patch > 0 || patch) str += $".{Patch}";
         if (!PreRelease.IsEmpty) str += PreRelease.ToString();
         return str;
     }
@@ -186,7 +245,12 @@ record SemanticVersion : IComparable<SemanticVersion>, IEquatable<SemanticVersio
         if (x.Minor != y.Minor) return x.Minor.CompareTo(y.Minor);
         if (x.Patch != y.Patch) return x.Patch.CompareTo(y.Patch);
 
-        return x.PreRelease.CompareTo(y.PreRelease);
+        if (!x.PreRelease.IsEmpty && !y.PreRelease.IsEmpty)
+            return x.PreRelease.CompareTo(y.PreRelease);
+
+        if (!x.PreRelease.IsEmpty) return -1;
+        if (!y.PreRelease.IsEmpty) return +1;
+        return 0;
     }
 
     /// <summary>
@@ -246,19 +310,20 @@ record SemanticVersion : IComparable<SemanticVersion>, IEquatable<SemanticVersio
     public SemanticVersion IncreasePatch() => new(Major, Minor, Patch + 1, "");
 
     /// <summary>
-    /// Returns a new instance where the pre-released version has been increased.
-    /// <br/>- If the original value was empty, then the given template is used as the returned
-    /// value, unless it is a null one itself. If this happens, then no increase is performed and
-    /// the <paramref name="increased"/> value is set to <c>false</c>. In all other cases the
-    /// value is increased, and the out argument is set to <c>true</c>.
-    /// <br/>- Any existing metadata is lost.
+    /// Returns a new instance where the release value, if it was not an empty one, has been
+    /// increased. The out argument is set to <c>true</c> or to <c>false</c> accordingly. Any
+    /// existing metadata is ignored.
     /// </summary>
     /// <param name="increased"></param>
-    /// <param name="template"></param>
     /// <returns></returns>
-    public SemanticVersion IncreasePreRelease(out bool increased, string? template = null)
+    public SemanticVersion IncreasePreRelease(out bool increased)
     {
-        var value = PreRelease.Increase(out increased, template);
-        return new(Major, Minor, Patch, value);
+        increased = false;
+        if (IsEmpty || (Major == 0 && Minor == 0 && Patch == 0)) return Empty;
+
+        var temp = PreRelease.Increase(out increased);
+        return increased
+            ? new(Major, Minor, Patch, temp)
+            : this;
     }
 }

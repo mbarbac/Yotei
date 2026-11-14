@@ -135,10 +135,6 @@ public static class Test_SemanticPreRelease
         var target = source.Increase(out increased);
         Assert.False(increased);
         Assert.True(target.IsEmpty);
-
-        target = source.Increase(out increased, "v000");
-        Assert.True(increased);
-        Assert.Equal("-v000", target.ToString());
     }
 
     [Fact]
@@ -147,33 +143,43 @@ public static class Test_SemanticPreRelease
         bool increased;
         var source = new SemanticPreRelease("abc");
         var target = source.Increase(out increased);
-        Assert.Equal("-abd", target.ToString());
         Assert.True(increased);
+        Assert.Equal("-abd", target.ToString());
+
+        source = "ab.cd.9";
+        target = source.Increase(out increased);
+        Assert.True(increased);
+        Assert.Equal("-ab.cd.10", target.ToString());
+
+        source = "ab.cd001";
+        target = source.Increase(out increased);
+        Assert.True(increased);
+        Assert.Equal("-ab.cd002", target.ToString());
+
+        source = "ab.cd99";
+        target = source.Increase(out increased);
+        Assert.True(increased);
+        Assert.Equal("-ab.cd100", target.ToString());
 
         source = "z";
         target = source.Increase(out increased);
-        Assert.Equal("-0A", target.ToString());
         Assert.True(increased);
+        Assert.Equal("-11", target.ToString());
 
-        source = "9";
+        source = "a.z";
         target = source.Increase(out increased);
-        Assert.Equal("-10", target.ToString());
         Assert.True(increased);
+        Assert.Equal("-b.1", target.ToString());
 
-        source = "z.9";
+        source = "a.z.z";
         target = source.Increase(out increased);
-        Assert.Equal("-z.10", target.ToString());
         Assert.True(increased);
+        Assert.Equal("-b.1.1", target.ToString());
 
-        source = "z9";
+        source = "a.v009.z";
         target = source.Increase(out increased);
-        Assert.Equal("-0A0", target.ToString());
         Assert.True(increased);
-
-        source = "123.z9";
-        target = source.Increase(out increased);
-        Assert.Equal("-124.A0", target.ToString());
-        Assert.True(increased);
+        Assert.Equal("-a.v010.1", target.ToString());
     }
 
     [Fact]

@@ -4,6 +4,7 @@
 #endif
 
 using System.Collections.ObjectModel;
+using System.Reflection.Metadata.Ecma335;
 
 namespace Yotei.Tools;
 
@@ -91,7 +92,7 @@ record SemanticPreRelease : IComparable<SemanticPreRelease>, IEquatable<Semantic
     /// </summary>
     public string Value
     {
-        get => _Value ?? string.Join('.', _ValueParts);
+        get => _Value ??= string.Join('.', _ValueParts);
         init
         {
             _ValueParts = []; // Preventive cleaning...
@@ -109,7 +110,8 @@ record SemanticPreRelease : IComparable<SemanticPreRelease>, IEquatable<Semantic
             if (index >= 0)
             {
                 Metadata = value[index..];
-                value = value[..index].NotNullNotEmpty(trim: true);
+                value = value[..index];
+                value = value.NotNullNotEmpty(trim: true);
             }
 
             // Getting the dot-separated parts...
@@ -118,7 +120,7 @@ record SemanticPreRelease : IComparable<SemanticPreRelease>, IEquatable<Semantic
                 _ValueParts[i] = ValidatePart(_ValueParts[i], leadingZeroes: false);
         }
     }
-    readonly string? _Value;
+    string? _Value;
 
     /// <summary>
     /// Reports what are the actual parts in the value.
@@ -132,7 +134,7 @@ record SemanticPreRelease : IComparable<SemanticPreRelease>, IEquatable<Semantic
     /// </summary>
     public string Metadata
     {
-        get => _Metadata ?? string.Join('.', _MetaParts);
+        get => _Metadata ??= string.Join('.', _MetaParts);
         init
         {
             _MetaParts = []; // Preventive cleaning...
@@ -151,7 +153,7 @@ record SemanticPreRelease : IComparable<SemanticPreRelease>, IEquatable<Semantic
                 _MetaParts[i] = ValidatePart(_MetaParts[i], leadingZeroes: true);
         }
     }
-    readonly string? _Metadata;
+    string? _Metadata;
 
     /// <summary>
     /// Reports what are the actual parts in the metadata.
@@ -247,6 +249,10 @@ record SemanticPreRelease : IComparable<SemanticPreRelease>, IEquatable<Semantic
                 if (result > 0) return +1;
                 return 0;
             }
+
+            // TODO SemanticPreRelease Compare: special trunk cases.
+            // When part is like "v01", compare just the numerical trunks. The easiest case is
+            // when both x and y have trunks, but there are many other cases to consider.
         }
     }
 
@@ -284,67 +290,66 @@ record SemanticPreRelease : IComparable<SemanticPreRelease>, IEquatable<Semantic
     public override int GetHashCode() => HashCode.Combine(Value);
 
     // ----------------------------------------------------
+    readonly static char[] CHARS = "ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvxyz".ToCharArray();
+    readonly static char[] DIGITS = "0123456789".ToCharArray();
+    readonly static char[] COMBINED = [.. DIGITS, ..CHARS];
+
+    // ----------------------------------------------------
 
     /// <summary>
-    /// Returns a new instance where the original value was increased.
-    /// <br/>- If the original value was empty, then the given template is used as the returned
-    /// value, unless it is a null one itself. If this happens, then no increase is performed and
-    /// the <paramref name="increased"/> value is set to <c>false</c>. In all other cases the
-    /// value is increased, and the out argument is set to <c>true</c>.
-    /// <br/>- Any existing metadata is lost.
+    /// Returns a new instance where the original value, if it was not an empty one, has been
+    /// increased. The out argument is set to <c>true</c> or to <c>false</c> accordingly. Any
+    /// existing metadata is ignored.
     /// </summary>
-    /// <param name="increased"></param>
-    /// <param name="template"></param>
     /// <returns></returns>
-    public SemanticPreRelease Increase(out bool increased, string? template = null)
+    public SemanticPreRelease Increase(out bool increased)
     {
+        // No value to increase.
         increased = false;
-
-        // Adjusting the template, if needed...
-        template = template?.NotNullNotEmpty(true);
-        if (template is not null)
-        {
-            var index = template.IndexOf('+');
-            if (index >= 0)
-            {
-                template = template[..index];
-                template = template.NotNullNotEmpty(trim: true);
-            }
-        }
-
-        // No value to increase...
-        if (_ValueParts.Length == 0)
-        {
-            increased = template is not null;
-            return increased ? new(template!) : Empty;
-        }
+        if (_ValueParts.Length == 0) return Empty;
 
         // Iterating...
         var parts = (string[])_ValueParts.Clone();
-        var overflow = false;
 
         for (int i = parts.Length - 1; i >= 0; i--)
         {
             var part = parts[i];
+
+            // Pure numeric part...
             if (part.All(char.IsDigit))
             {
                 var value = ulong.TryParse(part, out var temp) ? temp : 0;
                 value++;
                 parts[i] = value.ToString();
-                increased = true;
                 break;
             }
+
+            // Trailing numeric trunk...
+            var index = FirstTrailing(part);
+            if (index >= 0)
+            {
+                var trunk = part[index..];
+                var value = ulong.TryParse(trunk, out var r) ? r : 0;
+                value++;
+
+                var len = trunk.Length; trunk = value.ToString($"D{len}");
+                part = part[..index];
+                part += trunk;
+                parts[i] = part;
+                break;
+            }
+
+            // Otherwise, pure alphanumeric increase...
             else
             {
-                var value = Increase(part, out overflow);
+                var value = IncreaseAlpha(part, out var overflow);
                 parts[i] = value;
-                increased = true;
                 if (!overflow) break;
 
-                if (i == 0) // Adjusting first part for overflow, digits have lower precedence...
+                if (i == 0) // Adjusting first part when overflow...
                 {
                     var sb = new StringBuilder(value);
-                    sb.Insert(0, DIGITS[0]);
+                    sb.Insert(0, COMBINED[1]);
                     parts[i] = sb.ToString();
                     break;
                 }
@@ -352,56 +357,48 @@ record SemanticPreRelease : IComparable<SemanticPreRelease>, IEquatable<Semantic
         }
 
         // Finishing...
-        var result = new SemanticPreRelease() { _ValueParts = parts };
-        return result;
-    }
+        increased = true;
+        for (int i = 0; i < parts.Length; i++) parts[i] = ValidatePart(parts[i], leadingZeroes: false);
+        return new SemanticPreRelease() { _ValueParts = parts };
 
-    // ----------------------------------------------------
-
-    readonly static char[] CHARS = "ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvxyz".ToCharArray();
-    readonly static char[] DIGITS = "0123456789".ToCharArray();
-
-    /// <summary>
-    /// Increases an alphanumeric part with an indication if overflow has happened.
-    /// </summary>
-    static string Increase(string part, out bool overflow)
-    {
-        var sb = new StringBuilder(part);
-        overflow = false;
-
-        for (int i = sb.Length - 1; i >= 0; i--)
+        // The index of the first trailing digit, or -1
+        static int FirstTrailing(string part)
         {
-            var value = Increase(sb[i], out overflow);
-            sb[i] = value;
-            if (!overflow) break;
+            var r = -1; for (int i = part.Length - 1; i >= 0; i--)
+            {
+                if (!char.IsDigit(part[i])) break;
+                r = i;
+            }
+            return r;
         }
 
-        return sb.ToString();
-    }
-
-    /// <summary>
-    /// Returns an increased char with an indication if overflow has happened.
-    /// NOTE: we DO NOT consider embedded '-', '+', or any other separators.
-    /// </summary>
-    static char Increase(char value, out bool overflow)
-    {
-        if (char.IsDigit(value)) // Increasing digit characters...
+        // Increases the value of the given value indicating if overflow has happened...
+        static string IncreaseAlpha(string value, out bool overflow)
         {
-            var index = DIGITS.IndexOf(value);
-
-            if (index == DIGITS.Length - 1) { overflow = true; return DIGITS[0]; }
             overflow = false;
-            return DIGITS[index + 1];
+            var sb = new StringBuilder(value);
+
+            for (int i = sb.Length - 1; i >= 0; i--)
+            {
+                var temp = IncreaseChar(sb[i], out overflow);
+                sb[i] = temp;
+                if (!overflow) break;
+            }
+            return sb.ToString();
         }
-        else // Increasing letter characters...
-        {
-            var index = CHARS.IndexOf(value);
-            if (index < 0) throw new ArgumentException(
-                "Cannot increase an invalid character").WithData(value);
 
-            if (index == CHARS.Length - 1) { overflow = true; return CHARS[0]; }
+        // Increases the value of the given value indicating if overflow has happened...
+        static char IncreaseChar(char value, out bool overflow)
+        {
             overflow = false;
-            return CHARS[index + 1];
+            var index = COMBINED.IndexOf(value);
+
+            if (index == COMBINED.Length - 1)
+            {
+                overflow = true;
+                return COMBINED[1]; // No leading zeroes allowed!
+            }
+            return COMBINED[index + 1];
         }
     }
 }
