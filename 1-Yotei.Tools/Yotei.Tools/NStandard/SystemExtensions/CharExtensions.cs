@@ -33,7 +33,7 @@ static class CharExtensions
         /// <param name="value"></param>
         /// <returns></returns>
         [SuppressMessage("", "IDE0078")]
-        public static bool IsAsciiDigit(char value) => (value >= '0' && value <= '9')
+        public static bool IsAsciiDigit(char value) => (value >= '0' && value <= '9');
 #endif
     }
 

@@ -3,6 +3,8 @@
 #pragma warning disable CS0436
 #endif
 
+using System.Collections.ObjectModel;
+
 namespace Yotei.Tools;
 
 // ========================================================
@@ -28,13 +30,17 @@ record SemanticPreRelease : IComparable<SemanticPreRelease>, IEquatable<Semantic
     /// <summary>
     /// Initializes a new empty instance.
     /// </summary>
-    public SemanticPreRelease() { }
+    public SemanticPreRelease()
+    {
+        _ValueParts = [];
+        _MetaParts = [];
+    }
 
     /// <summary>
     /// Initializes a new instance with the given value.
     /// </summary>
     /// <param name="value"></param>
-    public SemanticPreRelease(string value) => Value = value;
+    public SemanticPreRelease(string value) : this() => Value = value;
 
     /// <summary>
     /// Copy constructor.
@@ -57,8 +63,8 @@ record SemanticPreRelease : IComparable<SemanticPreRelease>, IEquatable<Semantic
         if (IsEmpty) return string.Empty;
 
         var sb = new StringBuilder();
-        if (Value.Length > 0) sb.Append($"-{Value}");
-        if (Metadata.Length > 0) sb.Append($"+{Metadata}");
+        if (_ValueParts.Length > 0) sb.Append($"-{Value}");
+        if (_MetaParts.Length > 0) sb.Append($"+{Metadata}");
         return sb.ToString();
     }
 
@@ -69,16 +75,13 @@ record SemanticPreRelease : IComparable<SemanticPreRelease>, IEquatable<Semantic
     /// </summary>
     /// <param name="value"></param>
     public static implicit operator string(
-        SemanticPreRelease value)
-        => value.ThrowWhenNull().ToString();
+        SemanticPreRelease value) => value.ThrowWhenNull().ToString();
 
     /// <summary>
     /// Conversion operator.
     /// </summary>
     /// <param name="value"></param>
-    public static implicit operator SemanticPreRelease(
-        string value)
-        => new(value);
+    public static implicit operator SemanticPreRelease(string value) => new(value);
 
     // ----------------------------------------------------
 
@@ -88,32 +91,40 @@ record SemanticPreRelease : IComparable<SemanticPreRelease>, IEquatable<Semantic
     /// </summary>
     public string Value
     {
-        get => _Value ?? string.Concat(_ValueParts);
+        get => _Value ?? string.Join('.', _ValueParts);
         init
         {
-            _ValueParts = [];
+            _ValueParts = []; // Preventive cleaning...
 
+            // Empty is allowed, but not null or blanks-only...
             value.ThrowWhenNull();
-            value = value.NullWhenEmpty(trim: true)!; if (value is null) return;
-
-            if (value[0] == '-') value = value[1..];
+            if (value.Length == 0) return;
             value = value.NotNullNotEmpty(trim: true);
 
+            // It can start with '-'...
+            if (value[0] == '-') value = value[1..].NotNullNotEmpty(trim: true);
+
+            // Intercepting the metadata part...
             var index = value.IndexOf('+');
             if (index >= 0)
             {
                 Metadata = value[index..];
-                value = value[..index].Trim();
-                if (value.Length == 0) return;
+                value = value[..index].NotNullNotEmpty(trim: true);
             }
 
+            // Getting the dot-separated parts...
             _ValueParts = value.Split('.');
             for (int i = 0; i < _ValueParts.Length; i++)
                 _ValueParts[i] = ValidatePart(_ValueParts[i], leadingZeroes: false);
         }
     }
-    string? _Value;
-    string[] _ValueParts = [];
+    readonly string? _Value;
+
+    /// <summary>
+    /// Reports what are the actual parts in the value.
+    /// </summary>
+    public ReadOnlyCollection<string> ValueParts => Array.AsReadOnly(_ValueParts);
+    string[] _ValueParts;
 
     /// <summary>
     /// The pre-release metadata carried by this instance, or an empty string if any. The value of
@@ -121,24 +132,32 @@ record SemanticPreRelease : IComparable<SemanticPreRelease>, IEquatable<Semantic
     /// </summary>
     public string Metadata
     {
-        get => _Metadata ?? string.Concat(_MetaParts);
+        get => _Metadata ?? string.Join('.', _MetaParts);
         init
         {
-            _MetaParts = [];
+            _MetaParts = []; // Preventive cleaning...
 
+            // Empty is allowed, but not null or blanks-only...
             value.ThrowWhenNull();
-            value = value.NullWhenEmpty(trim: true)!; if (value is null) return;
-
-            if (value[0] == '+') value = value[1..];
+            if (value.Length == 0) return;
             value = value.NotNullNotEmpty(trim: true);
 
+            // It can start with '+'...
+            if (value[0] == '+') value = value[1..].NotNullNotEmpty(trim: true);
+
+            // Getting the dot-separated parts...
             _MetaParts = value.Split('.');
             for (int i = 0; i < _MetaParts.Length; i++)
                 _MetaParts[i] = ValidatePart(_MetaParts[i], leadingZeroes: true);
         }
     }
-    string? _Metadata;
-    string[] _MetaParts = [];
+    readonly string? _Metadata;
+
+    /// <summary>
+    /// Reports what are the actual parts in the metadata.
+    /// </summary>
+    public ReadOnlyCollection<string> MetadataParts => Array.AsReadOnly(_MetaParts);
+    string[] _MetaParts;
 
     /// <summary>
     /// Determines if this instance is an empty one or not.
@@ -160,8 +179,10 @@ record SemanticPreRelease : IComparable<SemanticPreRelease>, IEquatable<Semantic
                 throw new ArgumentException("Part carries invalid characters.").WithData(part);
         }
 
-        if (!leadingZeroes && part[0] == '0')
-            throw new ArgumentException("Part carries leading zeroes.").WithData(part);
+        if (!leadingZeroes &&
+            part[0] == '0' &&
+            part.All(char.IsDigit))
+            throw new ArgumentException( "Part carries leading zeroes.").WithData(part);
 
         return part;
     }
@@ -210,13 +231,21 @@ record SemanticPreRelease : IComparable<SemanticPreRelease>, IEquatable<Semantic
             {
                 var vx = int.TryParse(xpart, out var rx) ? rx : 0;
                 var vy = int.TryParse(ypart, out var ry) ? ry : 0;
-                return vx.CompareTo(vy);
+                
+                var result = vx.CompareTo(vy);
+                if (result < 0) return -1;
+                if (result > 0) return +1;
+                return 0;
             }
             else
             {
                 if (nx) return -1;
                 if (ny) return +1;
-                return string.Compare(xpart, ypart);
+
+                var result = string.Compare(xpart, ypart, StringComparison.Ordinal);
+                if (result < 0) return -1;
+                if (result > 0) return +1;
+                return 0;
             }
         }
     }
@@ -257,14 +286,14 @@ record SemanticPreRelease : IComparable<SemanticPreRelease>, IEquatable<Semantic
     // ----------------------------------------------------
 
     /// <summary>
-    /// Returns a new instance where the original value was increased. If that value was an empty
-    /// one, then the given template is returned instead (provided it is not a null one, in which
-    /// case an empty instance is returned).
-    /// <br/> The <paramref name="increased"/> value is always <c>true</c> unless the source value
-    /// was an empty one AND the template was also null or empty. If this happens, then its value
-    /// is set to <c>false</c>.
-    /// <br/> Any existing metadata is ignored.
+    /// Returns a new instance where the original value was increased.
+    /// <br/>- If the original value was empty, then the given template is used as the returned
+    /// value, unless it is a null one itself. If this happens, then no increase is performed and
+    /// the <paramref name="increased"/> value is set to <c>false</c>. In all other cases the
+    /// value is increased, and the out argument is set to <c>true</c>.
+    /// <br/>- Any existing metadata is lost.
     /// </summary>
+    /// <param name="increased"></param>
     /// <param name="template"></param>
     /// <returns></returns>
     public SemanticPreRelease Increase(out bool increased, string? template = null)
@@ -312,10 +341,11 @@ record SemanticPreRelease : IComparable<SemanticPreRelease>, IEquatable<Semantic
                 increased = true;
                 if (!overflow) break;
 
-                if (i == 0) // Adjusting first part for overflow...
+                if (i == 0) // Adjusting first part for overflow, digits have lower precedence...
                 {
-                    value += CHARS[0];
-                    parts[i] = value;
+                    var sb = new StringBuilder(value);
+                    sb.Insert(0, DIGITS[0]);
+                    parts[i] = sb.ToString();
                     break;
                 }
             }
@@ -328,8 +358,26 @@ record SemanticPreRelease : IComparable<SemanticPreRelease>, IEquatable<Semantic
 
     // ----------------------------------------------------
 
-    static char[] CHARS = "ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvxyz".ToCharArray();
-    static char[] DIGITS = "0123456789".ToCharArray();
+    readonly static char[] CHARS = "ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvxyz".ToCharArray();
+    readonly static char[] DIGITS = "0123456789".ToCharArray();
+
+    /// <summary>
+    /// Increases an alphanumeric part with an indication if overflow has happened.
+    /// </summary>
+    static string Increase(string part, out bool overflow)
+    {
+        var sb = new StringBuilder(part);
+        overflow = false;
+
+        for (int i = sb.Length - 1; i >= 0; i--)
+        {
+            var value = Increase(sb[i], out overflow);
+            sb[i] = value;
+            if (!overflow) break;
+        }
+
+        return sb.ToString();
+    }
 
     /// <summary>
     /// Returns an increased char with an indication if overflow has happened.
@@ -355,21 +403,5 @@ record SemanticPreRelease : IComparable<SemanticPreRelease>, IEquatable<Semantic
             overflow = false;
             return CHARS[index + 1];
         }
-    }
-
-    /// <summary>
-    /// Increases an alphanumeric part with an indication if overflow has happened.
-    /// </summary>
-    static string Increase(string part, out bool overflow)
-    {
-        var sb = new StringBuilder(part);
-        overflow = false;
-
-        for (int i = sb.Length - 1; i >= 0; i--)
-        {
-            var value = Increase(sb[i], out overflow);
-            sb[i] = value;
-        }
-        return sb.ToString();
     }
 }
