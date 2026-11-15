@@ -117,4 +117,53 @@ internal class Program
         }
         return false;
     }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Returns a collection with the project files found at the given root directory and its
+    /// subfolders, provided they are not part of the exclusion branch.
+    /// </summary>
+    /// <param name="root"></param>
+    /// <param name="exclude"></param>
+    /// <param name="ignoreCase"></param>
+    /// <returns></returns>
+    static internal List<ProjectFile> FindProjects(
+        string root,
+        string? exclude = null,
+        bool ignoreCase = true)
+    {
+        root = root.NotNullNotEmpty(trim: true);
+        exclude = exclude?.NotNullNotEmpty(trim: true);
+
+        var list = new List<ProjectFile>();
+        Populate(root);
+        return list;
+
+        /// <summary>
+        /// Recursively populates the list of projects, from the given path.
+        /// </summary>
+        void Populate(string path)
+        {
+            if (path.Contains(".git", ignoreCase)) return;
+            if (path.Contains(".vs", ignoreCase)) return;
+            if (path.Contains("\\bin\\", ignoreCase)) return;
+            if (path.Contains("\\obj\\", ignoreCase)) return;
+            if (exclude is not null && path.StartsWith(exclude, ignoreCase)) return;
+
+            var dir = new DirectoryInfo(path);
+            if (!dir.Exists) return;
+
+            var files = dir.GetFiles("*.csproj");
+            foreach (var file in files)
+            {
+                var name = file.FullName;
+                var index = list.FindIndex(x => string.Compare(x.FullName, name, ignoreCase) == 0);
+                if (index < 0) list.Add(new(file.FullName));
+            }
+
+            var dirs = dir.GetDirectories();
+            foreach (var temp in dirs) Populate(temp.FullName);
+        }
+    }
 }

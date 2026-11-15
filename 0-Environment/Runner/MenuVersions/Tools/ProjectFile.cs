@@ -70,16 +70,20 @@ public class ProjectFile : IEnumerable<ProjectFileLine>
     /// <summary>
     /// The name and extension of this file.
     /// </summary>
-    public string NameAndExtension => Extension is null
+    public string NameAndExtension => _NameAndExtension ??=  Extension is null
         ? Name
         : $"{Name}.{Extension}";
+
+    string? _NameAndExtension;
 
     /// <summary>
     /// The full name of this file.
     /// </summary>
-    public string FullName => Directory.Length > 0
+    public string FullName => _FullName ??= Directory.Length > 0
         ? $"{Directory}\\{NameAndExtension}"
         : NameAndExtension;
+
+    string? _FullName;
 
     // ----------------------------------------------------
 

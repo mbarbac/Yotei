@@ -49,22 +49,22 @@ public class ProjectFileLine
     /// <param name="head"></param>
     /// <param name="tail"></param>
     /// <param name="value"></param>
-    /// <param name="comparison"></param>
+    /// <param name="ignoreCase"></param>
     /// <returns></returns>
     public bool Extract(
         string head, string tail,
         [NotNullWhen(true)] out string? value,
-        StringComparison comparison = StringComparison.Ordinal)
+        StringComparison ignoreCase = StringComparison.Ordinal)
     {
         head = head.NotNullNotEmpty(trim: true);
         tail = tail.NotNullNotEmpty(trim: true);
         value = null;
 
-        var ini = Value.IndexOf(head, comparison);
+        var ini = Value.IndexOf(head, ignoreCase);
         if (ini < 0) return false;
         ini += head.Length;
 
-        var end = Value.IndexOf(tail, ini, comparison);
+        var end = Value.IndexOf(tail, ini, ignoreCase);
         if (end < 0) return false;
 
         value = Value[ini..end];
