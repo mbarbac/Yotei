@@ -11,6 +11,10 @@ internal class Program
     public static readonly string FatSeparator = new('*', 50);
     public static readonly string SlimSeparator = new('-', 35);
 
+    public static string NuGetRepoSource = @"https://api.nuget.org/v3/index.json";
+    public static string LocalRepoSource = "Local";
+    public static string LocalRepoPath = @"C:\Dev\Packages";
+
     // ----------------------------------------------------
 
     /// <summary>
@@ -27,8 +31,8 @@ internal class Program
         var menu = new ConsoleMenu { ToDebug = ToDebug, Timeout = Timeout }
         .Add(new("Exit"))
         .Add(new("Execute Tests"))
-        .Add(new("Manage Disk Artifacts"))
-        .Add(new("Manage Package Versions"));
+        .Add(new MenuArtifacts())
+        .Add(new MenuPackage());
 
         int position = 0; do
         {

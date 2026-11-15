@@ -121,7 +121,7 @@ public class ProjectFileLine
         delimiter = delimiter.NotNullNotEmpty(trim: true);
 
         var head = $"<{delimiter}>";
-        var tail = $"<{delimiter}/>";
+        var tail = $"</{delimiter}>";
         return Extract(head, tail, out value, comparison);
     }
 
@@ -142,7 +142,7 @@ public class ProjectFileLine
         value.ThrowWhenNull();
 
         var head = $"<{delimiter}>";
-        var tail = $"<{delimiter}/>";
+        var tail = $"</{delimiter}>";
         return Update(head, tail, value, comparison);
     }
 
