@@ -1,3 +1,4 @@
-﻿namespace Runner;
+﻿using static System.ConsoleColor;
+namespace Runner;
 
 // ========================================================
