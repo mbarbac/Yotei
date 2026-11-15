@@ -132,6 +132,13 @@ public static partial class ConsoleExtensions
         // ------------------------------------------------
 
         /// <summary>
+        /// Writes a the current line separator to the console and, if requested, also to the
+        /// debug environment.
+        /// </summary>
+        /// <param name="debug"></param>
+        public static void WriteLineEx(bool debug) => WriteLineEx(debug, "");
+
+        /// <summary>
         /// Writes the given message, formatted with the given arguments, if any, and followed by
         /// current line terminator, to the console and, if requested, to the debug environment.
         /// </summary>
@@ -613,7 +620,7 @@ public static partial class ConsoleExtensions
         public static string? EditLineEx(
             bool debug, string? source, TimeSpan timeout, Color forecolor, Color backcolor)
         {
-            // TODO: EditLineEx needs to guarantee window buffer is big enough.
+            PreventBufferOverflow(5); // At least 5 lines just by convention...
 
             var oldfore = Console.ForegroundColor; Console.ForegroundColor = forecolor;
             var oldback = Console.BackgroundColor; Console.BackgroundColor = backcolor;
@@ -774,6 +781,38 @@ public static partial class ConsoleExtensions
                     insert = value;
                 }
             }
+        }
+
+        // ------------------------------------------------
+
+        /// <summary>
+        /// In windows envirnoments, makes room in the console buffer to prevent buffer overflow
+        /// conditions to happen when using Cursor-alike and Buffer-alike properties, and similar
+        /// methods.
+        /// </summary>
+        /// <param name="num">The minimum number of lines to make room for.</param>
+        /// <param name="keep">The minimum percentage of lines to keep.</param>
+        public static void PreventBufferOverflow(int num, int keep = 50)
+        {
+            if (!OperatingSystem.IsWindows()) return;
+
+            var bheight = Console.BufferHeight;
+            var bwidth = Console.BufferWidth;
+            var top = Console.CursorTop;
+            if ((top + num) < bheight) return;
+
+            if (keep < 1) throw new ArgumentOutOfRangeException(nameof(keep)).WithData(keep);
+            if (keep > 100) throw new ArgumentOutOfRangeException(nameof(keep)).WithData(keep);
+            var percentage = keep / 100.0;
+            var lines = (int)Math.Ceiling(Console.BufferHeight * percentage);
+            if (lines < num) lines = num;
+
+            var orig = top - lines;
+            if (orig < 0) return;
+
+            Console.MoveBufferArea(0, orig, bwidth, lines, 0, 0);
+            Console.SetWindowPosition(0, 0);
+            Console.SetCursorPosition(0, lines);
         }
     }
 }

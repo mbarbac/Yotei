@@ -6,7 +6,9 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<Configurations>Debug;Release;Local</Configurations>
+		<NoWarn>IDE0130</NoWarn>
 	</PropertyGroup>
+	<!--IDE0130: Namespace does not match folder structure-->
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />

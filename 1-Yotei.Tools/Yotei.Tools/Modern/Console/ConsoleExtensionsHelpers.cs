@@ -10,7 +10,7 @@ public static partial class ConsoleExtensions
     /// If debug is requested, writes the given message in the not console-alike listeners.
     /// </summary>
     [Conditional("DEBUG")]
-    static void TryDebugWrite(bool debug, string message)
+    internal static void TryDebugWrite(bool debug, string message)
     {
         if (!debug) return;
 
@@ -23,7 +23,7 @@ public static partial class ConsoleExtensions
     /// followed by the current line terminator.
     /// </summary>
     [Conditional("DEBUG")]
-    static void TryDebugWriteLine(bool debug, string message)
+    internal static void TryDebugWriteLine(bool debug, string message)
     {
         if (!debug) return;
 
@@ -36,7 +36,7 @@ public static partial class ConsoleExtensions
     /// <summary>
     /// Obtains a formatted message.
     /// </summary>
-    static string FormatMessage(string message, params object?[]? args)
+    internal static string FormatMessage(string message, params object?[]? args)
     {
         message ??= string.Empty;
         args ??= [null];
@@ -47,7 +47,7 @@ public static partial class ConsoleExtensions
     /// Obtains a string with the given number of spaces.
     /// </summary>
     [SuppressMessage("", "CA2208")]
-    static string FromSpaces(int num)
+    internal static string FromSpaces(int num)
     {
         if (num < 0) throw new ArgumentOutOfRangeException("Negative number of spaces.").WithData(num);
         if (num == 0) return string.Empty;
@@ -66,7 +66,7 @@ public static partial class ConsoleExtensions
     /// <summary>
     /// Returns a human description of the key or character.
     /// </summary>
-    static string ToHumanString(ConsoleKeyInfo info)
+    internal static string ToHumanString(ConsoleKeyInfo info)
     {
         return info.KeyChar < 32
             ? $"[{info.Key}]"
@@ -89,7 +89,7 @@ public static partial class ConsoleExtensions
     /// <summary>
     /// Used to determine if the console was in insert mode.
     /// </summary>
-    static bool IsInInsertMode(bool raise = false)
+    internal static bool IsInInsertMode(bool raise = false)
     {
         var windows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
         if (!windows) return false;
