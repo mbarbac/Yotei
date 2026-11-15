@@ -19,11 +19,6 @@ public class CleanNuGetCaches : ConsoleMenu.Entry
         Console.WriteLineEx(true, Green, Headline());
         Console.WriteLineEx(true);
 
-        Console.WriteLineEx(true);
-        Console.WriteLineEx(true, Green, Program.SlimSeparator);
-        Console.WriteLineEx(true, Green, "Clean NuGet caches");
-        Console.WriteLineEx(true);
-
         var path = AppContext.BaseDirectory;
         SysCommand.Execute(
             "dotnet",

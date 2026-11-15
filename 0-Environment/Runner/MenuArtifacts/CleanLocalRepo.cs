@@ -5,10 +5,12 @@ namespace Runner;
 // ========================================================
 public class CleanLocalRepo : ConsoleMenu.Entry
 {
+    static string? Repo;
+
     /// <summary>
     /// <inheritdoc/>
     /// </summary>
-    public override string Headline() => "Clean Local Repo";
+    public override string Headline() => "Clean Local NuGet Repo";
 
     /// <summary>
     /// <inheritdoc/>
@@ -16,18 +18,20 @@ public class CleanLocalRepo : ConsoleMenu.Entry
     public override void Execute()
     {
         Console.WriteLineEx(true);
-        Console.WriteLineEx(true, Green, Program.SlimSeparator);
-        Console.WriteLineEx(true, Green, "Clean local NuGet repo");
+        Console.WriteLineEx(true, Green, Program.FatSeparator);
+        Console.WriteLineEx(true, Green, Headline());
         Console.WriteLineEx(true);
 
-        Console.WriteLine(Green, "(Leave path blank to abort)");
-        var path = Program.EditDirectory(Program.LocalRepoPath, "Path: ");
-        if (path is null) return;
+        Repo ??= Program.LocalRepoPath;
+
+        Console.WriteLine(Green, "(Leave blank to abort)");
+        Repo = Program.EditDirectory(Repo, "Repo: ");
+        if (Repo is null) return;
 
         Console.WriteLineEx(true);
         Console.WriteLineEx(true, Green, "Deleting:");
 
-        var dir = new DirectoryInfo(path);
+        var dir = new DirectoryInfo(Repo);
         var files = dir.GetFiles();
 
         Console.PreventBufferOverflow(files.Length + 5);
