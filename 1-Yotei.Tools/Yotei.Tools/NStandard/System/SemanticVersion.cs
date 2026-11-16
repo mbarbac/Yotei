@@ -310,9 +310,10 @@ record SemanticVersion : IComparable<SemanticVersion>, IEquatable<SemanticVersio
     public SemanticVersion IncreasePatch() => new(Major, Minor, Patch + 1, "");
 
     /// <summary>
-    /// Returns a new instance where the release value, if it was not an empty one, has been
-    /// increased. The out argument is set to <c>true</c> or to <c>false</c> accordingly. Any
-    /// existing metadata is ignored.
+    /// Returns a new instance where the release value has been increased, if possible, setting
+    /// the value of the out argument accordingly. Only the last numeric part, or the last one
+    /// containing a trailing numeric trunk, is increased. Alphanumeric parts are skipped and
+    /// not increased.
     /// </summary>
     /// <param name="increased"></param>
     /// <returns></returns>

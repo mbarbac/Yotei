@@ -232,12 +232,22 @@ public static class Test_SemanticVersion
 
         source = "1.2-abc";
         target = source.IncreasePreRelease(out increased);
-        Assert.True(increased);
-        Assert.Equal("1.2-abd", target.ToString()); Assert.Equal("1.2.0-abd", target.ToString(true));
+        Assert.False(increased);
 
-        source = "1.2-abc+xyz";
+        source = "1.2-ab.9";
         target = source.IncreasePreRelease(out increased);
         Assert.True(increased);
-        Assert.Equal("1.2-abd", target.ToString()); Assert.Equal("1.2.0-abd", target.ToString(true));
+        Assert.Equal("1.2-ab.10", target.ToString()); Assert.Equal("1.2.0-ab.10", target.ToString(true));
+        Assert.True(increased);
+
+        source = "1.2-v09";
+        target = source.IncreasePreRelease(out increased);
+        Assert.True(increased);
+        Assert.Equal("1.2-v10", target.ToString()); Assert.Equal("1.2.0-v10", target.ToString(true));
+
+        source = "1.2-v99";
+        target = source.IncreasePreRelease(out increased);
+        Assert.True(increased);
+        Assert.Equal("1.2-v100", target.ToString()); Assert.Equal("1.2.0-v100", target.ToString(true));
     }
 }

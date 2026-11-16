@@ -87,10 +87,15 @@ public static class Test_SemanticPreRelease
     // ----------------------------------------------------
 
     [Fact]
-    public static void Test_Compare()
+    public static void Test_Compare_Same()
     {
         var source = new SemanticPreRelease("abc");
         var target = new SemanticPreRelease("abc");
+        Assert.Equal(0, source.CompareTo(target));
+        Assert.Equal(0, target.CompareTo(source));
+
+        source = "xy012";
+        target = "xy012";
         Assert.Equal(0, source.CompareTo(target));
         Assert.Equal(0, target.CompareTo(source));
 
@@ -98,14 +103,23 @@ public static class Test_SemanticPreRelease
         target = "abc+456";
         Assert.Equal(0, source.CompareTo(target));
         Assert.Equal(0, target.CompareTo(source));
+    }
 
-        source = "ABC";
-        target = "abc";
+    [Fact]
+    public static void Test_Compare_Different_Alphanumeric()
+    {
+        var source = new SemanticPreRelease("ABC");
+        var target = new SemanticPreRelease("abc");
         Assert.Equal(-1, source.CompareTo(target));
         Assert.Equal(+1, target.CompareTo(source));
 
         source = "AB";
         target = "abc";
+        Assert.Equal(-1, source.CompareTo(target));
+        Assert.Equal(+1, target.CompareTo(source));
+
+        source = "ABC";
+        target = "ab";
         Assert.Equal(-1, source.CompareTo(target));
         Assert.Equal(+1, target.CompareTo(source));
 
@@ -119,8 +133,30 @@ public static class Test_SemanticPreRelease
         Assert.Equal(-1, source.CompareTo(target));
         Assert.Equal(+1, target.CompareTo(source));
 
-        source = "ab.10.yz";
-        target = "ab.72.yz";
+        source = "ab.12";
+        target = "ab.72";
+    }
+
+    [Fact]
+    public static void Test_Compare_Different_Mixed()
+    {
+        var source = new SemanticPreRelease("ab.12");
+        var target = new SemanticPreRelease("ab.75");
+        Assert.Equal(-1, source.CompareTo(target));
+        Assert.Equal(+1, target.CompareTo(source));
+
+        source = "ab.12.xy";
+        target = "ab.75.xy";
+        Assert.Equal(-1, source.CompareTo(target));
+        Assert.Equal(+1, target.CompareTo(source));
+
+        source = "ab.v012";
+        target = "ab.v15";
+        Assert.Equal(-1, source.CompareTo(target));
+        Assert.Equal(+1, target.CompareTo(source));
+
+        source = "ab.v00";
+        target = "ac.v00";
         Assert.Equal(-1, source.CompareTo(target));
         Assert.Equal(+1, target.CompareTo(source));
     }
@@ -143,51 +179,36 @@ public static class Test_SemanticPreRelease
         bool increased;
         var source = new SemanticPreRelease("abc");
         var target = source.Increase(out increased);
-        Assert.True(increased);
-        Assert.Equal("-abd", target.ToString());
+        Assert.False(increased);
 
-        source = "ab.cd.9";
+        source = "ab.9";
         target = source.Increase(out increased);
         Assert.True(increased);
-        Assert.Equal("-ab.cd.10", target.ToString());
+        Assert.Equal("-ab.10", target.ToString());
 
-        source = "ab.cd001";
+        source = "ab.9.xy";
         target = source.Increase(out increased);
         Assert.True(increased);
-        Assert.Equal("-ab.cd002", target.ToString());
+        Assert.Equal("-ab.10.xy", target.ToString());
 
-        source = "ab.cd99";
+        source = "ab.xy005";
         target = source.Increase(out increased);
         Assert.True(increased);
-        Assert.Equal("-ab.cd100", target.ToString());
+        Assert.Equal("-ab.xy006", target.ToString());
 
-        source = "z";
+        source = "ab.xy99";
         target = source.Increase(out increased);
         Assert.True(increased);
-        Assert.Equal("-11", target.ToString());
-
-        source = "a.z";
-        target = source.Increase(out increased);
-        Assert.True(increased);
-        Assert.Equal("-b.1", target.ToString());
-
-        source = "a.z.z";
-        target = source.Increase(out increased);
-        Assert.True(increased);
-        Assert.Equal("-b.1.1", target.ToString());
-
-        source = "a.v009.z";
-        target = source.Increase(out increased);
-        Assert.True(increased);
-        Assert.Equal("-a.v010.1", target.ToString());
+        Assert.Equal("-ab.xy100", target.ToString());
     }
 
     [Fact]
     public static void Test_Increase_Populated_MetadataIgnored()
     {
-        var source = new SemanticPreRelease("abc+123");
-        var target = source.Increase(out _);
-        Assert.Equal("-abd", target.ToString());
-        Assert.Empty(target.Metadata);
+        bool increased;
+        var source = new SemanticPreRelease("ab.9+001");
+        var target = source.Increase(out increased);
+        Assert.True(increased);
+        Assert.Equal("-ab.10", target.ToString());
     }
 }

@@ -4,7 +4,6 @@
 #endif
 
 using System.Collections.ObjectModel;
-using System.Reflection.Metadata.Ecma335;
 
 namespace Yotei.Tools;
 
@@ -115,9 +114,11 @@ record SemanticPreRelease : IComparable<SemanticPreRelease>, IEquatable<Semantic
             }
 
             // Getting the dot-separated parts...
-            _ValueParts = value.Split('.');
-            for (int i = 0; i < _ValueParts.Length; i++)
-                _ValueParts[i] = ValidatePart(_ValueParts[i], leadingZeroes: false);
+            _ValueParts = value.Split('.'); for (int i = 0; i < _ValueParts.Length; i++)
+            {
+                var part = _ValueParts[i]; part = ValidatePart(part, leadingZeroes: false);
+                _ValueParts[i] = part;
+            }
         }
     }
     string? _Value;
@@ -168,6 +169,9 @@ record SemanticPreRelease : IComparable<SemanticPreRelease>, IEquatable<Semantic
 
     // ----------------------------------------------------
 
+    readonly static char[] CHARS = "ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvxyz".ToCharArray();
+    readonly static char[] DIGITS = "0123456789".ToCharArray();
+
     /// <summary>
     /// Returns a validated part: only standard ASCII characters and digits are allowed.
     /// </summary>
@@ -184,9 +188,31 @@ record SemanticPreRelease : IComparable<SemanticPreRelease>, IEquatable<Semantic
         if (!leadingZeroes &&
             part[0] == '0' &&
             part.All(char.IsDigit))
-            throw new ArgumentException( "Part carries leading zeroes.").WithData(part);
+            throw new ArgumentException("Part carries leading zeroes.").WithData(part);
 
         return part;
+    }
+
+    /// <summary>
+    /// Splits the given part into its head and tail trunks. The tail one is the trailing digits
+    /// only portion of the part, and may be empty if any. The head one is the leading remaining
+    /// part, and it may be empty if the part is a digits-only one.
+    /// </summary>
+    /// <param name="part"></param>
+    /// <returns></returns>
+    static (string Head, string Tail) GetTrunks(string part)
+    {
+        // Getting the first trailing digit...
+        var index = -1; for (int i = part.Length - 1; i >= 0; i--)
+        {
+            if (!char.IsDigit(part[i])) break;
+            index = i;
+        }
+
+        // Finishing...
+        var head = index < 0 ? part : part[..index];
+        var tail = index < 0 ? "" : part[index..];
+        return (head, tail);
     }
 
     // ----------------------------------------------------
@@ -219,40 +245,54 @@ record SemanticPreRelease : IComparable<SemanticPreRelease>, IEquatable<Semantic
             i++;
         }
 
-        throw null;
-
         /// <summary>
-        /// Compares the two given parts using the precendence rules.
+        /// Compares the two given parts using the precedence rules.
         /// </summary>
         static int CompareParts(string xpart, string ypart)
         {
-            var nx = xpart.All(char.IsDigit);
-            var ny = ypart.All(char.IsDigit);
+            // Get the trunks...
+            var (xhead, xtail) = GetTrunks(xpart);
+            var (yhead, ytail) = GetTrunks(ypart);
 
-            if (nx && ny)
+            // All numeric
+            if (xhead.Length == 0 && yhead.Length == 0)
             {
-                var vx = int.TryParse(xpart, out var rx) ? rx : 0;
-                var vy = int.TryParse(ypart, out var ry) ? ry : 0;
-                
-                var result = vx.CompareTo(vy);
-                if (result < 0) return -1;
-                if (result > 0) return +1;
-                return 0;
-            }
-            else
-            {
-                if (nx) return -1;
-                if (ny) return +1;
-
-                var result = string.Compare(xpart, ypart, StringComparison.Ordinal);
+                var xvalue = ulong.TryParse(xtail, out var rx) ? rx : 0;
+                var yvalue = ulong.TryParse(ytail, out var ry) ? ry : 0;
+                var result = xvalue.CompareTo(yvalue);
                 if (result < 0) return -1;
                 if (result > 0) return +1;
                 return 0;
             }
 
-            // TODO SemanticPreRelease Compare: special trunk cases.
-            // When part is like "v01", compare just the numerical trunks. The easiest case is
-            // when both x and y have trunks, but there are many other cases to consider.
+            // Numeric parts have lower precedence...
+            if (xhead.Length == 0) return -1;
+            if (yhead.Length == 0) return +1;
+
+            // Trailing numeric trunks...
+            if (xtail.Length > 0 && ytail.Length > 0)
+            {
+                // The head must be the same to proceed to numeric comparison...
+                if (string.Compare(xhead, yhead) == 0)
+                {
+                    var xvalue = ulong.TryParse(xtail, out var rx) ? rx : 0;
+                    var yvalue = ulong.TryParse(ytail, out var ry) ? ry : 0;
+                    var result = xvalue.CompareTo(yvalue);
+                    if (result < 0) return -1;
+                    if (result > 0) return +1;
+                }
+            }
+            else // Trunk numeric parts have lowe precedence...
+            {
+                if (xtail.Length > 0) return -1;
+                if (ytail.Length > 0) return +1;
+            }
+
+            // Alphanumeric default case...
+            var r = string.Compare(xpart, ypart, StringComparison.Ordinal);
+            if (r < 0) return -1;
+            if (r > 0) return +1;
+            return 0;
         }
     }
 
@@ -290,115 +330,58 @@ record SemanticPreRelease : IComparable<SemanticPreRelease>, IEquatable<Semantic
     public override int GetHashCode() => HashCode.Combine(Value);
 
     // ----------------------------------------------------
-    readonly static char[] CHARS = "ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvxyz".ToCharArray();
-    readonly static char[] DIGITS = "0123456789".ToCharArray();
-    readonly static char[] COMBINED = [.. DIGITS, ..CHARS];
-
-    // ----------------------------------------------------
 
     /// <summary>
-    /// Returns a new instance where the original value, if it was not an empty one, has been
-    /// increased. The out argument is set to <c>true</c> or to <c>false</c> accordingly. Any
-    /// existing metadata is ignored.
+    /// Returns a new instance where the release value has been increased, if possible, setting
+    /// the value of the out argument accordingly. Only the last numeric part, or the last one
+    /// containing a trailing numeric trunk, is increased. Alphanumeric parts are skipped and
+    /// not increased.
     /// </summary>
     /// <returns></returns>
     public SemanticPreRelease Increase(out bool increased)
     {
-        // No value to increase.
+        // No value to increase...
         increased = false;
         if (_ValueParts.Length == 0) return Empty;
 
-        // Iterating...
+        // Preparing...
         var parts = (string[])_ValueParts.Clone();
-
         for (int i = parts.Length - 1; i >= 0; i--)
         {
             var part = parts[i];
+            var (head, tail) = GetTrunks(part);
 
-            // Pure numeric part...
-            if (part.All(char.IsDigit))
+            // Pure numeric...
+            if (head.Length == 0)
             {
-                var value = ulong.TryParse(part, out var temp) ? temp : 0;
-                value++;
+                var value = ulong.TryParse(tail, out var r) ? r : 0; value++;
                 parts[i] = value.ToString();
+                increased = true;
                 break;
             }
 
-            // Trailing numeric trunk...
-            var index = FirstTrailing(part);
-            if (index >= 0)
+            // Trailing numeric...
+            if (head.Length > 0 && tail.Length > 0)
             {
-                var trunk = part[index..];
-                var value = ulong.TryParse(trunk, out var r) ? r : 0;
-                value++;
-
-                var len = trunk.Length; trunk = value.ToString($"D{len}");
-                part = part[..index];
-                part += trunk;
-                parts[i] = part;
+                var value = ulong.TryParse(tail, out var r) ? r : 0; value++;
+                var len = tail.Length;
+                var trunk = value.ToString($"D{len}");
+                
+                head += trunk;
+                parts[i] = head;
+                increased = true;
                 break;
-            }
-
-            // Otherwise, pure alphanumeric increase...
-            else
-            {
-                var value = IncreaseAlpha(part, out var overflow);
-                parts[i] = value;
-                if (!overflow) break;
-
-                if (i == 0) // Adjusting first part when overflow...
-                {
-                    var sb = new StringBuilder(value);
-                    sb.Insert(0, COMBINED[1]);
-                    parts[i] = sb.ToString();
-                    break;
-                }
             }
         }
 
         // Finishing...
-        increased = true;
-        for (int i = 0; i < parts.Length; i++) parts[i] = ValidatePart(parts[i], leadingZeroes: false);
+        if (!increased) return this;
+
+        for (int i = 0; i < parts.Length; i++)
+        {
+            var part = parts[i]; part = ValidatePart(part, leadingZeroes: false);
+            parts[i] = part;
+        }
         return new SemanticPreRelease() { _ValueParts = parts };
-
-        // The index of the first trailing digit, or -1
-        static int FirstTrailing(string part)
-        {
-            var r = -1; for (int i = part.Length - 1; i >= 0; i--)
-            {
-                if (!char.IsDigit(part[i])) break;
-                r = i;
-            }
-            return r;
-        }
-
-        // Increases the value of the given value indicating if overflow has happened...
-        static string IncreaseAlpha(string value, out bool overflow)
-        {
-            overflow = false;
-            var sb = new StringBuilder(value);
-
-            for (int i = sb.Length - 1; i >= 0; i--)
-            {
-                var temp = IncreaseChar(sb[i], out overflow);
-                sb[i] = temp;
-                if (!overflow) break;
-            }
-            return sb.ToString();
-        }
-
-        // Increases the value of the given value indicating if overflow has happened...
-        static char IncreaseChar(char value, out bool overflow)
-        {
-            overflow = false;
-            var index = COMBINED.IndexOf(value);
-
-            if (index == COMBINED.Length - 1)
-            {
-                overflow = true;
-                return COMBINED[1]; // No leading zeroes allowed!
-            }
-            return COMBINED[index + 1];
-        }
     }
 }
