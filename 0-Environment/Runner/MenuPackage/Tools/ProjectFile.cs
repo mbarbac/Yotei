@@ -46,7 +46,7 @@ public class ProjectFile : IEnumerable<ProjectFileLine>
     public override string ToString()
     {
         var sb = new StringBuilder(NameAndExtension);
-        if (GetVersion(out var version)) sb.Append($" v:{version}");
+        if (GetVersion(out var version)) sb.Append($" {version.ToString(true)}");
         return sb.ToString();
     }
 

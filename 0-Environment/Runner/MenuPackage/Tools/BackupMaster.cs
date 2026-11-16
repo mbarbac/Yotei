@@ -48,7 +48,8 @@ public class BackupMaster
 
     /// <summary>
     /// Adds the contents of the given project to this instance, provided it has not been added
-    /// yet. If so, then this method is ignored. Returns the saved contents.
+    /// yet. If so, then this method is ignored. Returns the saved contents, either the new or
+    /// the saved ones.
     /// </summary>
     /// <param name="project"></param>
     /// <returns></returns>
@@ -57,7 +58,9 @@ public class BackupMaster
         project.ThrowWhenNull();
 
         if (Items.TryGetValue(project, out var lines)) return lines;
-        Items.Add(project, lines = [.. project]);
+
+        lines = [.. project.Select(x => new ProjectFileLine(x.Value))];
+        Items.Add(project, lines);
         return lines;
     }
 

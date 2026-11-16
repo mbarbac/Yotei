@@ -1,4 +1,5 @@
-﻿namespace Yotei.Tools;
+﻿using static System.ConsoleColor;
+namespace Yotei.Tools;
 
 // ========================================================
 /// <summary>
@@ -11,21 +12,6 @@ public partial record ConsoleMenu : IEnumerable<ConsoleMenu.Entry>
     /// Initializes a new empty instance.
     /// </summary>
     public ConsoleMenu() { }
-
-    /// <summary>
-    /// Copy constructor.
-    /// </summary>
-    /// <param name="other"></param>
-    public ConsoleMenu(ConsoleMenu other)
-    {
-        other.ThrowWhenNull();
-        ToDebug = other.ToDebug;
-        Timeout = other.Timeout;
-        BackgroundColor = other.BackgroundColor;
-        ForegroundColor = other.ForegroundColor;
-        SelectorColor = other.SelectorColor;
-        Entries = [.. other];
-    }
 
     /// <summary>
     /// <inheritdoc/>
@@ -143,7 +129,7 @@ public partial record ConsoleMenu : IEnumerable<ConsoleMenu.Entry>
     public ConsoleMenu InsertRange(int index, IEnumerable<Entry> range)
     {
         range.ThrowWhenNull();
-        foreach (var entry in range) Add(entry);
+        foreach (var entry in range) Insert(index++, entry);
         return this;
     }
 
@@ -173,14 +159,14 @@ public partial record ConsoleMenu : IEnumerable<ConsoleMenu.Entry>
     // ----------------------------------------------------
 
     /// <summary>
-    /// Runs this menu, starting at the entry whose index is given, so that the user can select
-    /// any of the registered ones, by pressing [Enter], and automatically execute its associated
-    /// action. Returns the index of the selected action, or -1 if the timeout has expired, or if
-    /// [Esc] has been pressed to cancel the menu.
+    /// Runs this menu in vertical mode, starting at the entry whose index is given, so that the
+    /// user can select any of the registered ones by pressing [Enter]. Returns the index of the
+    /// selected action, or -1 if the timeout has expired or if [Esc] has been pressed to cancel
+    /// the menu.
     /// </summary>
     /// <param name="position"></param>
     /// <returns></returns>
-    public int Run(int position = 0)
+    public int RunVertical(int position = 0)
     {
         // Hack to prevent xUnit to emit an annoying 'invalid handle' warning...
         if (Console.IsOutputRedirected) return -1;
@@ -215,7 +201,6 @@ public partial record ConsoleMenu : IEnumerable<ConsoleMenu.Entry>
                     Console.Write(ForegroundColor, BackgroundColor, "\u2588");
                     Console.CursorTop = top + Entries.Count;
                     Console.CursorLeft = 0;
-                    Entries[position].Execute();
                     return position;
 
                 case ConsoleKey.Escape:
@@ -224,11 +209,87 @@ public partial record ConsoleMenu : IEnumerable<ConsoleMenu.Entry>
                     return -1;
 
                 case ConsoleKey.UpArrow:
-                    if (position > 0) position--;
+                    position--; if (position < 0) position = Entries.Count - 1;
                     break;
 
                 case ConsoleKey.DownArrow:
-                    if (position < (Entries.Count - 1)) position++;
+                    position++; if (position >= Entries.Count) position = 0;
+                    break;
+
+                case ConsoleKey.Home:
+                    position = 0;
+                    break;
+
+                case ConsoleKey.End:
+                    position = Entries.Count - 1;
+                    break;
+            }
+        }
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Runs this selector in horizontal mode starting at the entry whose index is given. The user
+    /// can choose among the registered ones using the up and down arrows, select one with [Enter],
+    /// or abandon the selection with [Esc] or just by waiting the timeout period to expire.
+    /// Returns the index of the selected entry, or -1 if any.
+    /// </summary>
+    /// <param name="position"></param>
+    /// <returns></returns>
+    public int RunHorizontal(int position = 0)
+    {
+        // Hack to prevent xUnit to emit an annoying 'invalid handle' warning...
+        if (Console.IsOutputRedirected) return -1;
+
+        // Intercepting obvious cases...
+        if (position < 0) throw new ArgumentOutOfRangeException(nameof(position)).WithData(position);
+        if (Count == 0) return -1;
+
+        // Initializing...
+        Console.PreventBufferOverflow(Count + 5); // Plus 5 lines just by convention...
+        var top = Console.CursorTop;
+
+        var str = $"[^|v]";
+        Console.WriteEx(true, Green, BackgroundColor, str);
+        Console.WriteEx(true, " ");
+        var pos = Console.CursorLeft;
+        var len = 0;
+
+        static void ConsolePosition(int top, int left)
+        {
+            Console.CursorTop = top;
+            Console.CursorLeft = left;
+        }
+
+        while (true)
+        {
+            var name = Entries[position].Headline();
+            ConsolePosition(top, pos); Console.Write(new string(' ', len + 1));
+            ConsolePosition(top, pos); Console.Write(ForegroundColor, BackgroundColor, name);
+            len = name.Length;
+
+            var info = Console.ReadKey(Timeout, hide: true);
+            info ??= new ConsoleKeyInfo('\0', ConsoleKey.Escape, false, false, false);
+
+            switch (info.Value.Key)
+            {
+                case ConsoleKey.Enter:
+                    ConsolePosition(top, pos); Console.Write(new string(' ', len + 1));
+                    ConsolePosition(top, pos); Console.WriteEx(true, ForegroundColor, BackgroundColor, name);
+                    Console.WriteLine();
+                    return position;
+
+                case ConsoleKey.Escape:
+                    ConsolePosition(top, pos); Console.WriteLine(new string(' ', len + 1));
+                    return -1;
+
+                case ConsoleKey.UpArrow:
+                    position--; if (position < 0) position = Entries.Count - 1;
+                    break;
+
+                case ConsoleKey.DownArrow:
+                    position++; if (position >= Entries.Count) position = 0;
                     break;
 
                 case ConsoleKey.Home:

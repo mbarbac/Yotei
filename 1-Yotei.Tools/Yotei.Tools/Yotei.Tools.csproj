@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<Configurations>Debug;Release;Local</Configurations>
@@ -12,7 +12,7 @@
 
 	<PropertyGroup>
 		<Description>Yotei Common Tools</Description>
-		<Version>0.6.5-v0001</Version>
+		<Version>0.7-v0001</Version>
 		<Authors>mbarbac@hotmail.com</Authors>
 		<IsPackable>true</IsPackable>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>

@@ -39,11 +39,16 @@ public class CleanLocalRepo : ConsoleMenu.Entry
         var len = 0;
         var num = 0;
 
+        static void ConsolePosition(int top, int left)
+        {
+            Console.CursorTop = top;
+            Console.CursorLeft = left;
+        }
+
         foreach (var file in files)
         {
-            Console.CursorTop = row;
-            Console.CursorLeft = 0; Console.Write(new string(' ', len + 1));
-            Console.CursorLeft = 0; Console.Write(file.FullName);
+            ConsolePosition(row, 0); Console.Write(new string(' ', len + 1));
+            ConsolePosition(row, 0); Console.Write(file.FullName);
 
             try { file.Delete(); len = file.FullName.Length; num++; }
             catch (Exception e)

@@ -41,7 +41,7 @@ internal class Program
             Console.WriteLineEx(true, Green, FatSeparator);
             Console.WriteLineEx(true, Green, "Main Menu");
             Console.WriteLineEx(true);
-            position = menu.Run(position);
+            if ((position = menu.RunVertical(position)) > 0) menu[position].Execute();
         }
         while (position > 0);
     }
@@ -95,36 +95,6 @@ internal class Program
     // ----------------------------------------------------
 
     /// <summary>
-    /// Captures the desired build mode, starting from the given value.
-    /// </summary>
-    static internal bool CaptureBuildMode(ref BuildMode mode)
-    {
-        var menu = new ConsoleMenu { ToDebug = ToDebug, Timeout = Timeout }
-        .Add(new("Exit"))
-        .Add(new("Debug"))
-        .Add(new("Local"))
-        .Add(new("Release"));
-
-        var position = mode switch
-        {
-            BuildMode.Debug => 1,
-            BuildMode.Local => 2,
-            BuildMode.Release => 3,
-            _ => 0
-        };
-
-        position = menu.Run(position); switch (position)
-        {
-            case 1: mode = BuildMode.Debug; return true;
-            case 2: mode = BuildMode.Local; return true;
-            case 3: mode = BuildMode.Release; return true;
-        }
-        return false;
-    }
-
-    // ----------------------------------------------------
-
-    /// <summary>
     /// Returns a collection with the project files found at the given root directory and its
     /// subfolders, provided they are not part of the exclusion branch.
     /// </summary>
@@ -169,5 +139,54 @@ internal class Program
             var dirs = dir.GetDirectories();
             foreach (var temp in dirs) Populate(temp.FullName);
         }
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Decrease the given semantic version, from its patch, minor an major parts, and removing
+    /// and previous metadata. If a part is cero, then the previous one is set to the number
+    /// of nines '9' given by the number of digits requested.
+    /// </summary>
+    static internal SemanticVersion DecreaseVersion(
+        SemanticVersion version, 
+        uint minorDigits = 1,
+        uint patchDigits = 1)
+    {
+        var major = version.Major;
+        var minor = version.Minor;
+        var patch = version.Patch;
+        if (minorDigits <= 0) minorDigits = 1;
+        if (patchDigits <= 0) patchDigits = 1;
+
+        if (patch > 0) { patch--; return new(major, minor, patch); }
+
+        patch = NewValue(patchDigits);
+        if (minor > 0) { minor--; return new(major, minor, patch); }
+
+        minor = NewValue(minorDigits);
+        if (major > 0) major--; return new(major, minor, patch);
+
+        static int NewValue(uint digits)
+        {
+            var result = 0;
+            for (int i = 0; i < digits; i++) result = result * 10 + 9;
+            return result;
+        }
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Returns either <c>true</c> or <c>false</c> capturing the user's input.
+    /// </summary>
+    static internal bool CaptureYesNo(bool yes = true)
+    {
+        var menu = new ConsoleMenu { ToDebug = ToDebug, Timeout = Timeout }
+        .Add(new("Yes"))
+        .Add(new(""));
+
+        int position = menu.RunHorizontal(yes ? 0 : 1);
+        return position == 0;
     }
 }

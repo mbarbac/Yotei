@@ -69,11 +69,16 @@ public class CleanDiskArtifacts : ConsoleMenu.Entry
             var row = Console.CursorTop;
             var len = 0;
 
+            static void ConsolePosition(int top, int left)
+            {
+                Console.CursorTop = top;
+                Console.CursorLeft = left;
+            }
+
             foreach (var file in files)
             {
-                Console.CursorTop = row;
-                Console.CursorLeft = 0; Console.Write(new string(' ', len + 1));
-                Console.CursorLeft = 0; Console.Write(file.Name);
+                ConsolePosition(row, 0); Console.Write(new string(' ', len + 1));
+                ConsolePosition(row, 0); Console.Write(file.Name);
 
                 try { file.Delete(); len = file.Name.Length; num++; }
                 catch (Exception e)
