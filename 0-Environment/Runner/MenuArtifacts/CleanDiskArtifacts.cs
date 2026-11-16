@@ -29,10 +29,10 @@ public class CleanDiskArtifacts : ConsoleMenu.Entry
         if (Root is null) return;
 
         Console.WriteLineEx(true);
-        var num = Execute(Root, Root, false);
+        var (num, err) = Execute(Root, Root, false);
         Console.WriteLineEx(true);
-        Console.WriteEx(true, Green, "Deleted: ");
-        Console.WriteLineEx(true, num.ToString());
+        Console.WriteEx(true, Green, "Deleted: "); Console.WriteLineEx(true, num.ToString());
+        Console.WriteEx(true, Green, "Errors:  "); Console.WriteLineEx(true, Red, err.ToString());
 
         if (num != 0)
         {
@@ -45,14 +45,15 @@ public class CleanDiskArtifacts : ConsoleMenu.Entry
     /// Executes on the given path.
     /// </summary>
     [SuppressMessage("", "IDE0057")]
-    static int Execute(string root, string path, bool delete)
+    static (int num, int err) Execute(string root, string path, bool delete)
     {
         var dir = new DirectoryInfo(path);
-        if (!dir.Exists) return 0;
-        if (path.EndsWith(".git", Comparison)) return 0;
-        if (path.EndsWith(".vs", Comparison)) return 0;
+        if (!dir.Exists) return (0, 0);
+        if (path.EndsWith(".git", Comparison)) return (0, 0);
+        if (path.EndsWith(".vs", Comparison)) return (0, 0);
 
         var num = 0;
+        var err = 0;
         var reduced = path.Remove(0, root.Length);
         if (reduced.Length > 0 && reduced[0] == '\\') reduced = reduced[1..];
 
@@ -80,12 +81,10 @@ public class CleanDiskArtifacts : ConsoleMenu.Entry
                     Console.CursorTop = row;
                     Console.CursorLeft = 0; Console.Write(new string(' ', len + 1));
                     Console.CursorLeft = 0;
-
-                    Console.WriteEx(true, Magenta, "File: ");
-                    Console.WriteEx(true, file.FullName);
-                    Console.WriteEx(true, Magenta, ", Error: ");
+                    Console.WriteEx(true, Magenta, "File Error: ");
                     Console.WriteLineEx(true, Red, e.Message);
 
+                    err++;
                     row = Console.CursorTop;
                     len = 0;
                 }
@@ -107,7 +106,9 @@ public class CleanDiskArtifacts : ConsoleMenu.Entry
                 name.EndsWith("\\generated", Comparison) ||
                 name.EndsWith("\\testresults", Comparison);
 
-            num += Execute(root, name, remove);
+            var (xnum, xerr) = Execute(root, name, remove);
+            num += xnum;
+            err += xerr;
         }
 
         // This directory...
@@ -116,14 +117,13 @@ public class CleanDiskArtifacts : ConsoleMenu.Entry
             try { dir.Delete(); num++; }
             catch (Exception e)
             {
-                Console.WriteEx(true, Magenta, "Directory: ");
-                Console.WriteEx(true, dir.FullName);
-                Console.WriteEx(true, Magenta, ", Error: ");
+                Console.WriteEx(true, Magenta, "Directory Error: ");
                 Console.WriteLineEx(true, Red, e.Message);
+                err++;
             }
         }
 
         // Finishing...
-        return num;
+        return (num, err);
     }
 }

@@ -640,7 +640,7 @@ static partial class StringBuilderExtensions
     /// <summary>
     /// Maintains the collection of blank-alike charr values.
     /// </summary>
-    static char[] BLANKS = [
+    readonly static char[] BLANKS = [
         // Space-alike ones...
         ' ',      //(\u0020) Standard space
         '\u00A0', //Espacio de no separación (No-Break Space / &nbsp;).
