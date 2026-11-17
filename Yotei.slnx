@@ -5,6 +5,7 @@
     <BuildType Name="Release" />
   </Configurations>
   <Folder Name="/0-Environment/">
+    <Project Path="0-Environment/Experimental/Experimental.csproj" />
     <Project Path="0-Environment/Runner/Runner.csproj" Id="2bd15658-6cda-4291-9aaf-598253d17261" />
   </Folder>
   <Folder Name="/1-Yotei.Tools.AsyncLock/">
