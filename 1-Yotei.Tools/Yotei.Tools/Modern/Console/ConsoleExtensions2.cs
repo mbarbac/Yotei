@@ -6,6 +6,235 @@ public static partial class ConsoleExtensions
 {
     extension(Console)
     {
+        /// <summary>
+        /// Edits in the console the given source string or, if it is null, an empty initial one
+        /// is used instead. Returns <see langword="null"/> if such edition was cancelled,.
+        /// Otherwise, returns the editted value, which may also be an empty one.
+        /// <br/> The standard editing keys can be used to move across the value being editted.
+        /// [Enter] accepts the value, and [Esc] cancels the edition. Underline mode for block
+        /// editing is not supported.
+        /// </summary>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        public static string? EditLine(
+           string? source)
+           => EditLineEx(false, source, [], Timeout.InfiniteTimeSpan);
+
+        /// <summary>
+        /// Edits in the console the given source string or, if it is null, an empty initial one
+        /// is used instead. Returns <see langword="null"/> if such edition was cancelled.
+        /// Otherwise, returns the editted value, which may also be an empty one.
+        /// <br/> The standard editing keys can be used to move across the value being editted.
+        /// [Enter] accepts the value, and [Esc] cancels the edition. Underline mode for block
+        /// editing is not supported.
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="forecolor"></param>
+        /// <returns></returns>
+        public static string? EditLine(
+            string? source, Color forecolor)
+            => EditLineEx(false, source, [], Timeout.InfiniteTimeSpan, forecolor);
+
+        /// <summary>
+        /// Edits in the console the given source string or, if it is null, an empty initial one
+        /// is used instead. Returns <see langword="null"/> if such edition was cancelled.
+        /// Otherwise, returns the editted value, which may also be an empty one.
+        /// <br/> The standard editing keys can be used to move across the value being editted.
+        /// [Enter] accepts the value, and [Esc] cancels the edition. Underline mode for block
+        /// editing is not supported.
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="forecolor"></param>
+        /// <param name="backcolor"></param>
+        /// <returns></returns>
+        public static string? EditLine(
+            string? source, Color forecolor, Color backcolor)
+            => EditLineEx(false, source, [], Timeout.InfiniteTimeSpan, forecolor, backcolor);
+
+        // ------------------------------------------------
+
+        /// <summary>
+        /// Edits in the console the given source string or, if it is null, an empty initial one
+        /// is used instead. Returns <see langword="null"/> if such edition was cancelled,.
+        /// Otherwise, returns the editted value, which may also be an empty one.
+        /// <br/> The standard editing keys can be used to move across the value being editted.
+        /// [Enter] accepts the value, and [Esc] cancels the edition. Underline mode for block
+        /// editing is not supported.
+        /// <br/> If the given candidates' collection is not an empty one, [Tab], [Up] and [Down]
+        /// are used to enter into candidate selection mode, and to navigate though the options
+        /// (which are the candidates filtered using the characters already typed). Then, [Enter]
+        /// accepts the selected candidate and [Esc] cancels the selection mode.
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="candidates"></param>
+        /// <returns></returns>
+        public static string? EditLine(
+           string? source, IEnumerable<string> candidates)
+           => EditLineEx(false, source, candidates, Timeout.InfiniteTimeSpan);
+
+        /// <summary>
+        /// Edits in the console the given source string or, if it is null, an empty initial one
+        /// is used instead. Returns <see langword="null"/> if such edition was cancelled.
+        /// Otherwise, returns the editted value, which may also be an empty one.
+        /// <br/> The standard editing keys can be used to move across the value being editted.
+        /// [Enter] accepts the value, and [Esc] cancels the edition. Underline mode for block
+        /// editing is not supported.
+        /// <br/> If the given candidates' collection is not an empty one, [Tab], [Up] and [Down]
+        /// are used to enter into candidate selection mode, and to navigate though the options
+        /// (which are the candidates filtered using the characters already typed). Then, [Enter]
+        /// accepts the selected candidate and [Esc] cancels the selection mode.
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="candidates"></param>
+        /// <param name="forecolor"></param>
+        /// <returns></returns>
+        public static string? EditLine(
+            string? source, IEnumerable<string> candidates, Color forecolor)
+            => EditLineEx(false, source, candidates, Timeout.InfiniteTimeSpan, forecolor);
+
+        /// <summary>
+        /// Edits in the console the given source string or, if it is null, an empty initial one
+        /// is used instead. Returns <see langword="null"/> if such edition was cancelled.
+        /// Otherwise, returns the editted value, which may also be an empty one.
+        /// <br/> The standard editing keys can be used to move across the value being editted.
+        /// [Enter] accepts the value, and [Esc] cancels the edition. Underline mode for block
+        /// editing is not supported.
+        /// <br/> If the given candidates' collection is not an empty one, [Tab], [Up] and [Down]
+        /// are used to enter into candidate selection mode, and to navigate though the options
+        /// (which are the candidates filtered using the characters already typed). Then, [Enter]
+        /// accepts the selected candidate and [Esc] cancels the selection mode.
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="candidates"></param>
+        /// <param name="forecolor"></param>
+        /// <param name="backcolor"></param>
+        /// <returns></returns>
+        public static string? EditLine(
+            string? source, IEnumerable<string> candidates,
+            Color forecolor, Color backcolor)
+            => EditLineEx(false, source, candidates, Timeout.InfiniteTimeSpan, forecolor, backcolor);
+
+        // ------------------------------------------------
+
+        /// <summary>
+        /// Edits in the console the given source string or, if it is null, an empty initial one
+        /// is used instead. Returns <see langword="null"/> if such edition was cancelled, or if
+        /// the given timeout period expired without activity. Otherwise, returns the editted
+        /// value, which may also be an empty one.
+        /// <br/> The standard editing keys can be used to move across the value being editted.
+        /// [Enter] accepts the value, and [Esc] cancels the edition. Underline mode for block
+        /// editing is not supported.
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="timeout"></param>
+        /// <returns></returns>
+        public static string? EditLine(
+            string? source, TimeSpan timeout)
+            => EditLineEx(false, source, [], timeout, Console.ForegroundColor, Console.BackgroundColor);
+
+        /// <summary>
+        /// Edits in the console the given source string or, if it is null, an empty initial one
+        /// is used instead. Returns <see langword="null"/> if such edition was cancelled, or if
+        /// the given timeout period expired without activity. Otherwise, returns the editted
+        /// value, which may also be an empty one.
+        /// <br/> The standard editing keys can be used to move across the value being editted.
+        /// [Enter] accepts the value, and [Esc] cancels the edition. Underline mode for block
+        /// editing is not supported.
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="timeout"></param>
+        /// <param name="forecolor"></param>
+        /// <returns></returns>
+        public static string? EditLine(
+            string? source, TimeSpan timeout, Color forecolor)
+            => EditLineEx(false, source, [], timeout, forecolor, Console.BackgroundColor);
+
+        /// <summary>
+        /// Edits in the console the given source string or, if it is null, an empty initial one
+        /// is used instead. Returns <see langword="null"/> if such edition was cancelled, or if
+        /// the given timeout period expired without activity. Otherwise, returns the editted
+        /// value, which may also be an empty one.
+        /// <br/> The standard editing keys can be used to move across the value being editted.
+        /// [Enter] accepts the value, and [Esc] cancels the edition. Underline mode for block
+        /// editing is not supported.
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="timeout"></param>
+        /// <param name="forecolor"></param>
+        /// <param name="backcolor"></param>
+        /// <returns></returns>
+        public static string? EditLine(
+            string? source, TimeSpan timeout, Color forecolor, Color backcolor)
+            => EditLineEx(false, source, [], timeout, forecolor, backcolor);
+
+        // ------------------------------------------------
+
+        /// <summary>
+        /// Edits in the console the given source string or, if it is null, an empty initial one
+        /// is used instead. Returns <see langword="null"/> if such edition was cancelled, or if
+        /// the given timeout period expired without activity. Otherwise, returns the editted
+        /// value, which may also be an empty one.
+        /// <br/> The standard editing keys can be used to move across the value being editted.
+        /// [Enter] accepts the value, and [Esc] cancels the edition. Underline mode for block
+        /// editing is not supported.
+        /// <br/> If the given candidates' collection is not an empty one, [Tab], [Up] and [Down]
+        /// are used to enter into candidate selection mode, and to navigate though the options
+        /// (which are the candidates filtered using the characters already typed). Then, [Enter]
+        /// accepts the selected candidate and [Esc] cancels the selection mode.
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="candidates"></param>
+        /// <param name="timeout"></param>
+        /// <returns></returns>
+        public static string? EditLine(
+           string? source, IEnumerable<string> candidates, TimeSpan timeout)
+           => EditLineEx(false, source, candidates, timeout, Console.ForegroundColor, Console.BackgroundColor);
+
+        /// <summary>
+        /// Edits in the console the given source string or, if it is null, an empty initial one
+        /// is used instead. Returns <see langword="null"/> if such edition was cancelled, or if
+        /// the given timeout period expired without activity. Otherwise, returns the editted
+        /// value, which may also be an empty one.
+        /// <br/> The standard editing keys can be used to move across the value being editted.
+        /// [Enter] accepts the value, and [Esc] cancels the edition. Underline mode for block
+        /// editing is not supported.
+        /// <br/> If the given candidates' collection is not an empty one, [Tab], [Up] and [Down]
+        /// are used to enter into candidate selection mode, and to navigate though the options
+        /// (which are the candidates filtered using the characters already typed). Then, [Enter]
+        /// accepts the selected candidate and [Esc] cancels the selection mode.
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="candidates"></param>
+        /// <param name="timeout"></param>
+        /// <param name="forecolor"></param>
+        /// <returns></returns>
+        public static string? EditLine(
+            string? source, IEnumerable<string> candidates, TimeSpan timeout, Color forecolor)
+            => EditLineEx(false, source, candidates, timeout, forecolor, Console.BackgroundColor);
+
+        /// <summary>
+        /// Edits in the console the given source string or, if it is null, an empty initial one
+        /// is used instead. Returns <see langword="null"/> if such edition was cancelled, or if
+        /// the given timeout period expired without activity. Otherwise, returns the editted
+        /// value, which may also be an empty one.
+        /// <br/> The standard editing keys can be used to move across the value being editted.
+        /// [Enter] accepts the value, and [Esc] cancels the edition. Underline mode for block
+        /// editing is not supported.
+        /// <br/> If the given candidates' collection is not an empty one, [Tab], [Up] and [Down]
+        /// are used to enter into candidate selection mode, and to navigate though the options
+        /// (which are the candidates filtered using the characters already typed). Then, [Enter]
+        /// accepts the selected candidate and [Esc] cancels the selection mode.
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="candidates"></param>
+        /// <param name="timeout"></param>
+        /// <param name="forecolor"></param>
+        /// <param name="backcolor"></param>
+        /// <returns></returns>
+        public static string? EditLine(
+            string? source, IEnumerable<string> candidates,
+            TimeSpan timeout, Color forecolor, Color backcolor)
+            => EditLineEx(false, source, candidates, timeout, forecolor, backcolor);
 
         // ------------------------------------------------
 
