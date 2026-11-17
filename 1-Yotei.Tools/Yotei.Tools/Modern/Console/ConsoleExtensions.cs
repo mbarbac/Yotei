@@ -1,5 +1,4 @@
 ﻿using Color = System.ConsoleColor;
-
 namespace Yotei.Tools;
 
 // ========================================================
@@ -629,7 +628,7 @@ public static partial class ConsoleExtensions
 
             var sb = new StringBuilder(source ?? string.Empty);
             var pos = sb.Length;
-            bool insert = IsInInsertMode(raise: false);
+            bool insert = IsInInsertMode();
             int len;
 
             SetInsertMode(false);

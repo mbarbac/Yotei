@@ -1,6 +1,4 @@
-﻿using System.Runtime.InteropServices.Marshalling;
-using Color = System.ConsoleColor;
-
+﻿using Color = System.ConsoleColor;
 namespace Yotei.Tools;
 
 // ========================================================
@@ -89,6 +87,11 @@ public static partial class ConsoleExtensions
     /// <summary>
     /// Used to determine if the console was in insert mode.
     /// </summary>
+    internal static bool IsInInsertMode() => false;
+
+    /*/// <summary>
+    /// Used to determine if the console was in insert mode.
+    /// </summary>
     internal static bool IsInInsertMode(bool raise = false)
     {
         var windows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
@@ -97,10 +100,13 @@ public static partial class ConsoleExtensions
         IntPtr consoleHandle = GetStdHandle(STD_INPUT_HANDLE);
 
         if (GetConsoleMode(consoleHandle, out uint consoleMode))
-            return (consoleMode & ENABLE_INSERT_MODE) != 0;
+        {
+            var value = consoleMode & ENABLE_INSERT_MODE;
+            return value != 0;
+        }
 
         return raise
             ? throw new InvalidOperationException("Unable to retrieve console insert mode. Ensure output/input is not redirected.")
             : false;
-    }
+    }*/
 }

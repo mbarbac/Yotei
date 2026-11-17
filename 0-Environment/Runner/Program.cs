@@ -28,22 +28,28 @@ internal class Program
         Debug.IndentSize = 2;
         Debug.AutoFlush = true;
 
-        var menu = new ConsoleMenu { ToDebug = ToDebug, Timeout = Timeout }
-        .Add(new("Exit"))
-        .Add(new MenuTester())
-        .Add(new MenuArtifacts())
-        .Add(new MenuPackage());
+        Console.WriteEx(true, Green, "Name: ");
+        var editor = new TextEditor() { BackColor = Blue, OnDebug = true };
+        var value = editor.Edit(null, ["Juan", "Manuel", "Paloma", "Pedro", "Alfredo", "Maria"]);
+        Console.WriteLine(value is null ? "<cancelled>" : $"Entered: '{value}'");
+        Console.ReadLine();
 
-        int position = 0; do
-        {
-            Console.PreventBufferOverflow(menu.Count + 5);
-            Console.WriteLineEx(true);
-            Console.WriteLineEx(true, Green, FatSeparator);
-            Console.WriteLineEx(true, Green, "Main Menu");
-            Console.WriteLineEx(true);
-            if ((position = menu.RunVertical(position)) > 0) menu[position].Execute();
-        }
-        while (position > 0);
+        //var menu = new ConsoleMenu { ToDebug = ToDebug, Timeout = Timeout }
+        //.Add(new("Exit"))
+        //.Add(new MenuTester())
+        //.Add(new MenuArtifacts())
+        //.Add(new MenuPackage());
+
+        //int position = 0; do
+        //{
+        //    Console.PreventBufferOverflow(menu.Count + 5);
+        //    Console.WriteLineEx(true);
+        //    Console.WriteLineEx(true, Green, FatSeparator);
+        //    Console.WriteLineEx(true, Green, "Main Menu");
+        //    Console.WriteLineEx(true);
+        //    if ((position = menu.RunVertical(position)) > 0) menu[position].Execute();
+        //}
+        //while (position > 0);
     }
 
     // ----------------------------------------------------

@@ -29,6 +29,10 @@ public static class Test_TimeSpanExtensions
         span = TimeSpan.FromMilliseconds(Timeout.Infinite);
         ms = span.ValidatedTimeout;
         Assert.Equal(-1, ms);
+
+        span = Timeout.InfiniteTimeSpan;
+        ms = span.ValidatedTimeout;
+        Assert.Equal(-1, ms);
     }
 
     [Fact]
