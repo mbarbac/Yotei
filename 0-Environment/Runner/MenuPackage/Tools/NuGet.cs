@@ -74,7 +74,7 @@ public static class NuGet
         foreach (var item in items)
         {
             try { item.Delete(); }
-            catch (Exception e)
+            catch (Exception)
             {
                 Console.WriteEx(true, Red, "Cannot delete file: ");
                 Console.WriteLineEx(true, item.FullName);

@@ -27,7 +27,7 @@ public class MenuArtifacts : ConsoleMenu.Entry
             Console.WriteLineEx(true, Green, Program.FatSeparator);
             Console.WriteLineEx(true, Green, Headline());
             Console.WriteLineEx(true);
-            position = menu.RunVertical(position);
+            if ((position = menu.RunVertical(position)) > 0) menu[position].Execute();
         }
         while (position > 0);
     }

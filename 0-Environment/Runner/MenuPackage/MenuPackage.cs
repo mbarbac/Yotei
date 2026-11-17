@@ -36,7 +36,6 @@ public class MenuPackage : ConsoleMenu.Entry
 
             if (position >= menu.Count) position = 0;
             position = menu.RunVertical(position);
-
             if (position > 0) { var project = projects[position - 1]; Execute(project); }
         }
         while (position > 0);

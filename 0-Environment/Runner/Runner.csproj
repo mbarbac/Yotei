@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
@@ -6,12 +6,19 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<Configurations>Debug;Release;Local</Configurations>
+		<GenerateProgramFile>false</GenerateProgramFile> <!--xUnit hack prevents more than one entry point-->
 		<NoWarn>IDE0130</NoWarn>
 	</PropertyGroup>
 	<!--IDE0130: Namespace does not match folder structure-->
 
 	<ItemGroup>
 		<ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools\Yotei.Tools.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+		<!--<ProjectReference Include="..\..\0-Experimental\Experimental.Tests\Experimental.Tests.csproj" />-->
+		<!--<ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools.Tests\Yotei.Tools.Tests.csproj" />-->
+		<!--<ProjectReference Include="..\..\1-Yotei.Tools\Yotei.Tools.Tests.NStd20\Yotei.Tools.Tests.NStd20.csproj" />-->
+		<!--<ProjectReference Include="..\..\1-Yotei.Tools.AsyncLock\Yotei.Tools.AsyncLock.Tests\Yotei.Tools.AsyncLock.Tests.csproj" />-->
 	</ItemGroup>
 
 </Project>
