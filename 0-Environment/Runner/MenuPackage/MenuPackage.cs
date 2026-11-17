@@ -281,7 +281,7 @@ public class MenuPackage : ConsoleMenu.Entry
         Console.WriteEx(true, Green, "Pushing: "); Console.WriteEx(true, data.Project.ToString());
         Console.WriteEx(true, Green, " Mode: "); Console.WriteLineEx(true, mode.ToString());
 
-        NuGet.GetFiles(data.Project, out regulars, out symbols);
+        NuGet.GetFiles(data.Project, out regulars, out _);
         if (regulars.Count == 0) throw new UnExpectedException("No package files have been created.");
 
         var file = regulars[0];

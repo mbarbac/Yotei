@@ -4,6 +4,41 @@ namespace Yotei.Tools;
 // ========================================================
 public static partial class ConsoleExtensions
 {
+    extension(Console)
+    {
+        /// <summary>
+        /// In windows environments, makes room in the console buffer to prevent buffer overflow
+        /// conditions to happen when using Cursor-alike and Buffer-alike properties, and similar
+        /// methods.
+        /// </summary>
+        /// <param name="num">The minimum number of lines to make room for.</param>
+        /// <param name="keep">The minimum percentage of lines to keep.</param>
+        public static void PreventBufferOverflow(int num, int keep = 50)
+        {
+            if (!OperatingSystem.IsWindows()) return;
+
+            var bheight = Console.BufferHeight;
+            var bwidth = Console.BufferWidth;
+            var top = Console.CursorTop;
+            if ((top + num) < bheight) return;
+
+            if (keep < 1) throw new ArgumentOutOfRangeException(nameof(keep)).WithData(keep);
+            if (keep > 100) throw new ArgumentOutOfRangeException(nameof(keep)).WithData(keep);
+            var percentage = keep / 100.0;
+            var lines = (int)Math.Ceiling(Console.BufferHeight * percentage);
+            if (lines < num) lines = num;
+
+            var orig = top - lines;
+            if (orig < 0) return;
+
+            Console.MoveBufferArea(0, orig, bwidth, lines, 0, 0);
+            Console.SetWindowPosition(0, 0);
+            Console.SetCursorPosition(0, lines);
+        }
+    }
+
+    // ------------------------------------------------
+
     /// <summary>
     /// If debug is requested, writes the given message in the not console-alike listeners.
     /// </summary>
@@ -72,41 +107,35 @@ public static partial class ConsoleExtensions
     }
 
     // ----------------------------------------------------
-    
-    const int STD_INPUT_HANDLE = -10;
-    const uint ENABLE_INSERT_MODE = 0x0020;
-
-    [SuppressMessage("", "SYSLIB1054")]
-    [DllImport("kernel32.dll", SetLastError = true)]
-    private static extern IntPtr GetStdHandle(int nStdHandle);
-
-    [SuppressMessage("", "SYSLIB1054")]
-    [DllImport("kernel32.dll", SetLastError = true)]
-    private static extern bool GetConsoleMode(IntPtr hConsoleHandle, out uint lpMode);
 
     /// <summary>
-    /// Used to determine if the console was in insert mode.
+    /// Obtains an alternate color with a soft variation based upon the given one.
     /// </summary>
-    internal static bool IsInInsertMode() => false;
-
-    /*/// <summary>
-    /// Used to determine if the console was in insert mode.
-    /// </summary>
-    internal static bool IsInInsertMode(bool raise = false)
+    /// <param name="color"></param>
+    /// <returns></returns>
+    internal static Color AlternateColor(Color color) => color switch
     {
-        var windows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-        if (!windows) return false;
+        // Light colors...
+        Color.White => Color.Gray,
+        Color.Gray => Color.DarkGray,
+        Color.DarkGray => Color.Black,
+        Color.Yellow => Color.DarkYellow,
+        Color.Cyan => Color.DarkCyan,
+        Color.Magenta => Color.DarkMagenta,
+        Color.Red => Color.DarkRed,
+        Color.Green => Color.DarkGreen,
+        Color.Blue => Color.DarkBlue,
 
-        IntPtr consoleHandle = GetStdHandle(STD_INPUT_HANDLE);
+        // Dark colors...
+        Color.Black => Color.Gray,
+        Color.DarkYellow => Color.Yellow,
+        Color.DarkCyan => Color.Cyan,
+        Color.DarkMagenta => Color.Magenta,
+        Color.DarkRed => Color.Red,
+        Color.DarkGreen => Color.Green,
+        Color.DarkBlue => Color.Blue,
 
-        if (GetConsoleMode(consoleHandle, out uint consoleMode))
-        {
-            var value = consoleMode & ENABLE_INSERT_MODE;
-            return value != 0;
-        }
-
-        return raise
-            ? throw new InvalidOperationException("Unable to retrieve console insert mode. Ensure output/input is not redirected.")
-            : false;
-    }*/
+        // Default...
+        _ => color
+    };
 }
