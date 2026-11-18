@@ -1,4 +1,4 @@
-﻿namespace Experimental.Tests;
+﻿namespace Experimental;
 
 // ========================================================
 //public static class Test_
