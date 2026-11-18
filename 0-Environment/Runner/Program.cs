@@ -28,7 +28,8 @@ internal class Program
 
         var menu = new ConsoleMenu { ToDebug = ToDebug, Timeout = Timeout }
         .Add(new("Exit"))
-        .Add(new MenuTester())
+        .Add(new MenuTester(all: true))
+        .Add(new MenuTester(all: false))
         .Add(new MenuArtifacts())
         .Add(new MenuPackage());
 

@@ -4,11 +4,19 @@ using Xunit.v3;
 namespace Runner;
 
 // ========================================================
-public class MenuTester : ConsoleMenu.Entry
-{/// <summary>
- /// <inheritdoc/>
- /// </summary>
-    public override string Headline() => "Execute Tests";
+public class MenuTester(bool all) : ConsoleMenu.Entry
+{
+    /// <summary>
+    /// Determines if all tests are to be executed, instead of trying to filter them.
+    /// </summary>
+    public bool All { get; } = all;
+
+    /// <summary>
+    /// <inheritdoc/>
+    /// </summary>
+    public override string Headline() => All
+        ? "Execute All Tests"
+        : "Execute Filtered Tests";
 
     /// <summary>
     /// <inheritdoc/>
@@ -23,46 +31,41 @@ public class MenuTester : ConsoleMenu.Entry
         var items = Populate();
         if (items.Count == 0) { Console.WriteLineEx(true, "No tests found."); return; }
 
-        Console.WriteLine(Green,
-            "Class and Method filters are case sensitive, Assembly is not." +
-            "Leave filter blank to ignore." +
-            "\n[Tab] to select among options.");
+        // Trying to filter the available tests...
+        if (!All)
+        {
+            string? name = null;
+            List<string> temps = [];
+            Console.WriteLineEx(true, Green, "Blank to ignore. [Esc] to abort. [Tab] to choose.");
 
-        string? name = null;
-        List<string> temps = [];
+            Console.WriteLine();
+            Console.WriteEx(true, Green, "Assembly filter:    ");
+            temps = [.. items.Select(x => x.AssemblyName).Distinct(StringComparer.OrdinalIgnoreCase)];
+            name = Console.EditLineEx(true, null, temps, White, Blue);
+            if (name is null) { Console.WriteLineEx(true, "Aborted."); return; }
+            name = name.NullWhenEmpty(trim: true);
+            if (name != null) items = [.. items.Where(x => x.AssemblyName.Contains(name, ignoreCase: true))];
+            if (items.Count == 0) { Console.WriteLineEx(true, "No tests found."); return; }
 
-        Console.WriteLine();
-        Console.WriteEx(true, Green, "Assembly filter:    ");
-        temps = [.. items.Select(x => x.AssemblyName).Distinct(StringComparer.OrdinalIgnoreCase)];
-        name = Console.EditLineEx(true, null, temps, White, Blue);
-        if (name is null) { Console.WriteLineEx(true, "Aborted."); return; }
-        name = name.NullWhenEmpty(trim: true);
-        if (name != null) items = [.. items.Where(x => x.AssemblyName.Contains(name, ignoreCase: true))];
-        if (items.Count == 0) { Console.WriteLineEx(true, "No tests found."); return; }
+            Console.WriteEx(true, Green, "Test Class filter:  ");
+            temps = [.. items.Select(x => x.TypeFullName).Distinct(StringComparer.Ordinal)];
+            name = Console.EditLineEx(true, null, temps, White, Blue);
+            if (name is null) { Console.WriteLineEx(true, "Aborted."); return; }
+            name = name.NullWhenEmpty(trim: true);
+            if (name != null) items = [.. items.Where(x => x.TypeFullName.Contains(name, ignoreCase: true))];
+            if (items.Count == 0) { Console.WriteLineEx(true, "No tests found."); return; }
 
-        Console.WriteEx(true, Green, "Test Class filter:  ");
-        temps = [.. items.Select(x => x.TypeFullName).Distinct(StringComparer.Ordinal)];
-        name = Console.EditLineEx(true, null, temps, White, Blue);
-        if (name is null) { Console.WriteLineEx(true, "Aborted."); return; }
-        name = name.NullWhenEmpty(trim: true);
-        if (name != null) items = [.. items.Where(x => x.TypeFullName.Contains(name, ignoreCase: false))];
-        if (items.Count == 0) { Console.WriteLineEx(true, "No tests found."); return; }
+            Console.WriteEx(true, Green, "Test Method filter: ");
+            temps = [.. items.Select(x => $"{x.TypeFullName}.{x.MethodName}")];
+            name = Console.EditLineEx(true, null, temps, White, Blue);
+            if (name is null) { Console.WriteLineEx(true, "Aborted."); return; }
+            name = name.NullWhenEmpty(trim: true);
+            if (name != null) items = [.. items.Where(x => x.MethodFullName.Contains(name, ignoreCase: true))];
+            if (items.Count == 0) { Console.WriteLineEx(true, "No tests found."); return; }
+        }
 
-        Console.WriteEx(true, Green, "Test Method filter: ");
-        temps = [.. items.Select(x => $"{x.TypeFullName}.{x.MethodName}")];
-        name = Console.EditLineEx(true, null, temps, White, Blue);
-        if (name is null) { Console.WriteLineEx(true, "Aborted."); return; }
-        name = name.NullWhenEmpty(trim: true);
-        if (name != null) items = [.. items.Where(x => x.MethodFullName.Contains(name, ignoreCase: false))];
-        if (items.Count == 0) { Console.WriteLineEx(true, "No tests found."); return; }
-
+        // Executing...
         Execute(items);
-
-        //Console.WriteLineEx(true);
-        //Console.WriteLineEx(true, Green, Program.FatSeparator);
-        //Console.WriteLineEx(true);
-        //foreach (var item in items) Console.WriteLine(item);
-        //Console.WriteLine($"Total: {items.Count}");
     }
 
     // ----------------------------------------------------
