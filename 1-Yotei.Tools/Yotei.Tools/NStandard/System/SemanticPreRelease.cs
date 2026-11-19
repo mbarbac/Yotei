@@ -4,7 +4,6 @@
 #endif
 
 using System.Collections.ObjectModel;
-
 namespace Yotei.Tools;
 
 // ========================================================

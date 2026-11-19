@@ -3,9 +3,6 @@
 #pragma warning disable CS0436
 #endif
 
-using System.ComponentModel.DataAnnotations;
-using System.Runtime.ConstrainedExecution;
-
 namespace Yotei.Tools;
 
 // ========================================================
