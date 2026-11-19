@@ -155,4 +155,137 @@ static partial class EasyNameExtensions
 #endif
 
     // ----------------------------------------------------
+
+    /// <summary>
+    /// Determines if the given type is annotated as a nullable one, because its metadata carries
+    /// either a <see cref="NullableAttribute"/> compiler metadata attribute, or an extended
+    /// <see cref="IsNullableAttribute"/> one.
+    /// <br/>- This method only takes into consideration these attributes, but NOT if the type is
+    /// a nullable wrapper or not.
+    /// <br/>- Reference types may not carry the <see cref="NullableAttribute"/>, hence why the
+    /// extended <see cref="IsNullableAttribute"/> one is provided as a workaround.
+    /// <br/>- For consistency reasons, T-alike generic types are treated as conventional reference
+    /// ones.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    public static bool IsNullableAnnotated(this Type source)
+    {
+        // All but T-alike types...
+        if (source.FullName != null)
+        {
+            if (source.GetCustomAttributes(typeof(NullableAttribute), false)
+                .Any(x => IsNullableAttributeEnabled((NullableAttribute)x)))
+                return true;
+        }
+
+        // Finding custom attributes...
+        if (source.GetCustomAttributes(typeof(IsNullableAttribute), false).Length != 0)
+            return true;
+
+        // Default...
+        return false;
+    }
+
+    /// <summary>
+    /// Determines if the given element is annotated as a nullable one, because either its metadata
+    /// carries either a <see cref="NullableAttribute"/> compiler metadata attribute, or an extended
+    /// <see cref="IsNullableAttribute"/> one.
+    /// <br/>- Valid elements are: <see cref="Assembly"/>, <see cref="Module"/>, and the family of
+    /// <see cref="MemberInfo"/> ones (including Type, MethodBase, PropertyInfo, FieldInfo and
+    /// EventInfo).
+    /// </summary>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    public static bool IsNullableAnnotated(this ICustomAttributeProvider source)
+    {
+        if (source.GetCustomAttributes(typeof(NullableAttribute), false)
+            .Any(x => IsNullableAttributeEnabled((NullableAttribute)x)))
+            return true;
+
+        if (source.GetCustomAttributes(typeof(IsNullableAttribute), false).Length != 0)
+            return true;
+
+        return false;
+    }
+
+#if NET6_0_OR_GREATER
+    /// <summary>
+    /// Determines if the given element is annotated as a nullable one, because either the result
+    /// of the metadata nullability API , or because it is decorated with the <see cref="NullableAttribute"/>
+    /// compiler metadata attribute, or with an extended <see cref="IsNullableAttribute"/> one.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    public static bool IsNullableAnnotated(this ParameterInfo source)
+    {
+        var nic = new NullabilityInfoContext();
+        var info = nic.Create(source);
+        var done =
+            info.ReadState == NullabilityState.Nullable ||
+            info.WriteState == NullabilityState.Nullable;
+
+        return done || ((ICustomAttributeProvider)source).IsNullableAnnotated();
+    }
+#endif
+
+#if NET6_0_OR_GREATER
+    /// <summary>
+    /// Determines if the given element is annotated as a nullable one, because either the result
+    /// of the metadata nullability API , or because it is decorated with the <see cref="NullableAttribute"/>
+    /// compiler metadata attribute, or with an extended <see cref="IsNullableAttribute"/> one.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    public static bool IsNullableAnnotated(this PropertyInfo source)
+    {
+        var nic = new NullabilityInfoContext();
+        var info = nic.Create(source);
+        var done =
+            info.ReadState == NullabilityState.Nullable ||
+            info.WriteState == NullabilityState.Nullable;
+
+        return done || ((ICustomAttributeProvider)source).IsNullableAnnotated();
+    }
+#endif
+
+#if NET6_0_OR_GREATER
+    /// <summary>
+    /// Determines if the given element is annotated as a nullable one, because either the result
+    /// of the metadata nullability API , or because it is decorated with the <see cref="NullableAttribute"/>
+    /// compiler metadata attribute, or with an extended <see cref="IsNullableAttribute"/> one.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    public static bool IsNullableAnnotated(this FieldInfo source)
+    {
+        var nic = new NullabilityInfoContext();
+        var info = nic.Create(source);
+        var done =
+            info.ReadState == NullabilityState.Nullable ||
+            info.WriteState == NullabilityState.Nullable;
+
+        return done || ((ICustomAttributeProvider)source).IsNullableAnnotated();
+    }
+#endif
+
+#if NET6_0_OR_GREATER
+    /// <summary>
+    /// Determines if the given element is annotated as a nullable one, because either the result
+    /// of the metadata nullability API , or because it is decorated with the <see cref="NullableAttribute"/>
+    /// compiler metadata attribute, or with an extended <see cref="IsNullableAttribute"/> one.
+    /// </summary>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    public static bool IsNullableAnnotated(this EventInfo source)
+    {
+        var nic = new NullabilityInfoContext();
+        var info = nic.Create(source);
+        var done =
+            info.ReadState == NullabilityState.Nullable ||
+            info.WriteState == NullabilityState.Nullable;
+
+        return done || ((ICustomAttributeProvider)source).IsNullableAnnotated();
+    }
+#endif
 }
