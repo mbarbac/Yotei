@@ -17,10 +17,21 @@ static class IEnumerableExtensions
     {
         /// <summary>
         /// Determines if the collection is an empty one.
-        /// <br/> CAUTION: This property may drive side effects as it tries to obtain the first
-        /// element in the enumeration.
         /// </summary>
-        public bool IsEmpty => !source.Any();
+        /// <remarks>
+        /// In the general case, this property may drive side effects as it tries to enumerate the
+        /// collection to obtain its first element. Special cases, such as strings, are intercepted
+        /// for performance reasons.
+        /// </remarks>
+        public bool IsEmpty
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get
+            {
+                if (source is string str) return str.Length == 0;
+                return !source.Any();
+            }
+        }
 
         // ------------------------------------------------
 

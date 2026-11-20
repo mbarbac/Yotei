@@ -303,5 +303,7 @@ static partial class StringSpanExtensions
             => source.Length > 0
             && value.Length > 0
             && source.IndexOf(value, comparer) == (source.Length - value.Length);
+
+        // ------------------------------------------------
     }
 }

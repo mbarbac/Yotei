@@ -186,11 +186,13 @@ record EasyType : IEquatable<EasyType>
     // ----------------------------------------------------
 
     /// <summary>
-    /// Returns a new instance where the given values which are not-null ones have been set to
-    /// the returned instance, and to its generic list options (provided it is not a null one).
+    /// This method is intentionally internal, not for public consumption.
+    /// <br/> Returns a new instance where any given not-null value is used in it. In addition,
+    /// sets also the same not-null values in the <see cref="GenericListOptions"/> property,
+    /// provided it is not a null one.
     /// </summary>
     /// <returns></returns>
-    public EasyType With(
+    internal EasyType With(
         bool? usePlaceHolder = null, bool? useVariance = null, bool? useAccessibility = null,
         bool? useModifiers = null, bool? useKind = null, EasyNamespace? namespaceStyle = null,
         bool? useHost = null, bool? useSpecialNames = null, bool? removeAttributeSuffix = null,
