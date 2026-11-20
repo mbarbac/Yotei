@@ -25,14 +25,15 @@ public static class Test_ExtendedAge
         GC.Collect(); GC.WaitForPendingFinalizers();
         var old = PersonExtensions.Size;
         
-        Test_Collect_Helper();
+        Collect_Helper();
         GC.Collect(); GC.WaitForPendingFinalizers();
         GC.Collect(); GC.WaitForPendingFinalizers();
 
         var num = PersonExtensions.Size;
         Assert.Equal(old, num);
     }
-    static void Test_Collect_Helper()
+    
+    static void Collect_Helper()
     {
         var bond = new Person("James Bond") { Age = 50 };
         var mpenny = new Person("Miss Moneypenny") { Age = 45 };

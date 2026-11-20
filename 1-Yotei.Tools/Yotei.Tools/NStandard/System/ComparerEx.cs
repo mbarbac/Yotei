@@ -125,18 +125,18 @@ static class ComparerEx
             if (_ThrowTypeException) // Only if explicitly requested...
             {
                 throw new TypeException(
-                "Type does not implement IComparable<T>, and instances are not equal.")
-                .WithData(type)
-                .WithData(x)
-                .WithData(y);
+                    "Type does not implement IComparable<T>, and instances are not equal.")
+                    .WithData(type)
+                    .WithData(x)
+                    .WithData(y);
             }
             else // Throwing an 'ArgumentException' to mimic standard behavior...
             {
                 throw new ArgumentException(
-                "Type does not implement IComparable<T>, and instances are not equal.")
-                .WithData(type)
-                .WithData(x)
-                .WithData(y);
+                    "Type does not implement IComparable<T>, and instances are not equal.")
+                    .WithData(type)
+                    .WithData(x)
+                    .WithData(y);
             }
         }
     }

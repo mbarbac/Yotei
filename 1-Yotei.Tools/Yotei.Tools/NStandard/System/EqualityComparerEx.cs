@@ -120,10 +120,10 @@ static class EqualityComparerEx
             if (_ThrowTypeException) // Only if explicitly requested...
             {
                 throw new TypeException(
-                "Type does not implement IComparable<T> nor IEquatable<T>.")
-                .WithData(type)
-                .WithData(x)
-                .WithData(y);
+                    "Type does not implement IComparable<T> nor IEquatable<T>.")
+                    .WithData(type)
+                    .WithData(x)
+                    .WithData(y);
             }
             else // Mimicing standard behavior...
             {

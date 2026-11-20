@@ -3,8 +3,6 @@
 #pragma warning disable CS0436
 #endif
 
-using System.Reflection.Metadata.Ecma335;
-
 namespace Yotei.Tools;
 
 // ========================================================
