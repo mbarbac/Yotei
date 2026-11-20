@@ -15,7 +15,7 @@ internal
 #else
 public
 #endif
-enum EasyNullableStyle
+enum EasyNullable
 {
     /// <summary>
     /// Do not use nullable annotations.

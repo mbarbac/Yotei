@@ -3,8 +3,6 @@
 #pragma warning disable CS0436
 #endif
 
-using System.ComponentModel.DataAnnotations;
-
 namespace Yotei.Tools;
 
 // ========================================================
@@ -13,7 +11,7 @@ internal
 #else
 public
 #endif
-static class StringExtensions
+static partial class StringExtensions
 {
     extension(string source)
     {

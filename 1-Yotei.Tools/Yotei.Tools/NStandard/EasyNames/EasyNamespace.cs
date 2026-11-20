@@ -14,7 +14,7 @@ internal
 #else
 public
 #endif
-enum EasyNamespaceStyle
+enum EasyNamespace
 {
     /// <summary>
     /// Do not use namespaces.
