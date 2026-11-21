@@ -13,9 +13,6 @@ public
 #endif
 static partial class ReadOnlySpanExtensions
 {
-    extension<T>(ReadOnlySpan<T> source)
-    {
-    }
 }
 /*  SequenceCompareTo
  *  SequenceEqual

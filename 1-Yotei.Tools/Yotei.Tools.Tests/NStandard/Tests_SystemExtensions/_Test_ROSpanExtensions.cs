@@ -49,10 +49,12 @@ public static partial class Test_ReadOnlySpanExtensions
         var source = IntSpan([]);
         result = source.IndexOf(2); Assert.Equal(-1, result);
         result = source.IndexOf(2, IntEquality()); Assert.Equal(-1, result);
+        result = source.IndexOf(IntPredicate(2)); Assert.Equal(-1, result);
 
         source = IntSpan([1, 2, 3, 4]);
         result = source.IndexOf(2); Assert.Equal(1, result);
         result = source.IndexOf(2, IntEquality()); Assert.Equal(1, result);
+        result = source.IndexOf(IntPredicate(2)); Assert.Equal(1, result);
     }
 
     [Fact]
@@ -60,10 +62,105 @@ public static partial class Test_ReadOnlySpanExtensions
     {
         int result;
         var source = ItemSpan([]);
-        // source.IndexOf(Item(2)); => CS0311: Item<T> is not IEquatable
+        // source.IndexOf(Item(2)); // => CS0311: Item<T> is not IEquatable
         result = source.IndexOf(Item(2), ItemEquality()); Assert.Equal(-1, result);
+        result = source.IndexOf(ItemPredicate(2)); Assert.Equal(-1, result);
 
         source = ItemSpan([1, 2, 3, 4]);
         result = source.IndexOf(Item(2), ItemEquality()); Assert.Equal(1, result);
+        result = source.IndexOf(ItemPredicate(2)); Assert.Equal(1, result);
+    }
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_OnInt_LastIndexOf()
+    {
+        int result;
+        var source = IntSpan([]);
+        result = source.LastIndexOf(2); Assert.Equal(-1, result);
+        result = source.LastIndexOf(2, IntEquality()); Assert.Equal(-1, result);
+        result = source.LastIndexOf(IntPredicate(2)); Assert.Equal(-1, result);
+
+        source = IntSpan([1, 2, 3, 4]);
+        result = source.LastIndexOf(2); Assert.Equal(1, result);
+        result = source.LastIndexOf(2, IntEquality()); Assert.Equal(1, result);
+        result = source.LastIndexOf(IntPredicate(2)); Assert.Equal(1, result);
+    }
+
+    [Fact]
+    public static void Test_OnItem_LastIndexOf()
+    {
+        int result;
+        var source = ItemSpan([]);
+        // source.LastIndexOf(Item(2)); // => CS0311: Item<T> is not IEquatable
+        result = source.LastIndexOf(Item(2), ItemEquality()); Assert.Equal(-1, result);
+        result = source.LastIndexOf(ItemPredicate(2)); Assert.Equal(-1, result);
+
+        source = ItemSpan([1, 2, 3, 4]);
+        result = source.LastIndexOf(Item(2), ItemEquality()); Assert.Equal(1, result);
+        result = source.LastIndexOf(ItemPredicate(2)); Assert.Equal(1, result);
+    }
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_OnInt_IndexesOf()
+    {
+        List<int> result;
+        var source = IntSpan([]);
+        result = source.IndexesOf(2); Assert.Empty(result);
+        result = source.IndexesOf(2, IntEquality()); Assert.Empty(result);
+        result = source.IndexesOf(IntPredicate(2)); Assert.Empty(result);
+
+        source = IntSpan([1, 2, 3, 2]);
+        result = source.IndexesOf(2); Assert.True(result is [1, 3]);
+        result = source.IndexesOf(2, IntEquality()); Assert.True(result is [1, 3]);
+        result = source.IndexesOf(IntPredicate(2)); Assert.True(result is [1, 3]);
+    }
+
+    [Fact]
+    public static void Test_OnItem_IndexesOf()
+    {
+        List<int> result;
+        var source = ItemSpan([]);
+        // source.IndexesOf(Item(2)); // => CS0311: Item<T> is not IEquatable
+        result = source.IndexesOf(Item(2), ItemEquality()); Assert.Empty(result);
+        result = source.IndexesOf(ItemPredicate(2)); Assert.Empty(result);
+
+        source = ItemSpan([1, 2, 3, 2]);
+        result = source.IndexesOf(Item(2), ItemEquality()); Assert.True(result is [1, 3]);
+        result = source.IndexesOf(ItemPredicate(2)); Assert.True(result is [1, 3]);
+    }
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_OnInt_Contains()
+    {
+        bool result;
+        var source = IntSpan([]);
+        result = source.Contains(2); Assert.False(result);
+        result = source.Contains(2, IntEquality()); Assert.False(result);
+        result = source.Contains(IntPredicate(2)); Assert.False(result);
+
+        source = IntSpan([1, 2, 3, 4]);
+        result = source.Contains(2); Assert.True(result);
+        result = source.Contains(2, IntEquality()); Assert.True(result);
+        result = source.Contains(IntPredicate(2)); Assert.True(result);
+    }
+
+    [Fact]
+    public static void Test_OnItem_Contains()
+    {
+        bool result;
+        var source = ItemSpan([]);
+        // source.Contains(Item(2)); // => CS0311: Item<T> is not IEquatable
+        result = source.Contains(Item(2), ItemEquality()); Assert.False(result);
+        result = source.Contains(ItemPredicate(2)); Assert.False(result);
+
+        source = ItemSpan([1, 2, 3, 4]);
+        result = source.Contains(Item(2), ItemEquality()); Assert.True(result);
+        result = source.Contains(ItemPredicate(2)); Assert.True(result);
     }
 }

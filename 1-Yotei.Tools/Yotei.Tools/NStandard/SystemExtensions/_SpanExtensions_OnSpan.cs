@@ -13,9 +13,6 @@ public
 #endif
 static partial class SpanExtensions
 {
-    extension<T>(Span<T> source)
-    {
-    }
 }
 /*  SequenceCompareTo
  *  SequenceEqual
