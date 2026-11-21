@@ -84,8 +84,7 @@ static partial class ReadOnlySpanExtensions
     /// <param name="source"></param>
     /// <param name="value"></param>
     /// <returns></returns>
-    public static List<int> IndexesOf<T>(
-        this ReadOnlySpan<T> source, T value) where T : IEquatable<T>
+    public static List<int> IndexesOf<T>(this ReadOnlySpan<T> source, T value) where T : IEquatable<T>
     {
         var comparer = EqualityComparerEx.New<T>();
         return source.IndexesOf(x => comparer.Equals(x, value));
@@ -126,8 +125,6 @@ static partial class ReadOnlySpanExtensions
 
     /// <summary>
     /// Determines if the span contains the given value.
-    /// 
-    /// Returns the index of the first ocurrence of the given value, or -1 if any.
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="source"></param>
@@ -147,15 +144,148 @@ static partial class ReadOnlySpanExtensions
     /// <returns></returns>
     public static bool Contains<T>(
         this ReadOnlySpan<T> source, Predicate<T> predicate) => source.IndexOf(predicate) >= 0;
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Determines if the span starts with the given value.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static bool StartsWith<T>(this ReadOnlySpan<T> source, T value) where T : IEquatable<T>
+    {
+        var comparer = EqualityComparerEx.New<T>();
+        return source.StartsWith(value, comparer);
+    }
+
+    /// <summary>
+    /// Determines if the span starts with the given value.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static bool StartsWith<T>(
+        this ReadOnlySpan<T> source, T value, IEqualityComparer<T> comparer)
+        => source.IndexOf(value, comparer) == 0;
+
+    /// <summary>
+    /// Determines if the span starts with the given value.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="predicate"></param>
+    /// <returns></returns>
+    public static bool StartsWith<T>(
+        this ReadOnlySpan<T> source, Predicate<T> predicate) => source.IndexOf(predicate) == 0;
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Determines if the span ends with the given value.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static bool EndsWith<T>(this ReadOnlySpan<T> source, T value) where T : IEquatable<T>
+    {
+        var comparer = EqualityComparerEx.New<T>();
+        return source.EndsWith(value, comparer);
+    }
+
+    /// <summary>
+    /// Determines if the span ends with the given value.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static bool EndsWith<T>(
+        this ReadOnlySpan<T> source, T value, IEqualityComparer<T> comparer)
+        => source.Length > 0 && source.LastIndexOf(value, comparer) == source.Length - 1;
+
+    /// <summary>
+    /// Determines if the span ends with the given value.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="predicate"></param>
+    /// <returns></returns>
+    public static bool EndsWith<T>(
+        this ReadOnlySpan<T> source, Predicate<T> predicate)
+        => source.Length > 0 && source.LastIndexOf(predicate) == source.Length - 1;
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Returns a new instance where all leading ocurrences of the default value have been
+    /// removed.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    public static ReadOnlySpan<T> TrimStart<T>(this ReadOnlySpan<T> source) where T : IEquatable<T>
+    {
+        var comparer = EqualityComparerEx.New<T>();
+        return source.TrimStart(comparer);
+    }
+
+    /// <summary>
+    /// Returns a new instance where all leading ocurrences of the default value have been
+    /// removed.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static ReadOnlySpan<T> TrimStart<T>(
+        this ReadOnlySpan<T> source, IEqualityComparer<T> comparer)
+        => source.TrimStart(default!, comparer);
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Returns a new instance where all leading ocurrences of the given value have been removed.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static ReadOnlySpan<T> TrimStart<T>(
+        this ReadOnlySpan<T> source, T value, IEqualityComparer<T> comparer)
+    {
+        comparer.ThrowWhenNull();
+        return source.TrimStart(x => comparer.Equals(x, value));
+    }
+
+    /// <summary>
+    /// Returns a new instance where all leading ocurrences of the given value have been removed.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="predicate"></param>
+    /// <returns></returns>
+    public static ReadOnlySpan<T> TrimStart<T>(this ReadOnlySpan<T> source, Predicate<T> predicate)
+    {
+        predicate.ThrowWhenNull();
+
+        var span = source; while (span.Length > 0)
+        {
+            if (predicate(span[0])) span = span[1..];
+            else break;
+        }
+        return span;
+    }
 }
-/* 
- *  StartsWith
- *  EndsWith
- *  
- *  TryFind
- *  TryFindLast
- *  TryFindAll
- *  
+/*  
  *  TrimStart
  *  TrimEnd
  *  Trim

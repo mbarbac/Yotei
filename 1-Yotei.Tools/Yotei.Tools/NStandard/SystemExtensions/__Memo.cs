@@ -9,10 +9,6 @@
  *  StartsWith
  *  EndsWith
  *  
- *  TryFind
- *  TryFindLast
- *  TryFindAll
- *  
  *  TrimStart
  *  TrimEnd
  *  Trim
@@ -58,10 +54,6 @@
  *  StartsWith
  *  EndsWith
  *  
- *  TryFind
- *  TryFindLast
- *  TryFindAll
- *  
  *  TrimStart
  *  TrimEnd
  *  Trim
@@ -89,10 +81,6 @@
  *  Contains
  *  StartsWith
  *  EndsWith
- *  
- *  TryFind
- *  TryFindLast
- *  TryFindAll
  *  
  *  TrimStart
  *  TrimEnd
