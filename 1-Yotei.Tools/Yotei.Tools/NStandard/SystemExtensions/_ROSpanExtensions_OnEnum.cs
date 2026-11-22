@@ -109,29 +109,258 @@ static partial class ReadOnlySpanExtensions
         if (iter.MoveNext()) return false;
         return true;
     }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Searches for the first ocurrence of any of the given values.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <returns></returns>
+    public static int IndexOfAny<T>(
+        this ReadOnlySpan<T> source, IEnumerable<T> values) where T : IEquatable<T>
+    {
+        var comparer = EqualityComparerEx.New<T>();
+        return source.IndexOfAny(values, comparer);
+    }
+
+    /// <summary>
+    /// Searches for the first ocurrence of any of the given values.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static int IndexOfAny<T>(
+        this ReadOnlySpan<T> source, IEnumerable<T> values, IEqualityComparer<T> comparer)
+    {
+        values.ThrowWhenNull();
+        comparer.ThrowWhenNull();
+
+        for (int i = 0; i < source.Length; i++)
+        {
+            var item = source[i];
+            foreach (var value in values) if (comparer.Equals(item, value)) return i;
+        }
+        return -1;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Searches for the last ocurrence of any of the given values.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <returns></returns>
+    public static int LastIndexOfAny<T>(
+        this ReadOnlySpan<T> source, IEnumerable<T> values) where T : IEquatable<T>
+    {
+        var comparer = EqualityComparerEx.New<T>();
+        return source.LastIndexOfAny(values, comparer);
+    }
+
+    /// <summary>
+    /// Searches for the last ocurrence of any of the given values.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static int LastIndexOfAny<T>(
+        this ReadOnlySpan<T> source, IEnumerable<T> values, IEqualityComparer<T> comparer)
+    {
+        values.ThrowWhenNull();
+        comparer.ThrowWhenNull();
+
+        for (int i = source.Length - 1; i >= 0; i--)
+        {
+            var item = source[i];
+            foreach (var value in values) if (comparer.Equals(item, value)) return i;
+        }
+        return -1;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Determines if the span contains any of the given values.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <returns></returns>
+    public static bool ContainsAny<T>(
+        this ReadOnlySpan<T> source, IEnumerable<T> values) where T : IEquatable<T>
+        => source.IndexOfAny(values) >= 0;
+
+    /// <summary>
+    /// Determines if the span contains any of the given values.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static bool ContainsAny<T>(
+        this ReadOnlySpan<T> source, IEnumerable<T> values, IEqualityComparer<T> comparer)
+        => source.IndexOfAny(values, comparer) >= 0;
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Determines if the span ends with any of the given values.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <returns></returns>
+    public static bool EndsWithAny<T>(
+        this ReadOnlySpan<T> source, IEnumerable<T> values) where T : IEquatable<T>
+        => source.Length > 0 && source.IndexOfAny(values) == source.Length - 1;
+
+    /// <summary>
+    /// Determines if the span ends with any of the given values.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static bool EndsWithAny<T>(
+        this ReadOnlySpan<T> source, IEnumerable<T> values, IEqualityComparer<T> comparer)
+        => source.Length > 0 && source.IndexOfAny(values, comparer) == source.Length - 1;
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Returns the index of the first value that is not any of the given ones.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <returns></returns>
+    public static int IndexOfAnyExcept<T>(
+        this ReadOnlySpan<T> source, IEnumerable<T> values) where T : IEquatable<T>
+    {
+        var comparer = EqualityComparerEx.New<T>();
+        return source.IndexOfAnyExcept(values, comparer);
+    }
+
+    /// <summary>
+    /// Returns the index of the first value that is not any of the given ones.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static int IndexOfAnyExcept<T>(
+        this ReadOnlySpan<T> source, IEnumerable<T> values, IEqualityComparer<T> comparer)
+    {
+        comparer.ThrowWhenNull();
+
+        for (int i = 0; i < source.Length; i++)
+        {
+            var item = source[i];
+            var found = false;
+
+            foreach (var value in values)
+            {
+                var except = comparer.Equals(item, value);
+                if (except) { found = true; break; }
+            }
+            if (!found) return i;
+        }
+        return -1;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Returns the index of the last value that is not any of the given ones.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <returns></returns>
+    public static int LastIndexOfAnyExcept<T>(
+        this ReadOnlySpan<T> source, IEnumerable<T> values) where T : IEquatable<T>
+    {
+        var comparer = EqualityComparerEx.New<T>();
+        return source.LastIndexOfAnyExcept(values, comparer);
+    }
+
+    /// <summary>
+    /// Returns the index of the last value that is not any of the given ones.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static int LastIndexOfAnyExcept<T>(
+        this ReadOnlySpan<T> source, IEnumerable<T> values, IEqualityComparer<T> comparer)
+    {
+        comparer.ThrowWhenNull();
+
+        for (int i = source.Length - 1; i >= 0; i--)
+        {
+            var item = source[i];
+            var found = false;
+
+            foreach (var value in values)
+            {
+                var except = comparer.Equals(item, value);
+                if (except) { found = true; break; }
+            }
+            if (!found) return i;
+        }
+        return -1;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Determines if the span contains any values except the given ones.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <returns></returns>
+    public static bool ContainsAnyExcept<T>(
+        this ReadOnlySpan<T> source, IEnumerable<T> values) where T : IEquatable<T>
+        => source.IndexOfAnyExcept(values) >= 0;
+
+    /// <summary>
+    /// Determines if the span contains any values except the given ones.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static bool ContainsAnyExcept<T>(
+        this ReadOnlySpan<T> source, IEnumerable<T> values, IEqualityComparer<T> comparer)
+        => source.IndexOfAnyExcept(values, comparer) >= 0;
 }
-/*  SequenceEqual
+/*
+ *  IndexOfRange
+ *  LastIndexOfRange
+ *  IndexesOfRange
+ *  ContainsRange
+ *  StartsWithRange
+ *  EndsWithRange
  *  
- *  IndexOf
- *  LastIndexOf
- *  IndexesOf
- *  Contains
- *  StartsWith
- *  EndsWith
- *  
- *  TrimStart
- *  TrimEnd
- *  Trim
- *  
- *  IndexOfAny
- *  LastIndexOfAny
- *  IndexesOfAny
- *  ContainsAny
- *  StartsWithAny
- *  EndsWithAny
- *  
- *  IndexOfAnyExcept
- *  LastIndexOfAnyExcept
- *  IndexesOfAnyExcept
- *  ContainsAnyExcept
+ *  IndexOfAnyRange
+ *  LastIndexOfAnyRange
+ *  IndexesOfAnyRange
+ *  ContainsAnyRange
+ *  StartsWithAnyRange
+ *  EndsWithAnyRange
  */

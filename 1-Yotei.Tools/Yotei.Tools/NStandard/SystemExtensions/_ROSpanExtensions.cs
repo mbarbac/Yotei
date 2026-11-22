@@ -395,18 +395,6 @@ static partial class ReadOnlySpanExtensions
         => source.TrimStart(predicate).TrimEnd(predicate);
 }
 /*  
- *  IndexOfAny
- *  LastIndexOfAny
- *  IndexesOfAny
- *  ContainsAny
- *  StartsWithAny
- *  EndsWithAny
- *  
- *  IndexOfAnyExcept
- *  LastIndexOfAnyExcept
- *  IndexesOfAnyExcept
- *  ContainsAnyExcept
- *  
  *  Add(value)
  *  AddRange(span)
  *  AddRange(sequence)

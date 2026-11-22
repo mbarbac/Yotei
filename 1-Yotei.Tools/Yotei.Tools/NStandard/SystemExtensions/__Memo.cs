@@ -1,5 +1,4 @@
-﻿// ========================= STANDARD AND VALUE ARGUMENT
-/*  IsEmpty
+﻿/*  IsEmpty
  *  Clone
  *  
  *  IndexOf
@@ -24,6 +23,22 @@
  *  LastIndexOfAnyExcept
  *  IndexesOfAnyExcept
  *  ContainsAnyExcept
+ *  StartsWithAnyExcept
+ *  EndsWithAnyExcept
+ *  
+ *  IndexOfRange
+ *  LastIndexOfRange
+ *  IndexesOfRange
+ *  ContainsRange
+ *  StartsWithRange
+ *  EndsWithRange
+ *  
+ *  IndexOfAnyRange
+ *  LastIndexOfAnyRange
+ *  IndexesOfAnyRange
+ *  ContainsAnyRange
+ *  StartsWithAnyRange
+ *  EndsWithAnyRange
  *  
  *  Add(value)
  *  AddRange(span)
@@ -41,60 +56,4 @@
  *  RemoveLast(predicate)
  *  RemoveAll(predicate)
  *  Clear()
- */
-
-// ========================= SPAN ARGUMENT
-/*  SequenceCompareTo
- *  SequenceEqual
- *  
- *  IndexOf
- *  LastIndexOf
- *  IndexesOf
- *  Contains
- *  StartsWith
- *  EndsWith
- *  
- *  TrimStart
- *  TrimEnd
- *  Trim
- *  
- *  IndexOfAny
- *  LastIndexOfAny
- *  IndexesOfAny
- *  ContainsAny
- *  StartsWithAny
- *  EndsWithAny
- *  
- *  IndexOfAnyExcept
- *  LastIndexOfAnyExcept
- *  IndexesOfAnyExcept
- *  ContainsAnyExcept
- */
-
-// ========================= SEQUENCE ARGUMENT
-/*  SequenceCompareTo
- *  SequenceEqual
- *  
- *  IndexOf
- *  LastIndexOf
- *  IndexesOf
- *  Contains
- *  StartsWith
- *  EndsWith
- *  
- *  TrimStart
- *  TrimEnd
- *  Trim
- *  
- *  IndexOfAny
- *  LastIndexOfAny
- *  IndexesOfAny
- *  ContainsAny
- *  StartsWithAny
- *  EndsWithAny
- *  
- *  IndexOfAnyExcept
- *  LastIndexOfAnyExcept
- *  IndexesOfAnyExcept
- *  ContainsAnyExcept
  */
