@@ -1,4 +1,5 @@
-﻿namespace Yotei.Tools.Tests;
+﻿#pragma warning disable IDE0059, CA1859, IDE0301
+namespace Yotei.Tools.Tests;
 
 // ========================================================
 public static partial class Test_ReadOnlySpanExtensions
@@ -293,5 +294,101 @@ public static partial class Test_ReadOnlySpanExtensions
         source = ItemSpan([9, 9, 1, 2]);
         result = source.TrimStart(Item(9), ItemEquality()); Assert.True(result.SequenceEqual([new(1), new(2)], ItemEquality()));
         result = source.TrimStart(ItemPredicate(9)); Assert.True(result.SequenceEqual([new(1), new(2)], ItemEquality()));
+    }
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_OnInt_TrimEnd()
+    {
+        var result = IntSpan();
+        var source = IntSpan();
+        result = source.TrimEnd(); Assert.True(result.IsEmpty);
+        result = source.TrimEnd(IntEquality()); Assert.True(result.IsEmpty);
+
+        source = IntSpan([1, 0, 0]);
+        result = source.TrimEnd(); Assert.True(result is [1]);
+        result = source.TrimEnd(IntEquality()); Assert.True(result is [1]);
+
+        source = IntSpan([1, 2]);
+        result = source.TrimEnd(9); Assert.True(result is [1, 2]);
+        result = source.TrimEnd(9, IntEquality()); Assert.True(result is [1, 2]);
+        result = source.TrimEnd(IntPredicate(9)); Assert.True(result is [1, 2]);
+
+        source = IntSpan([9, 1, 2, 9]);
+        result = source.TrimEnd(9); Assert.True(result is [9, 1, 2]);
+        result = source.TrimEnd(9, IntEquality()); Assert.True(result is [9, 1, 2]);
+        result = source.TrimEnd(IntPredicate(9)); Assert.True(result is [9, 1, 2]);
+    }
+
+    [Fact]
+    public static void Test_OnItem_TrimEnd()
+    {
+        var result = ItemSpan();
+        var source = ItemSpan();
+        // source.TrimEnd(); // => CS0311: Item<T> is not IEquatable
+        result = source.TrimEnd(ItemEquality()); Assert.True(result.IsEmpty);
+
+        source = ItemSpan([0, 0, 1]);
+        result = source.TrimEnd(ItemEquality()); Assert.False(result.SequenceEqual([new(1)], ItemEquality()));
+
+        source = ItemSpan([new(1), null!, null!]);
+        result = source.TrimEnd(ItemEquality()); Assert.True(result.SequenceEqual([new(1)], ItemEquality()));
+
+        source = ItemSpan([1, 2]);
+        result = source.TrimEnd(Item(9), ItemEquality()); Assert.True(result.SequenceEqual([new(1), new(2)], ItemEquality()));
+        result = source.TrimEnd(ItemPredicate(9)); Assert.True(result.SequenceEqual([new(1), new(2)], ItemEquality()));
+
+        source = ItemSpan([9, 1, 2, 9]);
+        result = source.TrimEnd(Item(9), ItemEquality()); Assert.True(result.SequenceEqual([new(9), new(1), new(2)], ItemEquality()));
+        result = source.TrimEnd(ItemPredicate(9)); Assert.True(result.SequenceEqual([new(9), new(1), new(2)], ItemEquality()));
+    }
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_OnInt_Trim()
+    {
+        var result = IntSpan();
+        var source = IntSpan();
+        result = source.Trim(); Assert.True(result.IsEmpty);
+        result = source.Trim(IntEquality()); Assert.True(result.IsEmpty);
+
+        source = IntSpan([0, 0, 1, 0, 0]);
+        result = source.Trim(); Assert.True(result is [1]);
+        result = source.Trim(IntEquality()); Assert.True(result is [1]);
+
+        source = IntSpan([1, 2]);
+        result = source.Trim(9); Assert.True(result is [1, 2]);
+        result = source.Trim(9, IntEquality()); Assert.True(result is [1, 2]);
+        result = source.Trim(IntPredicate(9)); Assert.True(result is [1, 2]);
+
+        source = IntSpan([9, 1, 2, 9]);
+        result = source.Trim(9); Assert.True(result is [1, 2]);
+        result = source.Trim(9, IntEquality()); Assert.True(result is [1, 2]);
+        result = source.Trim(IntPredicate(9)); Assert.True(result is [1, 2]);
+    }
+
+    [Fact]
+    public static void Test_OnItem_Trim()
+    {
+        var result = ItemSpan();
+        var source = ItemSpan();
+        // source.Trim(); // => CS0311: Item<T> is not IEquatable
+        result = source.Trim(ItemEquality()); Assert.True(result.IsEmpty);
+
+        source = ItemSpan([0, 0, 1, 0, 0]);
+        result = source.Trim(ItemEquality()); Assert.False(result.SequenceEqual([new(1)], ItemEquality()));
+
+        source = ItemSpan([null!, null!, new(1), null!, null!]);
+        result = source.Trim(ItemEquality()); Assert.True(result.SequenceEqual([new(1)], ItemEquality()));
+
+        source = ItemSpan([1, 2]);
+        result = source.Trim(Item(9), ItemEquality()); Assert.True(result.SequenceEqual([new(1), new(2)], ItemEquality()));
+        result = source.Trim(ItemPredicate(9)); Assert.True(result.SequenceEqual([new(1), new(2)], ItemEquality()));
+
+        source = ItemSpan([9, 1, 2, 9]);
+        result = source.Trim(Item(9), ItemEquality()); Assert.True(result.SequenceEqual([new(1), new(2)], ItemEquality()));
+        result = source.Trim(ItemPredicate(9)); Assert.True(result.SequenceEqual([new(1), new(2)], ItemEquality()));
     }
 }

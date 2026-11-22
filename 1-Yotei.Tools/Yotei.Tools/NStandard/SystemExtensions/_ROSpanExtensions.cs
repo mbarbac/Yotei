@@ -249,8 +249,6 @@ static partial class ReadOnlySpanExtensions
         this ReadOnlySpan<T> source, IEqualityComparer<T> comparer)
         => source.TrimStart(default!, comparer);
 
-    // ----------------------------------------------------
-
     /// <summary>
     /// Returns a new instance where all leading ocurrences of the given value have been removed.
     /// </summary>
@@ -284,12 +282,119 @@ static partial class ReadOnlySpanExtensions
         }
         return span;
     }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Returns a new instance where all trailing ocurrences of the default value have been
+    /// removed.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    public static ReadOnlySpan<T> TrimEnd<T>(this ReadOnlySpan<T> source) where T : IEquatable<T>
+    {
+        var comparer = EqualityComparerEx.New<T>();
+        return source.TrimEnd(comparer);
+    }
+
+    /// <summary>
+    /// Returns a new instance where all trailing ocurrences of the default value have been
+    /// removed.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static ReadOnlySpan<T> TrimEnd<T>(
+        this ReadOnlySpan<T> source, IEqualityComparer<T> comparer)
+        => source.TrimEnd(default!, comparer);
+
+    /// <summary>
+    /// Returns a new instance where all trailing ocurrences of the given value have been removed.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static ReadOnlySpan<T> TrimEnd<T>(
+        this ReadOnlySpan<T> source, T value, IEqualityComparer<T> comparer)
+    {
+        comparer.ThrowWhenNull();
+        return source.TrimEnd(x => comparer.Equals(x, value));
+    }
+
+    /// <summary>
+    /// Returns a new instance where all trailing ocurrences of the given value have been removed.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="predicate"></param>
+    /// <returns></returns>
+    public static ReadOnlySpan<T> TrimEnd<T>(this ReadOnlySpan<T> source, Predicate<T> predicate)
+    {
+        predicate.ThrowWhenNull();
+
+        var span = source; while (span.Length > 0)
+        {
+            if (predicate(span[^1])) span = span[..^1];
+            else break;
+        }
+        return span;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Returns a new instance where all leading and trailing ocurrences of the default value have
+    /// been removed.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    public static ReadOnlySpan<T> Trim<T>(
+        this ReadOnlySpan<T> source) where T : IEquatable<T>
+        => source.TrimStart().TrimEnd();
+
+    /// <summary>
+    /// Returns a new instance where all leading and trailing ocurrences of the default value have
+    /// been removed.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static ReadOnlySpan<T> Trim<T>(
+        this ReadOnlySpan<T> source, IEqualityComparer<T> comparer)
+        => source.TrimStart(comparer).TrimEnd(comparer);
+
+    /// <summary>
+    /// Returns a new instance where all leading and trailing ocurrences of the given value have
+    /// been removed.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static ReadOnlySpan<T> Trim<T>(
+        this ReadOnlySpan<T> source, T value, IEqualityComparer<T> comparer)
+        => source.TrimStart(value, comparer).TrimEnd(value, comparer);
+
+    /// <summary>
+    /// Returns a new instance where all leading and trailing ocurrences of the given value have
+    /// been removed.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="predicate"></param>
+    /// <returns></returns>
+    public static ReadOnlySpan<T> Trim<T>(
+        this ReadOnlySpan<T> source, Predicate<T> predicate)
+        => source.TrimStart(predicate).TrimEnd(predicate);
 }
 /*  
- *  TrimStart
- *  TrimEnd
- *  Trim
- *  
  *  IndexOfAny
  *  LastIndexOfAny
  *  IndexesOfAny
