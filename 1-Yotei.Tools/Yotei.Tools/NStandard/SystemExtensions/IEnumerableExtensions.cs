@@ -17,12 +17,12 @@ static class IEnumerableExtensions
     {
         /// <summary>
         /// Determines if the collection is an empty one.
-        /// </summary>
-        /// <remarks>
+        /// <para>
         /// In the general case, this property may drive side effects as it tries to enumerate the
         /// collection to obtain its first element. Special cases, such as strings, are intercepted
-        /// for performance reasons.
-        /// </remarks>
+        /// fto improve performance.
+        /// </para>
+        /// </summary>
         public bool IsEmpty
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]

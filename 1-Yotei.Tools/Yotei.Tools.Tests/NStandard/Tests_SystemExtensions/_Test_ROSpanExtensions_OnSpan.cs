@@ -298,6 +298,55 @@ public static partial class Test_ReadOnlySpanExtensions
     // ----------------------------------------------------
 
     [Fact]
+    public static void Test_OnSpan_EndsWith_Range_Ints()
+    {
+        bool result;
+        var source = IntSpan();
+        var values = IntSpan();
+        result = source.EndsWith(values); Assert.True(result); // Empties are ok!
+        result = source.EndsWith(values, IntEquality()); Assert.True(result);
+
+        source = IntSpan([1, 2, 3]);
+        values = IntSpan([2, 4]);
+        result = source.EndsWith(values); Assert.False(result);
+        result = source.EndsWith(values, IntEquality()); Assert.False(result);
+
+        source = IntSpan([1, 2, 3]);
+        values = IntSpan([3, 4]);
+        result = source.EndsWith(values); Assert.False(result);
+        result = source.EndsWith(values, IntEquality()); Assert.False(result);
+
+        source = IntSpan([1, 2, 3, 4]);
+        values = IntSpan([3, 4]);
+        result = source.EndsWith(values); Assert.True(result);
+        result = source.EndsWith(values, IntEquality()); Assert.True(result);
+    }
+
+    [Fact]
+    public static void Test_OnSpan_EndsWith_Range_Items()
+    {
+        bool result;
+        var source = ItemSpan();
+        var values = ItemSpan();
+        // source.EndsWith(values); // => CS0311: Item<T> is not IEquatable
+        result = source.EndsWith(values, ItemEquality()); Assert.True(result);
+
+        source = ItemSpan([1, 2, 3]);
+        values = ItemSpan([2, 4]);
+        result = source.EndsWith(values, ItemEquality()); Assert.False(result);
+
+        source = ItemSpan([1, 2, 3]);
+        values = ItemSpan([3, 4]);
+        result = source.EndsWith(values, ItemEquality()); Assert.False(result);
+
+        source = ItemSpan([1, 2, 3, 4]);
+        values = ItemSpan([3, 4]);
+        result = source.EndsWith(values, ItemEquality()); Assert.True(result);
+    }
+
+    // ----------------------------------------------------
+
+    [Fact]
     public static void Test_OnSpan_IndexOfAny_Ints()
     {
         int result;
@@ -334,6 +383,7 @@ public static partial class Test_ReadOnlySpanExtensions
         values = ItemSpan([4, 1, 5]);
         result = source.IndexOfAny(values, ItemEquality()); Assert.Equal(1, result);
     }
+
 
     // ----------------------------------------------------
 

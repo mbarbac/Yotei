@@ -3,6 +3,10 @@
 #pragma warning disable CS0436
 #endif
 
+using System.Buffers;
+using System.ComponentModel.DataAnnotations;
+using System.Net.Http.Headers;
+
 namespace Yotei.Tools;
 
 // ========================================================
@@ -13,6 +17,66 @@ public
 #endif
 static partial class ReadOnlySpanExtensions
 {
+    /// <summary>
+    /// Invoked to obtain a span from the given enumerable.
+    /// <br/> If an array is returned in the out argument, it must be returned to the pool.
+    /// </summary>
+    /// <returns></returns>
+    static ReadOnlySpan<T> ToSpan<T>(this IEnumerable<T> source, out T[]? buffer)
+    {
+        buffer = null;
+
+        // Easiest case...
+        if (source is T[] array) return array;
+
+        // The 2nd easiest case...
+        if (source is ArraySegment<T> segment)
+        {
+            return new ReadOnlySpan<T>(segment.Array, segment.Offset, segment.Count);
+        }
+
+        // Source is a list (and we can marshall)...
+        if (source is List<T> list)
+        {
+#if !NETSTANDARD2_0
+            return CollectionsMarshal.AsSpan(list);
+#endif
+        }
+
+        // We can know the size upfront...
+        if (source is ICollection<T> collection)
+        {
+            var count = collection.Count;
+            if (count == 0) return [];
+
+            buffer = ArrayPool<T>.Shared.Rent(count);
+            collection.CopyTo(buffer, 0);
+            return new ReadOnlySpan<T>(buffer, 0, count);
+        }
+
+        // Allocating a span of an arbitrary size...
+        else
+        {
+            buffer = ArrayPool<T>.Shared.Rent(16);
+            int index = 0;
+
+            foreach (T item in source)
+            {
+                if (index == buffer.Length)
+                {
+                    var exp = ArrayPool<T>.Shared.Rent(buffer.Length * 2);
+                    Array.Copy(buffer, 0, exp, 0, index);
+                    ArrayPool<T>.Shared.Return(buffer, true);
+                    buffer = exp;
+                }
+                buffer[index++] = item;
+            }
+            return new ReadOnlySpan<T>(buffer, 0, index);
+        }
+    }
+
+    // ====================================================
+
     /// <summary>
     /// Determines the order of this span relative to the given sequence of values:
     /// <br/>- Less than 0: span precedes the values' sequence.
@@ -108,6 +172,176 @@ static partial class ReadOnlySpanExtensions
         }
         if (iter.MoveNext()) return false;
         return true;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Returns the index of the first ocurrence of the given sequence of values, or -1 if any.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <returns></returns>
+    public static int IndexOf<T>(
+        this ReadOnlySpan<T> source, IEnumerable<T> values) where T : IEquatable<T>
+    {
+        var comparer = EqualityComparerEx.New<T>();
+        return source.IndexOf(values, comparer);
+    }
+
+    /// <summary>
+    /// Returns the index of the first ocurrence of the given sequence of values, or -1 if any.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static int IndexOf<T>(
+        this ReadOnlySpan<T> source, IEnumerable<T> values, IEqualityComparer<T> comparer)
+    {
+        values.ThrowWhenNull();
+        comparer.ThrowWhenNull();
+
+        var span = values.ToSpan(out var buffer);
+        return source.IndexOf(span, comparer);
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Returns the index of the last ocurrence of the given sequence of values, or -1 if any.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <returns></returns>
+    public static int LastIndexOf<T>(
+        this ReadOnlySpan<T> source, IEnumerable<T> values) where T : IEquatable<T>
+    {
+        var comparer = EqualityComparerEx.New<T>();
+        return source.LastIndexOf(values, comparer);
+    }
+
+    /// <summary>
+    /// Returns the index of the last ocurrence of the given sequence of values, or -1 if any.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static int LastIndexOf<T>(
+        this ReadOnlySpan<T> source, IEnumerable<T> values, IEqualityComparer<T> comparer)
+    {
+        values.ThrowWhenNull();
+        comparer.ThrowWhenNull();
+
+        var span = values.ToSpan(out var buffer);
+        return source.LastIndexOf(span, comparer);
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Determines if the span contains the given sequence of values.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <returns></returns>
+    public static bool Contains<T>(
+        this ReadOnlySpan<T> source, IEnumerable<T> values) where T : IEquatable<T>
+    {
+        var comparer = EqualityComparerEx.New<T>();
+        return source.Contains(values, comparer);
+    }
+
+    /// <summary>
+    /// /// Determines if the span contains the given sequence of values.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static bool Contains<T>(
+        this ReadOnlySpan<T> source, IEnumerable<T> values, IEqualityComparer<T> comparer)
+    {
+        values.ThrowWhenNull();
+        comparer.ThrowWhenNull();
+
+        var span = values.ToSpan(out var buffer);
+        return source.Contains(span, comparer);
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Determines if the span starts with the given sequence of values.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <returns></returns>
+    public static bool StartsWith<T>(
+        this ReadOnlySpan<T> source, IEnumerable<T> values) where T : IEquatable<T>
+    {
+        var comparer = EqualityComparerEx.New<T>();
+        return source.StartsWith(values, comparer);
+    }
+
+    /// <summary>
+    /// Determines if the span starts with the given sequence of values.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static bool StartsWith<T>(
+        this ReadOnlySpan<T> source, IEnumerable<T> values, IEqualityComparer<T> comparer)
+    {
+        values.ThrowWhenNull();
+        comparer.ThrowWhenNull();
+
+        var span = values.ToSpan(out var buffer);
+        return source.StartsWith(span, comparer);
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Determines if the span ends with the given sequence of values.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <returns></returns>
+    public static bool EndsWith<T>(
+        this ReadOnlySpan<T> source, IEnumerable<T> values) where T : IEquatable<T>
+    {
+        var comparer = EqualityComparerEx.New<T>();
+        return source.EndsWith(values, comparer);
+    }
+
+    /// <summary>
+    /// Determines if the span ends with the given sequence of values.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static bool EndsWith<T>(
+        this ReadOnlySpan<T> source, IEnumerable<T> values, IEqualityComparer<T> comparer)
+    {
+        values.ThrowWhenNull();
+        comparer.ThrowWhenNull();
+
+        var span = values.ToSpan(out var buffer);
+        return source.EndsWith(span, comparer);
     }
 
     // ----------------------------------------------------

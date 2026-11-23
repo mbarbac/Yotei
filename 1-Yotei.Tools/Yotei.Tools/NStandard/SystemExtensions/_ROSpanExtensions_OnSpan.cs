@@ -176,7 +176,7 @@ static partial class ReadOnlySpanExtensions
     // ----------------------------------------------------
 
     /// <summary>
-    /// Deterimes if the span starts with the given sequence of values.
+    /// Determines if the span starts with the given sequence of values.
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="source"></param>
@@ -186,6 +186,19 @@ static partial class ReadOnlySpanExtensions
     public static bool StartsWith<T>(
         this ReadOnlySpan<T> source, ReadOnlySpan<T> values, IEqualityComparer<T> comparer)
         => source.IndexOf(values, comparer) == 0;
+
+    /// <summary>
+    /// Determines if the span ends with the given sequence of values.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static bool EndsWith<T>(
+        this ReadOnlySpan<T> source, ReadOnlySpan<T> values, IEqualityComparer<T> comparer)
+        => source.Length == 0 && values.Length == 0
+        || source.Length > 0 && source.LastIndexOf(values, comparer) == source.Length - values.Length;
 
 
 
