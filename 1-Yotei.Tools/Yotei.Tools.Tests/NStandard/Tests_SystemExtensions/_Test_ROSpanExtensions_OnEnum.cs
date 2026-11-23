@@ -78,6 +78,193 @@ public static partial class Test_ReadOnlySpanExtensions
     // ----------------------------------------------------
 
     [Fact]
+    public static void Test_OnEnum_IndexOf_Range_Ints() => Console.WriteLine("TODO...");
+    //{
+    //    int result;
+    //    var source = IntSpan();
+    //    var values = IntEnumerable();
+    //    result = source.IndexOf(values); Assert.Equal(0, result); // Empties are ok!
+    //    result = source.IndexOf(values, IntEquality()); Assert.Equal(0, result);
+
+    //    source = IntSpan([3, 1, 2]);
+    //    values = IntSpan([3, 4]);
+    //    result = source.IndexOf(values); Assert.Equal(-1, result);
+    //    result = source.IndexOf(values, IntEquality()); Assert.Equal(-1, result);
+
+    //    source = IntSpan([1, 2, 3]);
+    //    values = IntSpan([3, 4]);
+    //    result = source.IndexOf(values); Assert.Equal(-1, result);
+    //    result = source.IndexOf(values, IntEquality()); Assert.Equal(-1, result);
+
+    //    source = IntSpan([1, 2, 3, 4]);
+    //    values = IntSpan([2, 3]);
+    //    result = source.IndexOf(values); Assert.Equal(1, result);
+    //    result = source.IndexOf(values, IntEquality()); Assert.Equal(1, result);
+    //}
+
+    [Fact]
+    public static void Test_OnEnum_IndexOf_Range_Items() => Console.WriteLine("TODO...");
+    //{
+    //    int result;
+    //    var source = ItemSpan();
+    //    var values = ItemEnumerable();
+    //    // source.IndexOf(values); // => CS0311: Item<T> is not IEquatable
+    //    result = source.IndexOf(values, ItemEquality()); Assert.Equal(0, result);
+
+    //    source = ItemSpan([3, 1, 2]);
+    //    values = ItemSpan([3, 4]);
+    //    result = source.IndexOf(values, ItemEquality()); Assert.Equal(-1, result);
+
+    //    source = ItemSpan([1, 2, 3]);
+    //    values = ItemSpan([3, 4]);
+    //    result = source.IndexOf(values, ItemEquality()); Assert.Equal(-1, result);
+
+    //    source = ItemSpan([1, 2, 3, 4]);
+    //    values = ItemSpan([2, 3]);
+    //    result = source.IndexOf(values, ItemEquality()); Assert.Equal(1, result);
+    //}
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_OnEnum_LastIndexOf_Range_Ints() => Console.WriteLine("TODO...");
+    //{
+    //    int result;
+    //    var source = IntSpan();
+    //    var values = IntEnumerable();
+    //    result = source.LastIndexOf(values); Assert.Equal(0, result); // Empties are ok!
+    //    result = source.LastIndexOf(values, IntEquality()); Assert.Equal(0, result);
+
+    //    source = IntSpan([3, 1, 2]);
+    //    values = IntSpan([3, 4]);
+    //    result = source.LastIndexOf(values); Assert.Equal(-1, result);
+    //    result = source.LastIndexOf(values, IntEquality()); Assert.Equal(-1, result);
+
+    //    source = IntSpan([1, 2, 3]);
+    //    values = IntSpan([3, 4]);
+    //    result = source.LastIndexOf(values); Assert.Equal(-1, result);
+    //    result = source.LastIndexOf(values, IntEquality()); Assert.Equal(-1, result);
+
+    //    source = IntSpan([1, 2, 3, 4, 5]);
+    //    values = IntSpan([3, 4]);
+    //    result = source.LastIndexOf(values); Assert.Equal(2, result);
+    //    result = source.LastIndexOf(values, IntEquality()); Assert.Equal(2, result);
+    //}
+
+    [Fact]
+    public static void Test_OnEnum_LastIndexOf_Range_Items() => Console.WriteLine("TODO...");
+    //{
+    //    int result;
+    //    var source = ItemSpan();
+    //    var values = ItemEnumerable();
+    //    // source.LastIndexOf(values); // => CS0311: Item<T> is not IEquatable
+    //    result = source.LastIndexOf(values, ItemEquality()); Assert.Equal(0, result);
+
+    //    source = ItemSpan([3, 1, 2]);
+    //    values = ItemSpan([3, 4]);
+    //    result = source.LastIndexOf(values, ItemEquality()); Assert.Equal(-1, result);
+
+    //    source = ItemSpan([1, 2, 3]);
+    //    values = ItemSpan([3, 4]);
+    //    result = source.LastIndexOf(values, ItemEquality()); Assert.Equal(-1, result);
+
+    //    source = ItemSpan([1, 2, 3, 4, 5]);
+    //    values = ItemSpan([3, 4]);
+    //    result = source.LastIndexOf(values, ItemEquality()); Assert.Equal(2, result);
+    //}
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_OnEnum_Contains_Range_Ints() => Console.WriteLine("TODO...");
+    //{
+    //    bool result;
+    //    var source = IntSpan();
+    //    var values = IntEnumerable();
+    //    result = source.Contains(values); Assert.True(result); // Empties are ok!
+    //    result = source.Contains(values, IntEquality()); Assert.True(result);
+
+    //    source = IntSpan([3, 1, 2]);
+    //    values = IntSpan([3, 4]);
+    //    result = source.Contains(values); Assert.False(result);
+    //    result = source.Contains(values, IntEquality()); Assert.False(result);
+
+    //    source = IntSpan([1, 2, 3]);
+    //    values = IntSpan([3, 4]);
+    //    result = source.Contains(values); Assert.False(result);
+    //    result = source.Contains(values, IntEquality()); Assert.False(result);
+
+    //    source = IntSpan([1, 2, 3, 4, 5]);
+    //    values = IntSpan([3, 4]);
+    //    result = source.Contains(values); Assert.True(result);
+    //    result = source.Contains(values, IntEquality()); Assert.True(result);
+    //}
+
+    [Fact]
+    public static void Test_OnEnum_ContainsRange_Items() => Console.WriteLine("TODO...");
+    //{
+    //    bool result;
+    //    var source = ItemSpan();
+    //    var values = ItemEnumerable();
+    //    // source.Contains(values); // => CS0311: Item<T> is not IEquatable
+    //    result = source.Contains(values, ItemEquality()); Assert.True(result); // Empties are ok!
+
+    //    source = ItemSpan([3, 1, 2]);
+    //    values = ItemSpan([3, 4]);
+    //    result = source.Contains(values, ItemEquality()); Assert.False(result);
+
+    //    source = ItemSpan([1, 2, 3]);
+    //    values = ItemSpan([3, 4]);
+    //    result = source.Contains(values, ItemEquality()); Assert.False(result);
+
+    //    source = ItemSpan([1, 2, 3, 4, 5]);
+    //    values = ItemSpan([3, 4]);
+    //    result = source.Contains(values, ItemEquality()); Assert.True(result);
+    //}
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_OnEnum_StartsWith_Range_Ints() => Console.WriteLine("TODO...");
+    //{
+    //    bool result;
+    //    var source = IntSpan();
+    //    var values = IntEnumerable();
+    //    result = source.StartsWith(values); Assert.True(result); // Empties are ok!
+    //    result = source.StartsWith(values, IntEquality()); Assert.True(result);
+
+    //    source = IntSpan([1, 2, 3]);
+    //    values = IntSpan([1, 4]);
+    //    result = source.StartsWith(values); Assert.False(result);
+    //    result = source.StartsWith(values, IntEquality()); Assert.False(result);
+
+    //    source = IntSpan([1, 2, 3, 4]);
+    //    values = IntSpan([1, 2]);
+    //    result = source.StartsWith(values); Assert.True(result);
+    //    result = source.StartsWith(values, IntEquality()); Assert.True(result);
+    //}
+
+    [Fact]
+    public static void Test_OnEnum_StartsWith_Range_Items() => Console.WriteLine("TODO...");
+    //{
+    //    bool result;
+    //    var source = ItemSpan();
+    //    var values = ItemEnumerable();
+    //    // source.StartsWith(values); // => CS0311: Item<T> is not IEquatable
+    //    result = source.StartsWith(values, ItemEquality()); Assert.True(result);
+
+    //    source = ItemSpan([1, 2, 3]);
+    //    values = ItemSpan([1, 4]);
+    //    result = source.StartsWith(values, ItemEquality()); Assert.False(result);
+
+    //    source = ItemSpan([1, 2, 3, 4]);
+    //    values = ItemSpan([1, 2]);
+    //    result = source.StartsWith(values, ItemEquality()); Assert.True(result);
+    //}
+
+    // ----------------------------------------------------
+
+    [Fact]
     public static void Test_OnEnum_SequenceEquals_Ints()
     {
         bool result;

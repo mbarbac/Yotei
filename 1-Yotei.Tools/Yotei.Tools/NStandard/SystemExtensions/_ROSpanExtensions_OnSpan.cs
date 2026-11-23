@@ -79,6 +79,123 @@ static partial class ReadOnlySpanExtensions
     // ----------------------------------------------------
 
     /// <summary>
+    /// Returns the index of the first ocurrence of the given sequence of values, or -1 if any.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static int IndexOf<T>(
+        this ReadOnlySpan<T> source, ReadOnlySpan<T> values, IEqualityComparer<T> comparer)
+    {
+        comparer.ThrowWhenNull();
+
+        // mimic standard behavior...
+        if (source.Length == 0 && values.Length == 0) return 0;
+
+        if (source.IsEmpty) return -1;
+        if (values.IsEmpty) return -1;
+        if (values.Length > source.Length) return -1;
+
+        for (int i = 0; i < source.Length; i++)
+        {
+            var match = 0; for (int k = 0; k < values.Length; k++)
+            {
+                var j = i + k; if (j >= source.Length) break;
+                var x = source[j];
+                var y = values[k];
+                if (comparer.Equals(x, y)) match++; else break;
+            }
+            if (match == values.Length) return i;
+        }
+        return -1;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Returns the index of the last ocurrence of the given sequence of values, or -1 if any.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static int LastIndexOf<T>(
+        this ReadOnlySpan<T> source, ReadOnlySpan<T> values, IEqualityComparer<T> comparer)
+    {
+        comparer.ThrowWhenNull();
+
+        // mimic standard behavior...
+        if (source.Length == 0 && values.Length == 0) return 0;
+
+        if (source.IsEmpty) return -1;
+        if (values.IsEmpty) return -1;
+        if (values.Length > source.Length) return -1;
+
+        for (int i = source.Length - 1; i >= 0; i--)
+        {
+            var match = 0; for (int k = 0; k < values.Length; k++)
+            {
+                var j = i + k; if (j >= source.Length) break;
+                var x = source[j];
+                var y = values[k];
+                if (comparer.Equals(x, y)) match++; else break;
+            }
+            if (match == values.Length) return i;
+        }
+        return -1;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Determines if the span contains the given sequence of values.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <returns></returns>
+    public static bool Contains<T>(
+        this ReadOnlySpan<T> source, ReadOnlySpan<T> values) where T : IEquatable<T>
+        => source.IndexOf(values) >= 0;
+
+    /// <summary>
+    /// Determines if the span contains the given sequence of values.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static bool Contains<T>(
+        this ReadOnlySpan<T> source, ReadOnlySpan<T> values, IEqualityComparer<T> comparer)
+        => source.IndexOf(values, comparer) >= 0;
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Deterimes if the span starts with the given sequence of values.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static bool StartsWith<T>(
+        this ReadOnlySpan<T> source, ReadOnlySpan<T> values, IEqualityComparer<T> comparer)
+        => source.IndexOf(values, comparer) == 0;
+
+
+
+
+
+
+
+    // ----------------------------------------------------
+
+    /// <summary>
     /// Searches for the first ocurrence of any of the given values.
     /// </summary>
     /// <typeparam name="T"></typeparam>
