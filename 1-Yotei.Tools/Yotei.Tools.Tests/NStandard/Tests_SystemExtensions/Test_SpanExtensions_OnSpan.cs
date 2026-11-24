@@ -3,8 +3,6 @@
 // ========================================================
 public static partial class Test_SpanExtensions
 {
-}
-/*{
     [Fact]
     public static void Test_OnSpan_SequenceCompareTo_Ints()
     {
@@ -386,7 +384,6 @@ public static partial class Test_SpanExtensions
         result = source.IndexOfAny(values, ItemEquality()); Assert.Equal(1, result);
     }
 
-
     // ----------------------------------------------------
 
     [Fact]
@@ -478,12 +475,12 @@ public static partial class Test_SpanExtensions
         result = source.IndexOfAnyExcept(values); Assert.Equal(-1, result);
         result = source.IndexOfAnyExcept(values, IntEquality()); Assert.Equal(-1, result);
 
-        source = [1, 2, 3, 4];
-        values = [8, 9];
+        source = IntSpan([1, 2, 3, 4]);
+        values = IntSpan([8, 9]);
         result = source.IndexOfAnyExcept(values); Assert.Equal(0, result);
         result = source.IndexOfAnyExcept(values, IntEquality()); Assert.Equal(0, result);
 
-        values = [2, 1];
+        values = IntSpan([2, 1]);
         result = source.IndexOfAnyExcept(values); Assert.Equal(2, result);
         result = source.IndexOfAnyExcept(values, IntEquality()); Assert.Equal(2, result);
     }
@@ -516,12 +513,12 @@ public static partial class Test_SpanExtensions
         result = source.LastIndexOfAnyExcept(values); Assert.Equal(-1, result);
         result = source.LastIndexOfAnyExcept(values, IntEquality()); Assert.Equal(-1, result);
 
-        source = [3, 4, 1, 2];
-        values = [8, 9];
+        source = IntSpan([3, 4, 1, 2]);
+        values = IntSpan([8, 9]);
         result = source.LastIndexOfAnyExcept(values); Assert.Equal(3, result);
         result = source.LastIndexOfAnyExcept(values, IntEquality()); Assert.Equal(3, result);
 
-        values = [2, 1];
+        values = IntSpan([2, 1]);
         result = source.LastIndexOfAnyExcept(values); Assert.Equal(1, result);
         result = source.LastIndexOfAnyExcept(values, IntEquality()); Assert.Equal(1, result);
     }
@@ -554,13 +551,13 @@ public static partial class Test_SpanExtensions
         result = source.ContainsAnyExcept(values); Assert.False(result);
         result = source.ContainsAnyExcept(values, IntEquality()); Assert.False(result);
 
-        source = [8, 9, 1];
-        values = [8, 9];
+        source = IntSpan([8, 9, 1]);
+        values = IntSpan([8, 9]);
         result = source.ContainsAnyExcept(values); Assert.True(result);
         result = source.ContainsAnyExcept(values, IntEquality()); Assert.True(result);
 
-        source = [9];
-        values = [8, 9];
+        source = IntSpan([9]);
+        values = IntSpan([8, 9]);
         result = source.ContainsAnyExcept(values); Assert.False(result);
         result = source.ContainsAnyExcept(values, IntEquality()); Assert.False(result);
     }
@@ -582,4 +579,155 @@ public static partial class Test_SpanExtensions
         values = ItemSpan([8, 9]);
         result = source.ContainsAnyExcept(values, ItemEquality()); Assert.False(result);
     }
-}*/
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_OnSpan_AddRange_Ints()
+    {
+        var source = IntSpan();
+        var values = IntSpan([8, 9]);
+        var target = source.AddRange(values); Assert.True(target is [8, 9]);
+
+        source = IntSpan([1, 2]);
+        values = IntSpan([8, 9]);
+        target = source.AddRange(values); Assert.True(target is [1, 2, 8, 9]);
+    }
+
+    [Fact]
+    public static void Test_OnSpan_AddRange_Items()
+    {
+        var source = ItemSpan();
+        var values = ItemSpan([8, 9]);
+        var target = source.AddRange(values); Assert.True(target.SequenceEqual(ItemSpan([8, 9]), ItemEquality()));
+
+        source = ItemSpan([1, 2]);
+        values = ItemSpan([8, 9]);
+        target = source.AddRange(values); Assert.True(target.SequenceEqual(ItemSpan([1, 2, 8, 9]), ItemEquality()));
+    }
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_OnSpan_InsertRange_Ints()
+    {
+        var source = IntSpan();
+        var values = IntSpan([8, 9]);
+        var target = source.InsertRange(0, values); Assert.True(target is [8, 9]);
+
+        source = IntSpan([1, 2]);
+        values = IntSpan([8, 9]);
+        target = source.InsertRange(1, values); Assert.True(target is [1, 8, 9, 2]);
+        target = source.InsertRange(2, values); Assert.True(target is [1, 2, 8, 9]);
+    }
+
+    [Fact]
+    public static void Test_OnSpan_InsertRange_Items()
+    {
+        var source = ItemSpan();
+        var values = ItemSpan([8, 9]);
+        var target = source.InsertRange(0, values); Assert.True(target.SequenceEqual(ItemSpan([8, 9]), ItemEquality()));
+
+        source = ItemSpan([1, 2]);
+        values = ItemSpan([8, 9]);
+        target = source.InsertRange(1, values); Assert.True(target.SequenceEqual(ItemSpan([1, 8, 9, 2]), ItemEquality()));
+        target = source.InsertRange(2, values); Assert.True(target.SequenceEqual(ItemSpan([1, 2, 8, 9]), ItemEquality()));
+    }
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_OnSpan_Remove_Ints()
+    {
+        var source = IntSpan();
+        var values = IntSpan();
+        var target = source.Remove(values); Assert.True(target.IsEmpty);
+
+        source = IntSpan([1, 8, 9, 3]);
+        values = IntSpan([8, 9]);
+        target = source.Remove(values); Assert.True(target is [1, 3]);
+        target = source.Remove(values, IntEquality()); Assert.True(target is [1, 3]);
+    }
+
+    [Fact]
+    public static void Test_OnSpan_Remove_Items()
+    {
+        var target = ItemSpan();
+        var source = ItemSpan();
+        var values = ItemSpan();
+        // source.Remove(values); // => CS0311: Item<T> is not IEquatable
+
+        source = ItemSpan([1, 8, 9, 3]);
+        values = ItemSpan([8, 9]);
+        target = source.Remove(values, ItemEquality());
+        Assert.True(target.SequenceEqual(ItemSpan([1, 3]), ItemEquality()));
+    }
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_OnSpan_RemoveLast_Ints()
+    {
+        var source = IntSpan();
+        var values = IntSpan();
+        var target = source.RemoveLast(values); Assert.True(target.IsEmpty);
+
+        source = IntSpan([1, 8, 9, 3]);
+        values = IntSpan([8, 9]);
+        target = source.RemoveLast(values); Assert.True(target is [1, 3]);
+        target = source.RemoveLast(values, IntEquality()); Assert.True(target is [1, 3]);
+    }
+
+    [Fact]
+    public static void Test_OnSpan_RemoveLast_Items()
+    {
+        var target = ItemSpan();
+        var source = ItemSpan();
+        var values = ItemSpan();
+        // source.RemoveLast(values); // => CS0311: Item<T> is not IEquatable
+
+        source = ItemSpan([1, 8, 9, 3]);
+        values = ItemSpan([8, 9]);
+        target = source.RemoveLast(values, ItemEquality());
+        Assert.True(target.SequenceEqual(ItemSpan([1, 3]), ItemEquality()));
+    }
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_OnSpan_RemoveAll_Ints()
+    {
+        var source = IntSpan();
+        var values = IntSpan();
+        var target = source.RemoveAll(values); Assert.True(target.IsEmpty);
+
+        source = IntSpan([1, 8, 2, 3]);
+        values = IntSpan([8, 9]);
+        target = source.RemoveAll(values); Assert.True(target is [1, 8, 2, 3]);
+        target = source.RemoveAll(values, IntEquality()); Assert.True(target is [1, 8, 2, 3]);
+
+        source = IntSpan([1, 8, 9, 8, 9, 3]);
+        values = IntSpan([8, 9]);
+        target = source.RemoveAll(values); Assert.True(target is [1, 3]);
+        target = source.RemoveAll(values, IntEquality()); Assert.True(target is [1, 3]);
+    }
+
+    [Fact]
+    public static void Test_OnSpan_RemoveAll_Items()
+    {
+        var target = ItemSpan();
+        var source = ItemSpan();
+        var values = ItemSpan();
+        // source.RemoveAll(values); // => CS0311: Item<T> is not IEquatable
+
+        source = ItemSpan([1, 8, 2, 3]);
+        values = ItemSpan([8, 9]);
+        target = source.RemoveAll(values, ItemEquality());
+        Assert.True(target.SequenceEqual(ItemEnumerable([1, 8, 2, 3]), ItemEquality()));
+
+        source = ItemSpan([1, 8, 9, 8, 9, 3]);
+        values = ItemSpan([8, 9]);
+        target = source.RemoveAll(values, ItemEquality());
+        Assert.True(target.SequenceEqual(ItemEnumerable([1, 3]), ItemEquality()));
+    }
+}

@@ -5,15 +5,6 @@
 
 namespace Yotei.Tools;
 
-/* TODO: ROSpanExtensions OnEnum: Add, AddRange, ...
- * 
- *  IndexOfAnyRange
- *  LastIndexOfAnyRange
- *  IndexesOfAnyRange
- *  ContainsAnyRange
- *  StartsWithAnyRange
- *  EndsWithAnyRange
- */
 // ========================================================
 #if NETSTANDARD2_0
 internal

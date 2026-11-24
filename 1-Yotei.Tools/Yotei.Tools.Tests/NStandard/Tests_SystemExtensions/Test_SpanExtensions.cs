@@ -10,8 +10,6 @@ public static partial class Test_SpanExtensions
     static IEqualityComparer<int> IntEquality() => EqualityComparer<int>.Default;
     static IComparer<int> IntComparer() => Comparer<int>.Create((x, y) => x.CompareTo(y));
 
-
-
     // ----------------------------------------------------
 
     static Item<int> Item(int value) => new(value);
@@ -40,10 +38,32 @@ public static partial class Test_SpanExtensions
     // ----------------------------------------------------
 
     [Fact]
-    public static void Inherit_OnInt_IsEmpty()
+    public static void Inherit_IsEmpty()
     {
         var source = IntSpan(); Assert.True(source.IsEmpty);
         source = IntSpan([1, 2]); Assert.False(source.IsEmpty);
+    }
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_OnInt_Clone()
+    {
+        var source = IntSpan();
+        var target = source.Clone(); Assert.True(target.IsEmpty);
+
+        source = IntSpan([1, 2]);
+        target = source.Clone(); Assert.True(target is [1, 2]);
+    }
+
+    [Fact]
+    public static void Test_OnItem_Clone()
+    {
+        var source = ItemSpan();
+        var target = source.Clone(); Assert.True(target.IsEmpty);
+
+        source = ItemSpan([1, 2]);
+        target = source.Clone(); Assert.True(target.SequenceEqual(ItemEnumerable([1, 2]), ItemEquality()));
     }
 
     // ----------------------------------------------------
@@ -274,8 +294,6 @@ public static partial class Test_SpanExtensions
         result = source.TrimStart(9, IntEquality()); Assert.True(result is [1, 2, 9]);
         result = source.TrimStart(IntPredicate(9)); Assert.True(result is [1, 2, 9]);
     }
-}
-/*
 
     [Fact]
     public static void Test_OnItem_TrimStart()
@@ -395,4 +413,211 @@ public static partial class Test_SpanExtensions
         result = source.Trim(Item(9), ItemEquality()); Assert.True(result.SequenceEqual([new(1), new(2)], ItemEquality()));
         result = source.Trim(ItemPredicate(9)); Assert.True(result.SequenceEqual([new(1), new(2)], ItemEquality()));
     }
-}*/
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_OnInt_Add()
+    {
+        var source = IntSpan();
+        var target = source.Add(9); Assert.True(target is [9]);
+
+        source = IntSpan([1, 2]);
+        target = source.Add(9); Assert.True(target is [1, 2, 9]);
+    }
+
+    [Fact]
+    public static void Test_OnItem_Add()
+    {
+        var source = ItemSpan();
+        var target = source.Add(Item(9)); Assert.True(target.SequenceEqual(ItemEnumerable([9]), ItemEquality()));
+
+        source = ItemSpan([1, 2]);
+        target = source.Add(Item(9)); Assert.True(target.SequenceEqual(ItemEnumerable([1, 2, 9]), ItemEquality()));
+    }
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_OnInt_Insert()
+    {
+        var source = IntSpan();
+        var target = source.Insert(0, 9); Assert.True(target is [9]);
+
+        source = IntSpan([1, 2]);
+        target = source.Insert(1, 9); Assert.True(target is [1, 9, 2]);
+        target = source.Insert(2, 9); Assert.True(target is [1, 2, 9]);
+
+        try { source.Insert(-1, 0); Assert.Fail(""); } catch (ArgumentOutOfRangeException) { }
+        try { source.Insert(3, 0); Assert.Fail(""); } catch (ArgumentOutOfRangeException) { }
+    }
+
+    [Fact]
+    public static void Test_OnItem_Insert()
+    {
+        var source = ItemSpan();
+        var target = source.Insert(0, Item(9)); target.SequenceEqual(ItemEnumerable([9]), ItemEquality());
+
+        source = ItemSpan([1, 2]);
+        target = source.Insert(1, Item(9)); Assert.True(target.SequenceEqual(ItemEnumerable([1, 9, 2]), ItemEquality()));
+        target = source.Insert(2, Item(9)); Assert.True(target.SequenceEqual(ItemEnumerable([1, 2, 9]), ItemEquality()));
+
+        try { source.Insert(-1, Item(9)); Assert.Fail(""); } catch (ArgumentOutOfRangeException) { }
+        try { source.Insert(3, Item(9)); Assert.Fail(""); } catch (ArgumentOutOfRangeException) { }
+    }
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_RemoveAt()
+    {
+        var source = IntSpan([1]);
+        var target = source.RemoveAt(0); Assert.True(target.IsEmpty);
+
+        source = IntSpan([1, 2]);
+        target = source.RemoveAt(0); Assert.True(target is [2]);
+
+        source = IntSpan([1, 2]);
+        target = source.RemoveAt(1); Assert.True(target is [1]);
+
+        try { source.RemoveAt(-1); Assert.Fail(""); } catch (ArgumentOutOfRangeException) { }
+        try { source.RemoveAt(2); Assert.Fail(""); } catch (ArgumentOutOfRangeException) { }
+    }
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_RemoveRange()
+    {
+        var source = IntSpan();
+        var target = source.RemoveRange(0, 0); Assert.True(target.IsEmpty);
+
+        source = IntSpan([1, 2, 3, 4]);
+        try { source.RemoveRange(-1, 0); } catch (ArgumentOutOfRangeException) { }
+        try { source.RemoveRange(4, 0); } catch (ArgumentOutOfRangeException) { }
+
+        target = source.RemoveRange(0, 0); Assert.True(target is [1, 2, 3, 4]);
+        target = source.RemoveRange(0, 1); Assert.True(target is [2, 3, 4]);
+        target = source.RemoveRange(0, 2); Assert.True(target is [3, 4]);
+        target = source.RemoveRange(0, 3); Assert.True(target is [4]);
+        target = source.RemoveRange(0, 4); Assert.True(target.IsEmpty);
+        try { source.RemoveRange(0, 5); } catch (ArgumentOutOfRangeException) { }
+
+        target = source.RemoveRange(1, 0); Assert.True(target is [1, 2, 3, 4]);
+        target = source.RemoveRange(1, 1); Assert.True(target is [1, 3, 4]);
+        target = source.RemoveRange(1, 2); Assert.True(target is [1, 4]);
+        target = source.RemoveRange(1, 3); Assert.True(target is [1]);
+        try { source.RemoveRange(1, 4); } catch (ArgumentOutOfRangeException) { }
+
+        target = source.RemoveRange(2, 0); Assert.True(target is [1, 2, 3, 4]);
+        target = source.RemoveRange(2, 1); Assert.True(target is [1, 2, 4]);
+        target = source.RemoveRange(2, 2); Assert.True(target is [1, 2]);
+        try { source.RemoveRange(2, 3); } catch (ArgumentOutOfRangeException) { }
+
+        target = source.RemoveRange(3, 0); Assert.True(target is [1, 2, 3, 4]);
+        target = source.RemoveRange(3, 1); Assert.True(target is [1, 2, 3]);
+        try { source.RemoveRange(3, 2); } catch (ArgumentOutOfRangeException) { }
+    }
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_OnInt_Remove_Value()
+    {
+        var source = IntSpan();
+        var target = source.Remove(9); Assert.True(target.IsEmpty);
+
+        source = IntSpan([1, 9, 2, 9]);
+        target = source.Remove(0); Assert.True(target is [1, 9, 2, 9]);
+        target = source.Remove(9); Assert.True(target is [1, 2, 9]);
+
+        target = source.Remove(0, IntEquality()); Assert.True(target is [1, 9, 2, 9]);
+        target = source.Remove(9, IntEquality()); Assert.True(target is [1, 2, 9]);
+
+        target = source.Remove(IntPredicate(0)); Assert.True(target is [1, 9, 2, 9]);
+        target = source.Remove(IntPredicate(9)); Assert.True(target is [1, 2, 9]);
+    }
+
+    [Fact]
+    public static void Test_OnItem_Remove_Value()
+    {
+        var target = ItemSpan();
+        var source = ItemSpan();
+        // source.Remove(Item(9)); // => CS0311: Item<T> is not IEquatable
+
+        source = ItemSpan([1, 9, 2, 9]);
+        target = source.Remove(Item(0), ItemEquality()); Assert.True(target.SequenceEqual(ItemEnumerable([1, 9, 2, 9]), ItemEquality()));
+        target = source.Remove(Item(9), ItemEquality()); Assert.True(target.SequenceEqual(ItemEnumerable([1, 2, 9]), ItemEquality()));
+
+        target = source.Remove(ItemPredicate(0)); Assert.True(target.SequenceEqual(ItemEnumerable([1, 9, 2, 9]), ItemEquality()));
+        target = source.Remove(ItemPredicate(9)); Assert.True(target.SequenceEqual(ItemEnumerable([1, 2, 9]), ItemEquality()));
+    }
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_OnInt_RemoveLast_Value()
+    {
+        var source = IntSpan();
+        var target = source.RemoveLast(9); Assert.True(target.IsEmpty);
+
+        source = IntSpan([1, 9, 2, 9]);
+        target = source.RemoveLast(0); Assert.True(target is [1, 9, 2, 9]);
+        target = source.RemoveLast(9); Assert.True(target is [1, 9, 2]);
+
+        target = source.RemoveLast(0, IntEquality()); Assert.True(target is [1, 9, 2, 9]);
+        target = source.RemoveLast(9, IntEquality()); Assert.True(target is [1, 9, 2]);
+
+        target = source.RemoveLast(IntPredicate(0)); Assert.True(target is [1, 9, 2, 9]);
+        target = source.RemoveLast(IntPredicate(9)); Assert.True(target is [1, 9, 2]);
+    }
+
+    [Fact]
+    public static void Test_OnItem_RemoveLast_Value()
+    {
+        var target = ItemSpan();
+        var source = ItemSpan();
+        // source.RemoveLast(Item(9)); // => CS0311: Item<T> is not IEquatable
+
+        source = ItemSpan([1, 9, 2, 9]);
+        target = source.RemoveLast(Item(0), ItemEquality()); Assert.True(target.SequenceEqual(ItemEnumerable([1, 9, 2, 9]), ItemEquality()));
+        target = source.RemoveLast(Item(9), ItemEquality()); Assert.True(target.SequenceEqual(ItemEnumerable([1, 9, 2]), ItemEquality()));
+
+        target = source.RemoveLast(ItemPredicate(0)); Assert.True(target.SequenceEqual(ItemEnumerable([1, 9, 2, 9]), ItemEquality()));
+        target = source.RemoveLast(ItemPredicate(9)); Assert.True(target.SequenceEqual(ItemEnumerable([1, 9, 2]), ItemEquality()));
+    }
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_OnInt_RemoveAll_Value()
+    {
+        var source = IntSpan();
+        var target = source.RemoveAll(9); Assert.True(target.IsEmpty);
+
+        source = IntSpan([1, 9, 2, 9]);
+        target = source.RemoveAll(0); Assert.True(target is [1, 9, 2, 9]);
+        target = source.RemoveAll(9); Assert.True(target is [1, 2]);
+
+        target = source.RemoveAll(0, IntEquality()); Assert.True(target is [1, 9, 2, 9]);
+        target = source.RemoveAll(9, IntEquality()); Assert.True(target is [1, 2]);
+
+        target = source.RemoveAll(IntPredicate(0)); Assert.True(target is [1, 9, 2, 9]);
+        target = source.RemoveAll(IntPredicate(9)); Assert.True(target is [1, 2]);
+    }
+
+    [Fact]
+    public static void Test_OnItem_RemoveAll_Value()
+    {
+        var target = ItemSpan();
+        var source = ItemSpan();
+        // source.RemoveAll(Item(9)); // => CS0311: Item<T> is not IEquatable
+
+        source = ItemSpan([1, 9, 2, 9]);
+        target = source.RemoveAll(Item(0), ItemEquality()); Assert.True(target.SequenceEqual(ItemEnumerable([1, 9, 2, 9]), ItemEquality()));
+        target = source.RemoveAll(Item(9), ItemEquality()); Assert.True(target.SequenceEqual(ItemEnumerable([1, 2]), ItemEquality()));
+
+        target = source.RemoveAll(ItemPredicate(0)); Assert.True(target.SequenceEqual(ItemEnumerable([1, 9, 2, 9]), ItemEquality()));
+        target = source.RemoveAll(ItemPredicate(9)); Assert.True(target.SequenceEqual(ItemEnumerable([1, 2]), ItemEquality()));
+    }
+}

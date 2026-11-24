@@ -82,7 +82,7 @@ static class IEnumerableExtensions
         /// </summary>
         /// <param name="array"></param>
         /// <returns></returns>
-        public ReadOnlySpan<T> ToSpan(out T[]? array)
+        public ReadOnlySpan<T> ToSpan(out T[]? array, int sizeHint = 8)
         {
             array = null;
 
@@ -113,7 +113,8 @@ static class IEnumerableExtensions
             // Allocating an ad-hoc array of an arbitrary size...
             else
             {
-                array = ArrayPool<T>.Shared.Rent(16);
+                if (sizeHint <= 0) sizeHint = 8;
+                array = ArrayPool<T>.Shared.Rent(sizeHint);
                 int index = 0;
 
                 foreach (T item in source)

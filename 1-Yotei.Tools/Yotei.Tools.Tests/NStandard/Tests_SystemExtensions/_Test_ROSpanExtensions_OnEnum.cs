@@ -1,5 +1,11 @@
 ﻿namespace Yotei.Tools.Tests;
 
+// TODO ROSpan: AddRange(enum)
+// TODO ROSpan: InsertRange(enum)
+// TODO ROSpan: Remove(enum)
+// TODO ROSpan: RemoveLast(enum)
+// TODO ROSpan: RemoveAll(enum)
+
 // ========================================================
 public static partial class Test_ReadOnlySpanExtensions
 {
@@ -73,6 +79,46 @@ public static partial class Test_ReadOnlySpanExtensions
         source = ItemSpan([1, 1]);
         target = ItemEnumerable([1, 2]);
         result = source.SequenceCompareTo(target, ItemComparer()); Assert.Equal(-1, result);
+    }
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_OnEnum_SequenceEquals_Ints()
+    {
+        bool result;
+        var source = IntSpan();
+        var target = IntEnumerable();
+        result = source.SequenceEqual(target); Assert.True(result);
+        result = source.SequenceEqual(target, IntEquality()); Assert.True(result);
+
+        source = IntSpan([1, 2]);
+        target = [1, 2];
+        result = source.SequenceEqual(target); Assert.True(result);
+        result = source.SequenceEqual(target, IntEquality()); Assert.True(result);
+
+        source = IntSpan([1]);
+        target = [1, 2];
+        result = source.SequenceEqual(target); Assert.False(result);
+        result = source.SequenceEqual(target, IntEquality()); Assert.False(result);
+    }
+
+    [Fact]
+    public static void Test_OnEnum_SequenceEquals_Items()
+    {
+        bool result;
+        var source = ItemSpan();
+        var target = ItemEnumerable();
+        // source.SequenceEqual(target); // => CS0311: Item<T> is not IEquatable
+        result = source.SequenceEqual(target, ItemEquality()); Assert.True(result);
+
+        source = ItemSpan([1, 2]);
+        target = ItemEnumerable([1, 2]);
+        result = source.SequenceEqual(target, ItemEquality()); Assert.True(result);
+
+        source = ItemSpan([1]);
+        target = ItemEnumerable([1, 2]);
+        result = source.SequenceEqual(target, ItemEquality()); Assert.False(result);
     }
 
     // ----------------------------------------------------
@@ -309,46 +355,6 @@ public static partial class Test_ReadOnlySpanExtensions
         source = ItemSpan([1, 2, 3, 4]);
         values = ItemEnumerable([3, 4]);
         result = source.EndsWith(values, ItemEquality()); Assert.True(result);
-    }
-
-    // ----------------------------------------------------
-
-    [Fact]
-    public static void Test_OnEnum_SequenceEquals_Ints()
-    {
-        bool result;
-        var source = IntSpan();
-        var target = IntEnumerable();
-        result = source.SequenceEqual(target); Assert.True(result);
-        result = source.SequenceEqual(target, IntEquality()); Assert.True(result);
-
-        source = IntSpan([1, 2]);
-        target = [1, 2];
-        result = source.SequenceEqual(target); Assert.True(result);
-        result = source.SequenceEqual(target, IntEquality()); Assert.True(result);
-
-        source = IntSpan([1]);
-        target = [1, 2];
-        result = source.SequenceEqual(target); Assert.False(result);
-        result = source.SequenceEqual(target, IntEquality()); Assert.False(result);
-    }
-
-    [Fact]
-    public static void Test_OnEnum_SequenceEquals_Items()
-    {
-        bool result;
-        var source = ItemSpan();
-        var target = ItemEnumerable();
-        // source.SequenceEqual(target); // => CS0311: Item<T> is not IEquatable
-        result = source.SequenceEqual(target, ItemEquality()); Assert.True(result);
-
-        source = ItemSpan([1, 2]);
-        target = ItemEnumerable([1, 2]);
-        result = source.SequenceEqual(target, ItemEquality()); Assert.True(result);
-
-        source = ItemSpan([1]);
-        target = ItemEnumerable([1, 2]);
-        result = source.SequenceEqual(target, ItemEquality()); Assert.False(result);
     }
 
     // ----------------------------------------------------

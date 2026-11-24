@@ -1,6 +1,20 @@
 ﻿#pragma warning disable IDE0059, CA1859, IDE0301
 namespace Yotei.Tools.Tests;
 
+// TODO ROSpan: public static void Test_OnInt_Clone()
+// TODO ROSpan: public static void Test_OnItem_Clone()
+// TODO ROSpan: Add(value)
+// TODO ROSpan: Insert(value)
+// TODO ROSpan: RemoveAt(index)
+// TODO ROSpan: RemoveRange(index, count)
+// TODO ROSpan: Remove(value)
+// TODO ROSpan: RemoveLast(value)
+// TODO ROSpan: RemoveAll(value)
+// TODO ROSpan: Remove(predicate)
+// TODO ROSpan: RemoveLast(predicate)
+// TODO ROSpan: RemoveAll(predicate)
+// TODO ROSpan: Clear()
+
 // ========================================================
 public static partial class Test_ReadOnlySpanExtensions
 {

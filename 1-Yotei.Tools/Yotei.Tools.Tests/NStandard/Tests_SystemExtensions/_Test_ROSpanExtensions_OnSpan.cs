@@ -1,5 +1,11 @@
 ﻿namespace Yotei.Tools.Tests;
 
+// TODO ROSpan: AddRange(span)
+// TODO ROSpan: InsertRange(span)
+// TODO ROSpan: Remove(span)
+// TODO ROSpan: RemoveLast(span)
+// TODO ROSpan: RemoveAll(span)
+
 // ========================================================
 public static partial class Test_ReadOnlySpanExtensions
 {
