@@ -200,12 +200,6 @@ static partial class ReadOnlySpanExtensions
         => source.Length == 0 && values.Length == 0
         || source.Length > 0 && source.LastIndexOf(values, comparer) == source.Length - values.Length;
 
-
-
-
-
-
-
     // ----------------------------------------------------
 
     /// <summary>

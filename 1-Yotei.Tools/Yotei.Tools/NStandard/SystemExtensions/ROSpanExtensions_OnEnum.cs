@@ -3,12 +3,16 @@
 #pragma warning disable CS0436
 #endif
 
-using System.Buffers;
-using System.ComponentModel.DataAnnotations;
-using System.Net.Http.Headers;
-
 namespace Yotei.Tools;
 
+/*
+ *  IndexOfAnyRange
+ *  LastIndexOfAnyRange
+ *  IndexesOfAnyRange
+ *  ContainsAnyRange
+ *  StartsWithAnyRange
+ *  EndsWithAnyRange
+ */
 // ========================================================
 #if NETSTANDARD2_0
 internal
@@ -205,7 +209,8 @@ static partial class ReadOnlySpanExtensions
         comparer.ThrowWhenNull();
 
         var span = values.ToSpan(out var buffer);
-        return source.IndexOf(span, comparer);
+        try { return source.IndexOf(span, comparer); }
+        finally { if (buffer is not null) ArrayPool<T>.Shared.Return(buffer, true); }
     }
 
     // ----------------------------------------------------
@@ -239,7 +244,8 @@ static partial class ReadOnlySpanExtensions
         comparer.ThrowWhenNull();
 
         var span = values.ToSpan(out var buffer);
-        return source.LastIndexOf(span, comparer);
+        try { return source.LastIndexOf(span, comparer); }
+        finally { if (buffer is not null) ArrayPool<T>.Shared.Return(buffer, true); }
     }
 
     // ----------------------------------------------------
@@ -273,7 +279,8 @@ static partial class ReadOnlySpanExtensions
         comparer.ThrowWhenNull();
 
         var span = values.ToSpan(out var buffer);
-        return source.Contains(span, comparer);
+        try { return source.Contains(span, comparer); }
+        finally { if (buffer is not null) ArrayPool<T>.Shared.Return(buffer, true); }
     }
 
     // ----------------------------------------------------
@@ -307,7 +314,8 @@ static partial class ReadOnlySpanExtensions
         comparer.ThrowWhenNull();
 
         var span = values.ToSpan(out var buffer);
-        return source.StartsWith(span, comparer);
+        try { return source.StartsWith(span, comparer); }
+        finally { if (buffer is not null) ArrayPool<T>.Shared.Return(buffer, true); }
     }
 
     // ----------------------------------------------------
@@ -341,7 +349,8 @@ static partial class ReadOnlySpanExtensions
         comparer.ThrowWhenNull();
 
         var span = values.ToSpan(out var buffer);
-        return source.EndsWith(span, comparer);
+        try { return source.EndsWith(span, comparer); }
+        finally { if (buffer is not null) ArrayPool<T>.Shared.Return(buffer, true); }
     }
 
     // ----------------------------------------------------
@@ -583,18 +592,3 @@ static partial class ReadOnlySpanExtensions
         this ReadOnlySpan<T> source, IEnumerable<T> values, IEqualityComparer<T> comparer)
         => source.IndexOfAnyExcept(values, comparer) >= 0;
 }
-/*
- *  IndexOfRange
- *  LastIndexOfRange
- *  IndexesOfRange
- *  ContainsRange
- *  StartsWithRange
- *  EndsWithRange
- *  
- *  IndexOfAnyRange
- *  LastIndexOfAnyRange
- *  IndexesOfAnyRange
- *  ContainsAnyRange
- *  StartsWithAnyRange
- *  EndsWithAnyRange
- */
