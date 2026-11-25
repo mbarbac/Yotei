@@ -1,21 +1,15 @@
 ﻿#if NETSTANDARD2_0
-#pragma warning disable IDE0079
-#pragma warning disable CS0436
-#endif
-
+namespace Yotei.Tools.NStd20;
+#else
 namespace Yotei.Tools;
+#endif
 
 // ========================================================
 /// <summary>
 /// Represents a semantic versioning specification. See: https://semver.org
 /// <br/> Instances of this type are intended to be immutable ones.
 /// </summary>
-#if NETSTANDARD2_0
-internal
-#else
-public
-#endif
-record SemanticVersion : IComparable<SemanticVersion>, IEquatable<SemanticVersion>
+public record SemanticVersion : IComparable<SemanticVersion>, IEquatable<SemanticVersion>
 {
     /// <summary>
     /// An empty shared instance.

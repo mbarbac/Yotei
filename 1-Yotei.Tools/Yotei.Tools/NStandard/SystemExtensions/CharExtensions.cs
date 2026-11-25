@@ -1,17 +1,11 @@
 ﻿#if NETSTANDARD2_0
-#pragma warning disable IDE0079
-#pragma warning disable CS0436
-#endif
-
+namespace Yotei.Tools.NStd20;
+#else
 namespace Yotei.Tools;
+#endif
 
 // ========================================================
-#if NETSTANDARD2_0
-internal
-#else
-public
-#endif
-static class CharExtensions
+public static class CharExtensions
 {
     extension(char)
     {
@@ -154,13 +148,15 @@ static class CharExtensions
         [SuppressMessage("", "IDE0302")]
         public bool Equals(char x, char y)
         {
-            //var xs = x.ToString();
-            //var ys = y.ToString();
-            //return comparer.Equals(xs, ys);
-
+#if NETSTANDARD2_0
+            var xs = x.ToString();
+            var ys = y.ToString();
+            return comparer.Equals(xs, ys);
+#else
             Span<char> xs = stackalloc char[1]; xs[0] = x;
             Span<char> ys = stackalloc char[1]; ys[0] = y;
             return comparer.Equals(new string(xs), new string(ys));
+#endif
         }
         public int GetHashCode(char obj) => comparer.GetHashCode(obj.ToString());
     }
@@ -182,9 +178,15 @@ static class CharExtensions
         [SuppressMessage("", "IDE0302")]
         public bool Equals(char x, char y)
         {
+#if NETSTANDARD2_0
+            var xs = x.ToString();
+            var ys = y.ToString();
+            return string.Compare(xs, ys, comparison) == 0;
+#else
             Span<char> xs = stackalloc char[] { x };
             Span<char> ys = stackalloc char[] { y };
             return xs.CompareTo(ys, comparison) == 0;
+#endif
         }
 
         public int GetHashCode(char obj) => comparison is

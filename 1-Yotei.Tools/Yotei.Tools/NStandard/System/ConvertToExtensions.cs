@@ -1,17 +1,11 @@
 ﻿#if NETSTANDARD2_0
-#pragma warning disable IDE0079
-#pragma warning disable CS0436
-#endif
-
+namespace Yotei.Tools.NStd20;
+#else
 namespace Yotei.Tools;
+#endif
 
 // ========================================================
-#if NETSTANDARD2_0
-internal
-#else
-public
-#endif
-static class ConvertToExtensions
+public static class ConvertToExtensions
 {
     /// <summary>
     /// Tries to convert the given source value into an instance of the given target type.

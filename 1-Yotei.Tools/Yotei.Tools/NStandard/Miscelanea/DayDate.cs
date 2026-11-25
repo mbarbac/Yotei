@@ -1,9 +1,8 @@
 ﻿#if NETSTANDARD2_0
-#pragma warning disable IDE0079
-#pragma warning disable CS0436
-#endif
-
+namespace Yotei.Tools.NStd20.Miscelanea;
+#else
 namespace Yotei.Tools.Miscelanea;
+#endif
 
 // ========================================================
 /// <summary>
@@ -11,12 +10,7 @@ namespace Yotei.Tools.Miscelanea;
 /// <br/> Instances of this type take into consideration the XVI century conversion from the
 /// Julian calendar system to the Gregorian one.
 /// </summary>
-#if NETSTANDARD2_0
-internal
-#else
-public
-#endif
-sealed record DayDate : IComparable<DayDate>
+public sealed record DayDate : IComparable<DayDate>
 {
     /// <summary>
     /// Initializes a new instance.

@@ -1,17 +1,13 @@
 ﻿#if NETSTANDARD2_0
-#pragma warning disable IDE0079
-#pragma warning disable CS0436
-#endif
-
-namespace Yotei.Tools;
-
-// ========================================================
-#if NETSTANDARD2_0
-internal
+namespace Yotei.Tools.NStd20;
 #else
-public
+namespace Yotei.Tools;
 #endif
-interface IDisposableEx
+// ========================================================
+/// <summary>
+/// Extends the <see cref="IDisposable"/> interface.
+/// </summary>
+public interface IDisposableEx
 {
     /// <summary>
     /// Determines if this instance has been disposed.

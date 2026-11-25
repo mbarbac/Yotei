@@ -1,20 +1,14 @@
 ﻿#if NETSTANDARD2_0
-#pragma warning disable IDE0079
-#pragma warning disable CS0436
-#endif
-
+namespace Yotei.Tools.NStd20;
+#else
 namespace Yotei.Tools;
+#endif
 
 // ========================================================
 /// <summary>
 /// Builds <see cref="IEqualityComparer{T}"/> instances.
 /// </summary>
-#if NETSTANDARD2_0
-internal
-#else
-public
-#endif
-static class EqualityComparerEx
+public static class EqualityComparerEx
 {
     /// <summary>
     /// Returns a new instance that uses the type's capabilities.
@@ -97,7 +91,7 @@ static class EqualityComparerEx
         public bool Equals(T? x, T? y)
         {
             // External elements...
-            if (_Comparer is not null) return _Comparer.Equals(x, y);
+            if (_Comparer is not null) return _Comparer.Equals(x!, y!);
             if (_Func is not null) return _Func(x, y);
 
 
@@ -134,6 +128,6 @@ static class EqualityComparerEx
         /// <summary>
         /// <inheritdoc/>
         /// </summary>
-        public int GetHashCode([DisallowNull] T obj) => obj?.GetHashCode() ?? 0;
+        public int GetHashCode(T obj) => obj?.GetHashCode() ?? 0;
     }
 }

@@ -1,20 +1,14 @@
 ﻿#if NETSTANDARD2_0
-#pragma warning disable IDE0079
-#pragma warning disable CS0436
-#endif
-
+namespace Yotei.Tools.NStd20.Miscelanea;
+#else
 namespace Yotei.Tools.Miscelanea;
+#endif
 
 // ========================================================
 /// <summary>
 /// Represents an arbitrary clock time in a 24-hours format.
 /// </summary>
-#if NETSTANDARD2_0
-internal
-#else
-public
-#endif
-sealed record ClockTime : IComparable<ClockTime>
+public sealed record ClockTime : IComparable<ClockTime>
 {
     /// <summary>
     /// Initializes a new default instance.

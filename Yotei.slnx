@@ -18,9 +18,15 @@
   </Folder>
   <Folder Name="/1-Yotei.Tools.DynamicLambda/" />
   <Folder Name="/1-Yotei.Tools.Generators/" />
-  <Folder Name="/1-Yotei.Tools/">
+  <Folder Name="/1-Yotei.Tools/" />
+  <Folder Name="/1-Yotei.Tools/Core/">
     <Project Path="1-Yotei.Tools/Yotei.Tools.Tests/Yotei.Tools.Tests.csproj" Id="5cba5bdd-6056-4c36-a14f-b42ca4f7f4be" />
     <Project Path="1-Yotei.Tools/Yotei.Tools/Yotei.Tools.csproj" Id="15f4f455-5a7a-4dd8-9151-8b2ee9be2c9f" />
+  </Folder>
+  <Folder Name="/1-Yotei.Tools/NetStandard20/">
+    <Project Path="1-Yotei.Tools/Yotei.Tools.NStd20/Yotei.Tools.NStd20.csproj" Id="9858840c-750f-49f3-859d-33776e446ea3">
+      <BuildType Solution="Local|*" Project="Debug" />
+    </Project>
   </Folder>
   <Folder Name="/2-Yotei.ORM.Generators/" />
   <Folder Name="/2-Yotei.ORM/" />

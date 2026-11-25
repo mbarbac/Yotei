@@ -1,20 +1,14 @@
 ﻿#if NETSTANDARD2_0
-#pragma warning disable IDE0079
-#pragma warning disable CS0436
-#endif
-
+namespace Yotei.Tools.NStd20;
+#else
 namespace Yotei.Tools;
+#endif
 
 // ========================================================
 /// <summary>
 /// Builds <see cref="Predicate{T}"/> instances.
 /// </summary>
-#if NETSTANDARD2_0
-internal
-#else
-public
-#endif
-static class PredicateEx
+public static class PredicateEx
 {
     /// <summary>
     /// Returns a predicate that tests for equality with the given value, using the type's own

@@ -1,20 +1,14 @@
 ﻿#if NETSTANDARD2_0
-#pragma warning disable IDE0079
-#pragma warning disable CS0436
-#endif
-
+namespace Yotei.Tools.NStd20;
+#else
 namespace Yotei.Tools;
+#endif
 
 // ========================================================
 /// <summary>
 /// Represents the ocurrence of an unexpected situation.
 /// </summary>
-#if NETSTANDARD2_0
-internal
-#else
-public
-#endif
-class UnExpectedException : Exception
+public class UnExpectedException : Exception
 {
     /// <summary>
     /// Initializes a new instance.

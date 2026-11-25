@@ -1,20 +1,14 @@
 ﻿#if NETSTANDARD2_0
-#pragma warning disable IDE0079
-#pragma warning disable CS0436
-#endif
-
+namespace Yotei.Tools.NStd20;
+#else
 namespace Yotei.Tools;
+#endif
 
 // ========================================================
 /// <summary>
 /// Builds <see cref="IComparer{T}"/> instances.
 /// </summary>
-#if NETSTANDARD2_0
-internal
-#else
-public
-#endif
-static class ComparerEx
+public static class ComparerEx
 {
     /// <summary>
     /// Returns a new instance that uses the type's capabilities.
@@ -97,7 +91,7 @@ static class ComparerEx
         public int Compare([AllowNull] T x, [AllowNull] T y)
         {
             // External elements...
-            if (_Comparer is not null) return _Comparer.Compare(x, y);
+            if (_Comparer is not null) return _Comparer.Compare(x!, y!);
             if (_Func is not null) return _Func(x, y);
 
             // Comparison against null...

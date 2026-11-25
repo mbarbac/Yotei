@@ -1,17 +1,10 @@
 ﻿#if NETSTANDARD2_0
-#pragma warning disable IDE0079
-#pragma warning disable CS0436
-#endif
-
-namespace Yotei.Tools;
-
-// ========================================================
-#if NETSTANDARD2_0
-internal
+namespace Yotei.Tools.NStd20;
 #else
-public
+namespace Yotei.Tools;
 #endif
-static class TimeSpanExtensions
+// ========================================================
+public static class TimeSpanExtensions
 {
     extension(TimeSpan source)
     {

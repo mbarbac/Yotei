@@ -1,20 +1,14 @@
 ﻿#if NETSTANDARD2_0
-#pragma warning disable IDE0079
-#pragma warning disable CS0436
-#endif
-
+namespace Yotei.Tools.NStd20;
+#else
 namespace Yotei.Tools;
+#endif
 
 // ========================================================
 /// <summary>
 /// Base extended disposable record.
 /// </summary>
-#if NETSTANDARD2_0
-internal
-#else
-public
-#endif
-abstract record DisposableRecord : IDisposableEx
+public abstract record DisposableRecord : IDisposableEx
 #if !NETSTANDARD2_0
     , IAsyncDisposableEx
 #endif

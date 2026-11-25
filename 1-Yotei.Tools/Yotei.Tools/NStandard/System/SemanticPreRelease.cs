@@ -1,10 +1,10 @@
-﻿#if NETSTANDARD2_0
-#pragma warning disable IDE0079
-#pragma warning disable CS0436
-#endif
+﻿using System.Collections.ObjectModel;
 
-using System.Collections.ObjectModel;
+#if NETSTANDARD2_0
+namespace Yotei.Tools.NStd20;
+#else
 namespace Yotei.Tools;
+#endif
 
 // ========================================================
 /// <summary>
@@ -12,12 +12,7 @@ namespace Yotei.Tools;
 /// See: https://semver.org
 /// <br/> Instances of this type are intended to be immutable ones.
 /// </summary>
-#if NETSTANDARD2_0
-internal
-#else
-public
-#endif
-record SemanticPreRelease : IComparable<SemanticPreRelease>, IEquatable<SemanticPreRelease>
+public record SemanticPreRelease : IComparable<SemanticPreRelease>, IEquatable<SemanticPreRelease>
 {
     /// <summary>
     /// An empty shared instance.
@@ -90,7 +85,14 @@ record SemanticPreRelease : IComparable<SemanticPreRelease>, IEquatable<Semantic
     /// </summary>
     public string Value
     {
-        get => _Value ??= string.Join('.', _ValueParts);
+        get
+        {
+#if NETSTANDARD2_0
+            return _Value ??= string.Join(".", _ValueParts);
+#else
+            return _Value ??= string.Join('.', _ValueParts);
+#endif
+        }
         init
         {
             _ValueParts = []; // Preventive cleaning...
@@ -134,7 +136,14 @@ record SemanticPreRelease : IComparable<SemanticPreRelease>, IEquatable<Semantic
     /// </summary>
     public string Metadata
     {
-        get => _Metadata ??= string.Join('.', _MetaParts);
+        get
+        {
+#if NETSTANDARD2_0
+            return _Metadata ??= string.Join(".", _MetaParts);
+#else
+            return _Metadata ??= string.Join('.', _MetaParts);
+#endif
+        }
         init
         {
             _MetaParts = []; // Preventive cleaning...
