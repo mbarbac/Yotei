@@ -261,9 +261,9 @@ public static class ConvertToExtensions
         Type targetType,
         IFormatProvider? provider = null)
     {
-        Type sourceType = source is null ? null! : source.GetType();
-        targetType.ThrowWhenNull();
+        ArgumentNullException.ThrowIfNull(targetType);
 
+        Type sourceType = source is null ? null! : source.GetType();
         if (source is null) // From null souce...
         {
             target = default;

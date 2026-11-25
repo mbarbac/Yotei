@@ -86,7 +86,7 @@ public class ProjectFileLine
     {
         head = head.NotNullNotEmpty(trim: true);
         tail = tail.NotNullNotEmpty(trim: true);
-        value.ThrowWhenNull();
+        ArgumentNullException.ThrowIfNull(value);
 
         var ini = Value.IndexOf(head, comparison);
         if (ini < 0) return false;
@@ -139,7 +139,7 @@ public class ProjectFileLine
         StringComparison comparison = StringComparison.Ordinal)
     {
         delimiter = delimiter.NotNullNotEmpty(trim: true);
-        value.ThrowWhenNull();
+        ArgumentNullException.ThrowIfNull(value);
 
         var head = $"<{delimiter}>";
         var tail = $"</{delimiter}>";
@@ -237,7 +237,7 @@ public class ProjectFileLine
     /// <returns></returns>
     public bool UpdateNuPackageVersion(SemanticVersion version)
     {
-        version.ThrowWhenNull();
+        ArgumentNullException.ThrowIfNull(version);
         if (version.IsEmpty) throw new EmptyException("Version cannot be empty.");
 
         return Update(NUVERSION, NUTAIL, version);

@@ -36,7 +36,8 @@ public sealed record ClockTime : IComparable<ClockTime>
     /// <param name="source"></param>
     public ClockTime(ClockTime source)
     {
-        source.ThrowWhenNull();
+        ArgumentNullException.ThrowIfNull(source);
+
         Hour = source.Hour;
         Minute = source.Minute;
         Second = source.Second;

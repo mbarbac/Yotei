@@ -42,7 +42,8 @@ public record SemanticPreRelease : IComparable<SemanticPreRelease>, IEquatable<S
     /// <param name="other"></param>
     public SemanticPreRelease(SemanticPreRelease other)
     {
-        other.ThrowWhenNull();
+        ArgumentNullException.ThrowIfNull(other);
+
         _ValueParts = (string[])other._ValueParts.Clone();
         _MetaParts = (string[])other._MetaParts.Clone();
     }
@@ -98,7 +99,8 @@ public record SemanticPreRelease : IComparable<SemanticPreRelease>, IEquatable<S
             _ValueParts = []; // Preventive cleaning...
 
             // Empty is allowed, but not null or blanks-only...
-            value.ThrowWhenNull();
+            ArgumentNullException.ThrowIfNull(value);
+
             if (value.Length == 0) return;
             value = value.NotNullNotEmpty(trim: true);
 
@@ -149,7 +151,8 @@ public record SemanticPreRelease : IComparable<SemanticPreRelease>, IEquatable<S
             _MetaParts = []; // Preventive cleaning...
 
             // Empty is allowed, but not null or blanks-only...
-            value.ThrowWhenNull();
+            ArgumentNullException.ThrowIfNull(value);
+
             if (value.Length == 0) return;
             value = value.NotNullNotEmpty(trim: true);
 

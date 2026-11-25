@@ -59,9 +59,6 @@ public static partial class StringExtensions
             bool trim,
             [CallerArgumentExpression(nameof(source))] string? name = null)
         {
-            if (string.IsNullOrWhiteSpace(name)) name = nameof(source);
-            source.ThrowWhenNull(name);
-
             source = source.NullWhenEmpty(trim);
             return source is null ? throw new EmptyException(name!) : source;
         }
@@ -78,7 +75,7 @@ public static partial class StringExtensions
         /// <returns></returns>
         public string? Wrap(char head, char tail, bool trim, IEqualityComparer<char> comparer)
         {
-            comparer.ThrowWhenNull();
+            ArgumentNullException.ThrowIfNull(comparer);
 
             if (source is not null)
             {
@@ -159,7 +156,7 @@ public static partial class StringExtensions
             char head, char tail, bool trim, IEqualityComparer<char> comparer,
             bool recursive = true)
         {
-            comparer.ThrowWhenNull();
+            ArgumentNullException.ThrowIfNull(comparer);
 
             if (source is not null)
             {

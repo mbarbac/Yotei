@@ -39,7 +39,9 @@
 		<ToolsPath>..\..\1-Yotei.Tools\Yotei.Tools</ToolsPath>
 	</PropertyGroup>
 	<ItemGroup>
-		<Compile Include="$(ToolsPath)\NStandard\**\*.cs" Exclude="$(ToolsPath)\NStandard\**\obj\**;(ToolsPath)\NStandard\**\bin\**">
+		<Compile
+			Include="$(ToolsPath)\NStandard\**\*.cs"
+			Exclude="$(ToolsPath)\NStandard\**\obj\**;(ToolsPath)\NStandard\**\bin\**">
 			<Link>Yotei.Tools\%(RecursiveDir)%(FileName)%(Extension)</Link>
 		</Compile>
 	</ItemGroup>

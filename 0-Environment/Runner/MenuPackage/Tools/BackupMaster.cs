@@ -40,7 +40,7 @@ public class BackupMaster
         ProjectFile project,
         [NotNullWhen(true)] out List<ProjectFileLine>? lines)
     {
-        project.ThrowWhenNull();
+        ArgumentNullException.ThrowIfNull(project);
 
         lines = null;
         return Items.TryGetValue(project, out lines);
@@ -55,7 +55,7 @@ public class BackupMaster
     /// <returns></returns>
     public List<ProjectFileLine> Add(ProjectFile project)
     {
-        project.ThrowWhenNull();
+        ArgumentNullException.ThrowIfNull(project);
 
         if (Items.TryGetValue(project, out var lines)) return lines;
 

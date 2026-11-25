@@ -64,7 +64,7 @@ public static class ObjectExtensions
     public static bool EqualsEx<T>(
         [AllowNull] this T source, [AllowNull] T target, IEqualityComparer<T> comparer)
     {
-        comparer.ThrowWhenNull();
+        ArgumentNullException.ThrowIfNull(comparer);
 
         if (!typeof(T).IsValueType)
         {

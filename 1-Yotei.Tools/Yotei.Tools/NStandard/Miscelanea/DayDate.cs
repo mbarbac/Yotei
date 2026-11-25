@@ -31,7 +31,8 @@ public sealed record DayDate : IComparable<DayDate>
     /// <param name="source"></param>
     public DayDate(DayDate source)
     {
-        source.ThrowWhenNull();
+        ArgumentNullException.ThrowIfNull(source);
+
         Year = source.Year;
         Month = source.Month;
         Day = source.Day;

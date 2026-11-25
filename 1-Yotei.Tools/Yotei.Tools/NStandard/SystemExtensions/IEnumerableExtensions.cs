@@ -35,7 +35,7 @@ public static class IEnumerableExtensions
         /// <param name="action"></param>
         public void ForEach(Action<T> action)
         {
-            action.ThrowWhenNull();
+            ArgumentNullException.ThrowIfNull(action);
             foreach (var item in source) action(item);
         }
 
@@ -47,8 +47,8 @@ public static class IEnumerableExtensions
         /// <param name="action"></param>
         public void ForEach(Predicate<T> predicate, Action<T> action)
         {
-            predicate.ThrowWhenNull();
-            action.ThrowWhenNull();
+            ArgumentNullException.ThrowIfNull(predicate);
+            ArgumentNullException.ThrowIfNull(action);
 
             foreach (var item in source) if (predicate(item)) action(item);
         }

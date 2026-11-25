@@ -2,11 +2,13 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 #if NETSTANDARD2_0
+#pragma warning disable IDE0079
 #pragma warning disable CS0436
+
 namespace System;
 
 /// <summary>
-/// Represent a range has start and end indexes.
+/// Represent a range has start and end indexes. ditto.
 /// </summary>
 /// <remarks>
 /// Range is used by the C# compiler to support the range syntax.

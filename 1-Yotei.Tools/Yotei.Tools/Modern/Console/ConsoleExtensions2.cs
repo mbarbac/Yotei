@@ -488,7 +488,7 @@ public static partial class ConsoleExtensions
             string? source, IEnumerable<string> candidates,
             TimeSpan timeout, Color forecolor, Color backcolor)
         {
-            candidates.ThrowWhenNull();
+            ArgumentNullException.ThrowIfNull(candidates);
             PreventBufferOverflow(5); // 5 by convention...
 
             var oldfore = Console.ForegroundColor; Console.ForegroundColor = forecolor;

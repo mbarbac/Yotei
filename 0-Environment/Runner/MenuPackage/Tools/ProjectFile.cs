@@ -149,7 +149,7 @@ public class ProjectFile : IEnumerable<ProjectFileLine>
         SemanticVersion version,
         [NotNullWhen(true)] out SemanticVersion? oldversion)
     {
-        version.ThrowWhenNull();
+        ArgumentNullException.ThrowIfNull(version);
 
         foreach (var line in Lines)
         {
@@ -227,7 +227,7 @@ public class ProjectFile : IEnumerable<ProjectFileLine>
     /// <param name="line"></param>
     public void Add(ProjectFileLine line)
     {
-        line.ThrowWhenNull();
+        ArgumentNullException.ThrowIfNull(line);
         if (Lines.Contains(line)) throw new DuplicateException("Duplicated line.").WithData(line);
         Lines.Add(line);
     }
@@ -238,7 +238,7 @@ public class ProjectFile : IEnumerable<ProjectFileLine>
     /// <param name="range"></param>
     public void AddRange(IEnumerable<ProjectFileLine> range)
     {
-        range.ThrowWhenNull();
+        ArgumentNullException.ThrowIfNull(range);
         foreach (var line in range) Add(line);
     }
 
@@ -249,7 +249,7 @@ public class ProjectFile : IEnumerable<ProjectFileLine>
     /// <param name="line"></param>
     public void Insert(int index, ProjectFileLine line)
     {
-        line.ThrowWhenNull();
+        ArgumentNullException.ThrowIfNull(line);
         if (Lines.Contains(line)) throw new DuplicateException("Duplicated line.").WithData(line);
         Lines.Insert(index, line);
     }
@@ -261,7 +261,7 @@ public class ProjectFile : IEnumerable<ProjectFileLine>
     /// <param name="range"></param>
     public void InsertRange(int index, IEnumerable<ProjectFileLine> range)
     {
-        range.ThrowWhenNull();
+        ArgumentNullException.ThrowIfNull(range);
         foreach (var line in range) Insert(index++, line);
     }
 

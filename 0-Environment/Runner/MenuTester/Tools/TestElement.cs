@@ -89,7 +89,7 @@ public record TestElement : IEquatable<TestElement>
     /// <returns></returns>
     public static bool IsValid(MethodInfo method)
     {
-        method.ThrowWhenNull();
+        ArgumentNullException.ThrowIfNull(method);
 
         // Must be a parameter-less method...
         var pars = method.GetParameters();

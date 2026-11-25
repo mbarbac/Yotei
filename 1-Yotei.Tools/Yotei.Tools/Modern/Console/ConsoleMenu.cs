@@ -102,7 +102,7 @@ public partial record ConsoleMenu : IEnumerable<ConsoleMenu.Entry>
     /// <returns></returns>
     public ConsoleMenu AddRange(IEnumerable<Entry> range)
     {
-        range.ThrowWhenNull();
+        ArgumentNullException.ThrowIfNull(range);
         foreach (var entry in range) Add(entry);
         return this;
     }
@@ -128,7 +128,7 @@ public partial record ConsoleMenu : IEnumerable<ConsoleMenu.Entry>
     /// <returns></returns>
     public ConsoleMenu InsertRange(int index, IEnumerable<Entry> range)
     {
-        range.ThrowWhenNull();
+        ArgumentNullException.ThrowIfNull(range);
         foreach (var entry in range) Insert(index++, entry);
         return this;
     }

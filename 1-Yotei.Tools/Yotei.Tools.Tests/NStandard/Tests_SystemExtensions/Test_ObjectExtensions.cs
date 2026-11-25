@@ -1,4 +1,8 @@
-﻿namespace Yotei.Tools.Tests;
+﻿#if NETSTANDARD2_0
+namespace Yotei.Tools.NStd20.Tests;
+#else
+namespace Yotei.Tools.Tests;
+#endif
 
 // ========================================================
 public static class Test_ObjectExtensions
@@ -7,9 +11,9 @@ public static class Test_ObjectExtensions
     public static void Test_ThrowWhenNull()
     {
         string? name = "James";
-        name.ThrowWhenNull();
+        ArgumentNullException.ThrowIfNull(name);
 
-        try { name = null; name.ThrowWhenNull(); Assert.Fail(""); }
+        try { name = null; ArgumentNullException.ThrowIfNull(name); Assert.Fail(""); }
         catch (ArgumentNullException) { }
     }
 

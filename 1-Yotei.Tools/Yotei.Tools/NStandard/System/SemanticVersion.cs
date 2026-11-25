@@ -63,7 +63,8 @@ public record SemanticVersion : IComparable<SemanticVersion>, IEquatable<Semanti
     public SemanticVersion(string value) : this()
     {
         // Empty is allowed, but not null or blanks-only...
-        value.ThrowWhenNull();
+        ArgumentNullException.ThrowIfNull(value);
+
         if (value.Length == 0) return;
         value = value.NotNullNotEmpty(trim: true);
 
@@ -128,7 +129,7 @@ public record SemanticVersion : IComparable<SemanticVersion>, IEquatable<Semanti
     /// <param name="other"></param>
     public SemanticVersion(SemanticVersion other)
     {
-        other.ThrowWhenNull();
+        ArgumentNullException.ThrowIfNull(other);
 
         Major = other.Major;
         Minor = other.Minor;
