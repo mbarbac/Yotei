@@ -8,10 +8,3 @@
 //    {
 //    }
 //}
-
-public class Fake
-{
-    public void MM()
-    {
-    }
-}

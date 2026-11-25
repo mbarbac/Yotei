@@ -1,8 +1,9 @@
 ﻿#if NETSTANDARD2_0
+#pragma warning disable CS8777
 namespace Yotei.Tools.NStd20;
 
 // ========================================================
-public static class ArgumentNullExceptionExceptions
+public static class ArgumentNullExceptionExtensions
 {
     extension(ArgumentNullException)
     {
@@ -27,7 +28,7 @@ public static class ArgumentNullExceptionExceptions
         /// <param name="name"></param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void ThrowIfNullOrEmpty(
-            [NotNull] string value,
+            [NotNull] string? value,
             [CallerArgumentExpression(nameof(value))] string? name = null)
         {
             if (string.IsNullOrEmpty(value)) throw new ArgumentNullException(name);
@@ -40,7 +41,7 @@ public static class ArgumentNullExceptionExceptions
         /// <param name="name"></param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void ThrowIfNullOrWhiteSpace(
-            [NotNull] string value,
+            [NotNull] string? value,
             [CallerArgumentExpression(nameof(value))] string? name = null)
         {
             if (string.IsNullOrWhiteSpace(value)) throw new ArgumentNullException(name);
