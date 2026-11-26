@@ -3,6 +3,7 @@ namespace Yotei.Tools.NStd20;
 #else
 namespace Yotei.Tools;
 #endif
+
 // ========================================================
 public static class TimeSpanExtensions
 {

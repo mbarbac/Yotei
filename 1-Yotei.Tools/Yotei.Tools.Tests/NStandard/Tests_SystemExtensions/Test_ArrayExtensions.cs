@@ -12,43 +12,6 @@ namespace Yotei.Tools.Tests;
 // ========================================================
 public static partial class Test_ArrayExtensions
 {
-    static int[] IntArray() => [];
-    static int[] IntArray(IEnumerable<int> values) => values.ToArray();
-
-    static ReadOnlySpan<int> IntSpan() => [];
-    static ReadOnlySpan<int> IntSpan(IEnumerable<int> values) => values.ToArray();
-
-    static Predicate<int> IntPredicate(int value) => x => x == value;
-    static IEqualityComparer<int> IntEquality() => EqualityComparer<int>.Default;
-    static IComparer<int> IntComparer() => Comparer<int>.Create((x, y) => x.CompareTo(y));
-
-    // ----------------------------------------------------
-
-    static Item<int> Item(int value) => new(value);
-    static Item<int>[] ItemArray() => [];
-    static Item<int>[] ItemArray(IEnumerable<int> values) => [.. values.Select(x => Item(x))];
-
-    static ReadOnlySpan<Item<int>> ItemSpan() => [];
-    static ReadOnlySpan<Item<int>> ItemSpan(IEnumerable<int> values) => values.Select(x => Item(x)).ToArray();
-
-    static Predicate<Item<int>> ItemPredicate(int value) => x => x.Value == value;
-    static IEqualityComparer<Item<int>> ItemEquality() => EqualityComparerEx.New<Item<int>>((x, y) =>
-    {
-        if (x is null && y is null) return true;
-        if (x is null) return false;
-        if (y is null) return false;
-        return x.Value == y.Value;
-    });
-    static IComparer<Item<int>> ItemComparer() => ComparerEx.New<Item<int>>((x, y) =>
-    {
-        if (x is null && y is null) return 0;
-        if (x is null) return -1;
-        if (y is null) return +1;
-        return x.Value.CompareTo(y.Value);
-    });
-
-    // ----------------------------------------------------
-
     [Fact]
     public static void Test_IsEmpty()
     {
@@ -95,41 +58,208 @@ public static partial class Test_ArrayExtensions
 
     // ----------------------------------------------------
 
-    // TODO ArraEx: IndexOf value
-    // TODO ArraEx: LastIndexOf value
-    // TODO ArraEx: IndexesOf value
-    // TODO ArraEx: Contains value
-    // TODO ArraEx: StartsWith value
-    // TODO ArraEx: EndsWith value
+    [Fact]
+    public static void Test_IndexOf_Value_Int()
+    {
+        int result;
+        var source = Array.Empty<int>();
+        result = source.IndexOf(9); Assert.Equal(-1, result);
+        result = source.IndexOf(9, IntEquality()); Assert.Equal(-1, result);
+        result = source.IndexOf(IntPredicate(9)); Assert.Equal(-1, result);
+
+        source = [1, 9, 3, 4];
+        result = source.IndexOf(9); Assert.Equal(1, result);
+        result = source.IndexOf(9, IntEquality()); Assert.Equal(1, result);
+        result = source.IndexOf(IntPredicate(9)); Assert.Equal(1, result);
+    }
+
+    [Fact]
+    public static void Test_IndexOf_Value_Item()
+    {
+        int result;
+        var source = Array.Empty<Item<int>>();
+        // result = source.IndexOf(Item(9)); // Item<> not IEquatable
+        result = source.IndexOf(Item(9), ItemEquality()); Assert.Equal(-1, result);
+        result = source.IndexOf(ItemPredicate(9)); Assert.Equal(-1, result);
+
+        source = ItemArray([1, 9, 3, 4]);
+        result = source.IndexOf(Item(9), ItemEquality()); Assert.Equal(1, result);
+        result = source.IndexOf(ItemPredicate(9)); Assert.Equal(1, result);
+    }
 
     // ----------------------------------------------------
 
-    // TODO ArraEx: IndexOfAny value
-    // TODO ArraEx: LastIndexOfAny value
-    // TODO ArraEx: IndexesOfAny value
-    // TODO ArraEx: ContainsAny value
-    // TODO ArraEx: StartsWithAny value
-    // TODO ArraEx: EndsWithAny value
+    [Fact]
+    public static void Test_LastIndexOf_Value_Int()
+    {
+        int result;
+        var source = Array.Empty<int>();
+        result = source.LastIndexOf(9); Assert.Equal(-1, result);
+        result = source.LastIndexOf(9, IntEquality()); Assert.Equal(-1, result);
+        result = source.LastIndexOf(IntPredicate(9)); Assert.Equal(-1, result);
+
+        source = [1, 2, 9, 4];
+        result = source.LastIndexOf(9); Assert.Equal(2, result);
+        result = source.LastIndexOf(9, IntEquality()); Assert.Equal(2, result);
+        result = source.LastIndexOf(IntPredicate(9)); Assert.Equal(2, result);
+    }
+
+    [Fact]
+    public static void Test_LastIndexOf_Value_Item()
+    {
+        int result;
+        var source = Array.Empty<Item<int>>();
+        // result = source.LastIndexOf(Item(9)); // Item<> not IEquatable
+        result = source.LastIndexOf(Item(9), ItemEquality()); Assert.Equal(-1, result);
+        result = source.LastIndexOf(ItemPredicate(9)); Assert.Equal(-1, result);
+
+        source = ItemArray([1, 2, 9, 4]);
+        result = source.LastIndexOf(Item(9), ItemEquality()); Assert.Equal(2, result);
+        result = source.LastIndexOf(ItemPredicate(9)); Assert.Equal(2, result);
+    }
 
     // ----------------------------------------------------
 
-    // TODO ArraEx: IndexOfAnyExcept value
-    // TODO ArraEx: LastIndexOfAnyExcept value
-    // TODO ArraEx: IndexesOfAnyExcept value
-    // TODO ArraEx: ContainsAnyExcept value
-    // TODO ArraEx: StartsWithAnyExcept value
-    // TODO ArraEx: EndsWithAnyExcept value
+    [Fact]
+    public static void Test_IndexesOf_Value_Int()
+    {
+        List<int> result;
+        var source = Array.Empty<int>();
+        result = source.IndexesOf(9); Assert.True(result.IsEmpty);
+        result = source.IndexesOf(9, IntEquality()); Assert.True(result.IsEmpty);
+        result = source.IndexesOf(IntPredicate(9)); Assert.True(result.IsEmpty);
+
+        source = [1, 9, 9, 4];
+        result = source.IndexesOf(9); Assert.True(result is [1, 2]);
+        result = source.IndexesOf(9, IntEquality()); Assert.True(result is [1, 2]);
+        result = source.IndexesOf(IntPredicate(9)); Assert.True(result is [1, 2]);
+    }
+
+    [Fact]
+    public static void Test_IndexesOf_Value_Item()
+    {
+        List<int> result;
+        var source = Array.Empty<Item<int>>();
+        // result = source.IndexesOf(Item(9)); // Item<> not IEquatable
+        result = source.IndexesOf(Item(9), ItemEquality()); Assert.True(result.IsEmpty);
+        result = source.IndexesOf(ItemPredicate(9)); Assert.True(result.IsEmpty);
+
+        source = ItemArray([1, 9, 9, 4]);
+        result = source.IndexesOf(Item(9), ItemEquality()); Assert.True(result is [1, 2]);
+        result = source.IndexesOf(ItemPredicate(9)); Assert.True(result is [1, 2]);
+    }
 
     // ----------------------------------------------------
 
-    // TODO ArraEx: ResizeStart
-    // TODO ArraEx: ResizeEnd
+    [Fact]
+    public static void Test_Contains_Value_Int()
+    {
+        bool result;
+        var source = Array.Empty<int>();
+        result = source.Contains(9); Assert.False(result);
+        result = source.Contains(9, IntEquality()); Assert.False(result);
+        result = source.Contains(IntPredicate(9)); Assert.False(result);
+
+        source = [1, 9, 3];
+        result = source.Contains(9); Assert.True(result);
+        result = source.Contains(9, IntEquality()); Assert.True(result);
+        result = source.Contains(IntPredicate(9)); Assert.True(result);
+    }
+
+    [Fact]
+    public static void Test_Contains_Value_Item()
+    {
+        bool result;
+        var source = Array.Empty<Item<int>>();
+        result = source.Contains(Item(9)); Assert.False(result); // Not needs IEquatable!
+        result = source.Contains(Item(9), ItemEquality()); Assert.False(result);
+        result = source.Contains(ItemPredicate(9)); Assert.False(result);
+
+        source = ItemArray([1, 9, 3]);
+        result = source.Contains(Item(9)); Assert.False(result);
+        result = source.Contains(Item(9), ItemEquality()); Assert.True(result);
+        result = source.Contains(ItemPredicate(9)); Assert.True(result);
+    }
 
     // ----------------------------------------------------
 
-    // TODO ArraEx: TrimStart value
-    // TODO ArraEx: TrimEnd value
-    // TODO ArraEx: Trim value
+    [Fact]
+    public static void Test_StartsWith_Value_Int()
+    {
+        bool result;
+        var source = Array.Empty<int>();
+        result = source.StartsWith(9); Assert.False(result);
+        result = source.StartsWith(9, IntEquality()); Assert.False(result);
+        result = source.StartsWith(IntPredicate(9)); Assert.False(result);
+
+        source = [1, 9];
+        result = source.StartsWith(9); Assert.False(result);
+        result = source.StartsWith(9, IntEquality()); Assert.False(result);
+        result = source.StartsWith(IntPredicate(9)); Assert.False(result);
+
+        source = [9, 1];
+        result = source.StartsWith(9); Assert.True(result);
+        result = source.StartsWith(9, IntEquality()); Assert.True(result);
+        result = source.StartsWith(IntPredicate(9)); Assert.True(result);
+    }
+
+    [Fact]
+    public static void Test_StartsWith_Value_Item()
+    {
+        bool result;
+        var source = Array.Empty<Item<int>>();
+        // result = source.StartsWith(9); Assert.False(result); // Needs IEquatable!
+        result = source.StartsWith(Item(9), ItemEquality()); Assert.False(result);
+        result = source.StartsWith(ItemPredicate(9)); Assert.False(result);
+
+        source = ItemArray([1, 9]);
+        result = source.StartsWith(Item(9), ItemEquality()); Assert.False(result);
+        result = source.StartsWith(ItemPredicate(9)); Assert.False(result);
+
+        source = ItemArray([9, 1]);
+        result = source.StartsWith(Item(9), ItemEquality()); Assert.True(result);
+        result = source.StartsWith(ItemPredicate(9)); Assert.True(result);
+    }
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_EndsWith_Value_Int()
+    {
+        bool result;
+        var source = Array.Empty<int>();
+        result = source.EndsWith(9); Assert.False(result);
+        result = source.EndsWith(9, IntEquality()); Assert.False(result);
+        result = source.EndsWith(IntPredicate(9)); Assert.False(result);
+
+        source = [9, 1];
+        result = source.EndsWith(9); Assert.False(result);
+        result = source.EndsWith(9, IntEquality()); Assert.False(result);
+        result = source.EndsWith(IntPredicate(9)); Assert.False(result);
+
+        source = [1, 9];
+        result = source.EndsWith(9); Assert.True(result);
+        result = source.EndsWith(9, IntEquality()); Assert.True(result);
+        result = source.EndsWith(IntPredicate(9)); Assert.True(result);
+    }
+
+    [Fact]
+    public static void Test_EndsWith_Value_Item()
+    {
+        bool result;
+        var source = Array.Empty<Item<int>>();
+        // result = source.EndsWith(9); Assert.False(result); // Needs IEquatable!
+        result = source.EndsWith(Item(9), ItemEquality()); Assert.False(result);
+        result = source.EndsWith(ItemPredicate(9)); Assert.False(result);
+
+        source = ItemArray([9, 1]);
+        result = source.EndsWith(Item(9), ItemEquality()); Assert.False(result);
+        result = source.EndsWith(ItemPredicate(9)); Assert.False(result);
+
+        source = ItemArray([1, 9]);
+        result = source.EndsWith(Item(9), ItemEquality()); Assert.True(result);
+        result = source.EndsWith(ItemPredicate(9)); Assert.True(result);
+    }
 
     // ----------------------------------------------------
 

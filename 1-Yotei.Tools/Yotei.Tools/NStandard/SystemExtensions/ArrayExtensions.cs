@@ -46,4 +46,213 @@ public static partial class ArrayExtension
             }
         }
     }
+
+    // ----------------------------------------------------
+
+#if NETSTANDARD2_0
+    /// <summary>
+    /// Returns the index of the first ocurrence of the given value, or -1 if any.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static int IndexOf<T>(this T[] source, T value, IEqualityComparer<T> comparer)
+    {
+        ArgumentNullException.ThrowIfNull(comparer);
+        return source.IndexOf(x => comparer.Equals(x, value));
+    }
+#endif
+
+    /// <summary>
+    /// Returns the index of the first value that matches the given predicate, or -1 if any.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="predicate"></param>
+    /// <returns></returns>
+    public static int IndexOf<T>(this T[] source, Predicate<T> predicate)
+    {
+        ArgumentNullException.ThrowIfNull(predicate);
+
+        for (int i = 0; i < source.Length; i++) if (predicate(source[i])) return i;
+        return -1;
+    }
+
+    // ----------------------------------------------------
+
+#if NETSTANDARD2_0
+    /// <summary>
+    /// Returns the index of the last ocurrence of the given value, or -1 if any.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static int LastIndexOf<T>(this T[] source, T value, IEqualityComparer<T> comparer)
+    {
+        ArgumentNullException.ThrowIfNull(comparer);
+        return source.LastIndexOf(x => comparer.Equals(x, value));
+    }
+#endif
+
+    /// <summary>
+    /// Returns the index of the last value that matches the given predicate, or -1 if any.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="predicate"></param>
+    /// <returns></returns>
+    public static int LastIndexOf<T>(this T[] source, Predicate<T> predicate)
+    {
+        ArgumentNullException.ThrowIfNull(predicate);
+
+        for (int i = source.Length - 1; i >= 0; i--) if (predicate(source[i])) return i;
+        return -1;
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Returns the indexes of the ocurrences of the given value.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public static List<int> IndexesOf<T>(this T[] source, T value) where T : IEquatable<T>
+    {
+        var comparer = EqualityComparerEx.New<T>();
+        return source.IndexesOf(value, comparer);
+    }
+
+    /// <summary>
+    /// Returns the indexes of the ocurrences of the given value.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static List<int> IndexesOf<T>(this T[] source, T value, IEqualityComparer<T> comparer)
+    {
+        ArgumentNullException.ThrowIfNull(comparer);
+        return source.IndexesOf(x => comparer.Equals(x, value));
+    }
+
+    /// <summary>
+    /// Returns the indexes of values that match the given predicate.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="predicate"></param>
+    /// <returns></returns>
+    public static List<int> IndexesOf<T>(this T[] source, Predicate<T> predicate)
+    {
+        ArgumentNullException.ThrowIfNull(predicate);
+
+        List<int> nums = [];
+        for (int i = 0; i < source.Length; i++) if (predicate(source[i])) nums.Add(i);
+        return nums;
+    }
+
+    // ----------------------------------------------------
+
+#if NETSTANDARD2_0
+    /// <summary>
+    /// Determines if the array contains the given value.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static bool Contains<T>(
+        this T[] source, T value, IEqualityComparer<T> comparer)
+        => source.IndexOf(value, comparer) >= 0;
+#endif
+
+    /// <summary>
+    /// Determines if the array contains a value that matches the given predicate.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="predicate"></param>
+    /// <returns></returns>
+    public static bool Contains<T>(
+        this T[] source, Predicate<T> predicate) => source.IndexOf(predicate) >= 0;
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Determines if the array starts with the given value, or not.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public static bool StartsWith<T>(
+        this T[] source, T value) where T : IEquatable<T>
+        => source.IndexOf(value) == 0;
+
+    /// <summary>
+    /// Determines if the array starts with the given value, or not.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static bool StartsWith<T>(
+        this T[] source, T value, IEqualityComparer<T> comparer)
+        => source.IndexOf(value, comparer) == 0;
+
+    /// <summary>
+    /// Determines if the array starts with a value that matches the given predictae, or not.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="predicate"></param>
+    /// <returns></returns>
+    public static bool StartsWith<T>(
+        this T[] source, Predicate<T> predicate)
+        => source.IndexOf(predicate) == 0;
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Determines if the array ends with the given value, or not.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public static bool EndsWith<T>(
+        this T[] source, T value) where T : IEquatable<T>
+        => source.Length > 0 && source.IndexOf(value) == source.Length - 1;
+
+    /// <summary>
+    /// Determines if the array ends with the given value, or not.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static bool EndsWith<T>(
+        this T[] source, T value, IEqualityComparer<T> comparer)
+        => source.Length > 0 && source.IndexOf(value, comparer) == source.Length - 1;
+
+    /// <summary>
+    /// Determines if the array ends with a value that matches the given predictae, or not.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="predicate"></param>
+    /// <returns></returns>
+    public static bool EndsWith<T>(
+        this T[] source, Predicate<T> predicate)
+        => source.Length > 0 && source.IndexOf(predicate) == source.Length - 1;
 }
