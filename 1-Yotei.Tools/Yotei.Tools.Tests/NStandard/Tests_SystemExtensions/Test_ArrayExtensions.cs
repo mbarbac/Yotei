@@ -263,12 +263,12 @@ public static partial class Test_ArrayExtensions
 
     // ----------------------------------------------------
 
-    // TODO ArraEx: Add value
-    // TODO ArraEx: Insert value
-    // TODO ArraEx: RemoveAt
-    // TODO ArraEx: RemoveRange index count
-    // TODO ArraEx: Remove value
-    // TODO ArraEx: RemoveLast value
-    // TODO ArraEx: RemoveAll value
-    // TODO ArraEx: Clear
+    // TODO ArrayEx: Add value
+    // TODO ArrayEx: Insert value
+    // TODO ArrayEx: RemoveAt
+    // TODO ArrayEx: RemoveRange index count
+    // TODO ArrayEx: Remove value
+    // TODO ArrayEx: RemoveLast value
+    // TODO ArrayEx: RemoveAll value
+    // TODO ArrayEx: Clear
 }

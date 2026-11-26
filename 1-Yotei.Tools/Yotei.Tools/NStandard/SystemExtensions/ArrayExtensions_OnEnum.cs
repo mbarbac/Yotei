@@ -147,4 +147,54 @@ public static partial class ArrayExtension
     public static bool ContainsAny<T>(
         this T[] source, IEnumerable<T> values, IEqualityComparer<T> comparer)
         => source.IndexOfAny(values, comparer) >= 0;
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Determines if the array starts with any of the given values.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <returns></returns>
+    public static bool StartsWithAny<T>(
+        this T[] source, IEnumerable<T> values) where T : IEquatable<T>
+        => source.IndexOfAny(values) == 0;
+
+    /// <summary>
+    /// Determines if the array starts with any of the given values.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static bool StartsWithAny<T>(
+        this T[] source, IEnumerable<T> values, IEqualityComparer<T> comparer)
+        => source.IndexOfAny(values, comparer) == 0;
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Determines if the array ends with any of the given values.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <returns></returns>
+    public static bool EndsWithAny<T>(
+        this T[] source, IEnumerable<T> values) where T : IEquatable<T>
+        => source.Length > 0 && source.IndexOfAny(values) == source.Length - 1;
+
+    /// <summary>
+    /// Determines if the array ends with any of the given values.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static bool EndsWithAny<T>(
+        this T[] source, IEnumerable<T> values, IEqualityComparer<T> comparer)
+        => source.Length > 0 && source.IndexOfAny(values, comparer) == source.Length - 1;
 }

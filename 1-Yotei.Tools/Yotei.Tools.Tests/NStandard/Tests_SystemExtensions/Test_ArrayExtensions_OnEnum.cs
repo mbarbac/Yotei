@@ -50,12 +50,12 @@ public static partial class Test_ArrayExtensions
 
     // ----------------------------------------------------
 
-    // TODO ArraEx: IndexOf_Range enum
-    // TODO ArraEx: LastIndexOf_Range enum
-    // TODO ArraEx: IndexesOf_Range enum
-    // TODO ArraEx: Contains_Range enum
-    // TODO ArraEx: StartsWith_Range enum
-    // TODO ArraEx: EndsWith_Range enum
+    // TODO ArrayEx: IndexOf_Range enum
+    // TODO ArrayEx: LastIndexOf_Range enum
+    // TODO ArrayEx: IndexesOf_Range enum
+    // TODO ArrayEx: Contains_Range enum
+    // TODO ArrayEx: StartsWith_Range enum
+    // TODO ArrayEx: EndsWith_Range enum
 
     // ----------------------------------------------------
 
@@ -219,29 +219,104 @@ public static partial class Test_ArrayExtensions
 
     // ----------------------------------------------------
 
-    // TODO ArraEx: StartsWithAny enum
-    // TODO ArraEx: EndsWithAny enum
+    [Fact]
+    public static void Test_StartsWithAny_Enum_Ints()
+    {
+        bool result;
+        var source = IntArray();
+        var values = IntEnumerable();
+        result = source.StartsWithAny(values); Assert.False(result);
+        result = source.StartsWithAny(values, IntEquality()); Assert.False(result);
+
+        source = [1, 2];
+        values = IntEnumerable([8, 9]);
+        result = source.StartsWithAny(values); Assert.False(result);
+        result = source.StartsWithAny(values, IntEquality()); Assert.False(result);
+
+        source = [9, 2];
+        values = IntEnumerable([8, 9]);
+        result = source.StartsWithAny(values); Assert.True(result);
+        result = source.StartsWithAny(values, IntEquality()); Assert.True(result);
+    }
+
+    [Fact]
+    public static void Test_StartsWithAny_Enum_Items()
+    {
+        bool result;
+        var source = ItemArray();
+        var values = ItemEnumerable();
+        //result = source.StartsWithAny(values); // Item<> not IEquatable
+        result = source.StartsWithAny(values, ItemEquality()); Assert.False(result);
+
+        source = ItemArray([1, 2]);
+        values = ItemEnumerable([8, 9]);
+        result = source.StartsWithAny(values, ItemEquality()); Assert.False(result);
+
+        source = ItemArray([9, 2]);
+        values = ItemEnumerable([8, 9]);
+        result = source.StartsWithAny(values, ItemEquality()); Assert.True(result);
+    }
 
     // ----------------------------------------------------
 
-    // TODO ArraEx: IndexOfAnyExcept enum
-    // TODO ArraEx: LastIndexOfAnyExcept enum
-    // TODO ArraEx: IndexesOfAnyExcept enum
-    // TODO ArraEx: ContainsAnyExcept enum
-    // TODO ArraEx: StartsWithAnyExcept enum
-    // TODO ArraEx: EndsWithAnyExcept enum
+    [Fact]
+    public static void Test_EndsWithAny_Enum_Ints()
+    {
+        bool result;
+        var source = IntArray();
+        var values = IntEnumerable();
+        result = source.EndsWithAny(values); Assert.False(result);
+        result = source.EndsWithAny(values, IntEquality()); Assert.False(result);
+
+        source = [1, 2];
+        values = IntEnumerable([8, 9]);
+        result = source.EndsWithAny(values); Assert.False(result);
+        result = source.EndsWithAny(values, IntEquality()); Assert.False(result);
+
+        source = [1, 9];
+        values = IntEnumerable([8, 9]);
+        result = source.EndsWithAny(values); Assert.True(result);
+        result = source.EndsWithAny(values, IntEquality()); Assert.True(result);
+    }
+
+    [Fact]
+    public static void Test_EndsWithAny_Enum_Items()
+    {
+        bool result;
+        var source = ItemArray();
+        var values = ItemEnumerable();
+        //result = source.EndsWithAny(values); // Item<> not IEquatable
+        result = source.EndsWithAny(values, ItemEquality()); Assert.False(result);
+
+        source = ItemArray([1, 2]);
+        values = ItemEnumerable([8, 9]);
+        result = source.EndsWithAny(values, ItemEquality()); Assert.False(result);
+
+        source = ItemArray([1, 9]);
+        values = ItemEnumerable([8, 9]);
+        result = source.EndsWithAny(values, ItemEquality()); Assert.True(result);
+    }
 
     // ----------------------------------------------------
 
-    // TODO ArraEx: TrimStart enum
-    // TODO ArraEx: TrimEnd enum
-    // TODO ArraEx: Trim enum
+    // TODO ArrayEx: IndexOfAnyExcept enum
+    // TODO ArrayEx: LastIndexOfAnyExcept enum
+    // TODO ArrayEx: IndexesOfAnyExcept enum
+    // TODO ArrayEx: ContainsAnyExcept enum
+    // TODO ArrayEx: StartsWithAnyExcept enum
+    // TODO ArrayEx: EndsWithAnyExcept enum
 
     // ----------------------------------------------------
 
-    // TODO ArraEx: AddRange enum
-    // TODO ArraEx: InsertRange enum
-    // TODO ArraEx: Remove enum
-    // TODO ArraEx: RemoveLast enum
-    // TODO ArraEx: RemoveAll enum
+    // TODO ArrayEx: TrimStart enum
+    // TODO ArrayEx: TrimEnd enum
+    // TODO ArrayEx: Trim enum
+
+    // ----------------------------------------------------
+
+    // TODO ArrayEx: AddRange enum
+    // TODO ArrayEx: InsertRange enum
+    // TODO ArrayEx: Remove enum
+    // TODO ArrayEx: RemoveLast enum
+    // TODO ArrayEx: RemoveAll enum
 }

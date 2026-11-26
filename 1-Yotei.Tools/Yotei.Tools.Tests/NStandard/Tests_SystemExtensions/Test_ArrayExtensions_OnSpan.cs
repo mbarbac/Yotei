@@ -50,12 +50,12 @@ public static partial class Test_ArrayExtensions
 
     // ----------------------------------------------------
 
-    // TODO ArraEx: IndexOf_Range span
-    // TODO ArraEx: LastIndexOf_Range span
-    // TODO ArraEx: Contains_Range span
-    // TODO ArraEx: Contains_Range span
-    // TODO ArraEx: StartsWith_Range span
-    // TODO ArraEx: EndsWith_Range span
+    // TODO ArrayEx: IndexOf_Range span
+    // TODO ArrayEx: LastIndexOf_Range span
+    // TODO ArrayEx: Contains_Range span
+    // TODO ArrayEx: Contains_Range span
+    // TODO ArrayEx: StartsWith_Range span
+    // TODO ArrayEx: EndsWith_Range span
 
     // ----------------------------------------------------
 
@@ -219,29 +219,104 @@ public static partial class Test_ArrayExtensions
 
     // ----------------------------------------------------
 
-    // TODO ArraEx: StartsWithAny span
-    // TODO ArraEx: EndsWithAny span
+    [Fact]
+    public static void Test_StartsWithAny_Span_Ints()
+    {
+        bool result;
+        var source = IntArray();
+        var values = IntSpan();
+        result = source.StartsWithAny(values); Assert.False(result);
+        result = source.StartsWithAny(values, IntEquality()); Assert.False(result);
+
+        source = [1, 2];
+        values = IntSpan([8, 9]);
+        result = source.StartsWithAny(values); Assert.False(result);
+        result = source.StartsWithAny(values, IntEquality()); Assert.False(result);
+
+        source = [9, 2];
+        values = IntSpan([8, 9]);
+        result = source.StartsWithAny(values); Assert.True(result);
+        result = source.StartsWithAny(values, IntEquality()); Assert.True(result);
+    }
+
+    [Fact]
+    public static void Test_StartsWithAny_Span_Items()
+    {
+        bool result;
+        var source = ItemArray();
+        var values = ItemSpan();
+        //result = source.StartsWithAny(values); // Item<> not IEquatable
+        result = source.StartsWithAny(values, ItemEquality()); Assert.False(result);
+
+        source = ItemArray([1, 2]);
+        values = ItemSpan([8, 9]);
+        result = source.StartsWithAny(values, ItemEquality()); Assert.False(result);
+
+        source = ItemArray([9, 2]);
+        values = ItemSpan([8, 9]);
+        result = source.StartsWithAny(values, ItemEquality()); Assert.True(result);
+    }
 
     // ----------------------------------------------------
 
-    // TODO ArraEx: IndexOfAnyExcept span
-    // TODO ArraEx: LastIndexOfAnyExcept span
-    // TODO ArraEx: IndexesOfAnyExcept span
-    // TODO ArraEx: ContainsAnyExcept span
-    // TODO ArraEx: StartsWithAnyExcept span
-    // TODO ArraEx: EndsWithAnyExcept span
+    [Fact]
+    public static void Test_EndsWithAny_Span_Ints()
+    {
+        bool result;
+        var source = IntArray();
+        var values = IntSpan();
+        result = source.EndsWithAny(values); Assert.False(result);
+        result = source.EndsWithAny(values, IntEquality()); Assert.False(result);
+
+        source = [1, 2];
+        values = IntSpan([8, 9]);
+        result = source.EndsWithAny(values); Assert.False(result);
+        result = source.EndsWithAny(values, IntEquality()); Assert.False(result);
+
+        source = [1, 9];
+        values = IntSpan([8, 9]);
+        result = source.EndsWithAny(values); Assert.True(result);
+        result = source.EndsWithAny(values, IntEquality()); Assert.True(result);
+    }
+
+    [Fact]
+    public static void Test_EndsWithAny_Span_Items()
+    {
+        bool result;
+        var source = ItemArray();
+        var values = ItemSpan();
+        //result = source.EndsWithAny(values); // Item<> not IEquatable
+        result = source.EndsWithAny(values, ItemEquality()); Assert.False(result);
+
+        source = ItemArray([1, 2]);
+        values = ItemSpan([8, 9]);
+        result = source.EndsWithAny(values, ItemEquality()); Assert.False(result);
+
+        source = ItemArray([1, 9]);
+        values = ItemSpan([8, 9]);
+        result = source.EndsWithAny(values, ItemEquality()); Assert.True(result);
+    }
 
     // ----------------------------------------------------
 
-    // TODO ArraEx: TrimStart span
-    // TODO ArraEx: TrimEnd span
-    // TODO ArraEx: Trim span
+    // TODO ArrayEx: IndexOfAnyExcept span
+    // TODO ArrayEx: LastIndexOfAnyExcept span
+    // TODO ArrayEx: IndexesOfAnyExcept span
+    // TODO ArrayEx: ContainsAnyExcept span
+    // TODO ArrayEx: StartsWithAnyExcept span
+    // TODO ArrayEx: EndsWithAnyExcept span
 
     // ----------------------------------------------------
 
-    // TODO ArraEx: AddRange span
-    // TODO ArraEx: InsertRange span
-    // TODO ArraEx: Remove span
-    // TODO ArraEx: RemoveLast span
-    // TODO ArraEx: RemoveAll span
+    // TODO ArrayEx: TrimStart span
+    // TODO ArrayEx: TrimEnd span
+    // TODO ArrayEx: Trim span
+
+    // ----------------------------------------------------
+
+    // TODO ArrayEx: AddRange span
+    // TODO ArrayEx: InsertRange span
+    // TODO ArrayEx: Remove span
+    // TODO ArrayEx: RemoveLast span
+    // TODO ArrayEx: RemoveAll span
 }
