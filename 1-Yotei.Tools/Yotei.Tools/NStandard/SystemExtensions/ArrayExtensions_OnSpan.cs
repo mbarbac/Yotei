@@ -1,4 +1,6 @@
 ﻿#if NETSTANDARD2_0
+using System.Xml.Serialization;
+
 namespace Yotei.Tools.NStd20;
 #else
 namespace Yotei.Tools;
@@ -55,6 +57,131 @@ public static partial class ArrayExtension
         return true;
     }
 #endif
+
+    // ----------------------------------------------------
+
+#if NETSTANDARD2_0
+    /// <summary>
+    /// Returns the index of the first ocurrence of the given sequence, or -1 if any.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static int IndexOf<T>(
+        this T[] source, ReadOnlySpan<T> values, IEqualityComparer<T> comparer)
+    {
+        ArgumentNullException.ThrowIfNull(comparer);
+
+        if (source.Length == 0 && values.Length == 0) return 0; // Standard behavior!
+        if (source.Length == 0) return -1;
+        if (values.Length == 0) return -1;
+        if (values.Length > source.Length) return -1;
+
+        for (int i = 0; i < source.Length; i++)
+        {
+            var match = 0; for (int k = 0; k < values.Length; k++)
+            {
+                var j = i + k; if (j >= source.Length) break;
+                var x = source[j];
+                var y = values[k];
+                if (comparer.Equals(x, y)) match++; else break;
+            }
+            if (match == values.Length) return i;
+        }
+        return -1;
+    }
+#endif
+
+    // ----------------------------------------------------
+
+#if NETSTANDARD2_0
+    /// <summary>
+    /// Returns the index of the last ocurrence of the given sequence, or -1 if any.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static int LastIndexOf<T>(
+        this T[] source, ReadOnlySpan<T> values, IEqualityComparer<T> comparer)
+    {
+        ArgumentNullException.ThrowIfNull(comparer);
+
+        if (source.Length == 0 && values.Length == 0) return 0; // Standard behavior!
+        if (source.Length == 0) return -1;
+        if (values.Length == 0) return -1;
+        if (values.Length > source.Length) return -1;
+
+        for (int i = source.Length - 1; i >= 0; i--)
+        {
+            var match = 0; for (int k = 0; k < values.Length; k++)
+            {
+                var j = i + k; if (j >= source.Length) break;
+                var x = source[j];
+                var y = values[k];
+                if (comparer.Equals(x, y)) match++; else break;
+            }
+            if (match == values.Length) return i;
+        }
+        return -1;
+    }
+#endif
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Determines if the array contains the given sequence of values.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <returns></returns>
+    public static bool Contains<T>(
+        this T[] source, ReadOnlySpan<T> values) where T : IEquatable<T>
+        => source.IndexOf(values) >= 0;
+
+    /// <summary>
+    /// Determines if the array contains the given sequence of values.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static bool Contains<T>(
+        this T[] source, ReadOnlySpan<T> values, IEqualityComparer<T> comparer)
+        => source.IndexOf(values, comparer) >= 0;
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Determines if the array starts with the given sequence of values.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static bool StartsWith<T>(
+        this T[] source, ReadOnlySpan<T> values, IEqualityComparer<T> comparer)
+        => source.IndexOf(values, comparer) == 0;
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Determines if the array ends with the given sequence of values.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static bool EndsWith<T>(
+        this T[] source, ReadOnlySpan<T> values, IEqualityComparer<T> comparer)
+        => source.Length > 0 && source.IndexOf(values, comparer) == source.Length - values.Length;
 
     // ----------------------------------------------------
 
@@ -224,4 +351,227 @@ public static partial class ArrayExtension
     public static bool EndsWithAny<T>(
         this T[] source, ReadOnlySpan<T> values, IEqualityComparer<T> comparer)
         => source.Length > 0 && source.IndexOfAny(values, comparer) == source.Length - 1;
+
+    // ----------------------------------------------------
+
+#if NETSTANDARD2_0
+    /// <summary>
+    /// Returns the index of the first value that is NOT any of the given ones.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <returns></returns>
+    public static int IndexOfAnyExcept<T>(
+        this T[] source, ReadOnlySpan<T> values) where T : IEquatable<T>
+    {
+        var comparer = EqualityComparerEx.New<T>();
+        return source.IndexOfAnyExcept(values, comparer);
+    }
+#endif
+
+#if NETSTANDARD2_0
+    /// <summary>
+    /// Returns the index of the first value that is NOT any of the given ones.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static int IndexOfAnyExcept<T>(
+        this T[] source, ReadOnlySpan<T> values, IEqualityComparer<T> comparer)
+    {
+        ArgumentNullException.ThrowIfNull(comparer);
+
+        for (int i = 0; i < source.Length; i++)
+        {
+            var item = source[i];
+            var found = false;
+
+            foreach (var value in values)
+            {
+                var except = comparer.Equals(item, value);
+                if (except) { found = true; break; }
+            }
+            if (!found) return i;
+        }
+        return -1;
+    }
+#endif
+
+    // ----------------------------------------------------
+
+#if NETSTANDARD2_0
+    /// <summary>
+    /// Returns the index of the last value that is NOT any of the given ones.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <returns></returns>
+    public static int LastIndexOfAnyExcept<T>(
+        this T[] source, ReadOnlySpan<T> values) where T : IEquatable<T>
+    {
+        var comparer = EqualityComparerEx.New<T>();
+        return source.LastIndexOfAnyExcept(values, comparer);
+    }
+#endif
+
+#if NETSTANDARD2_0
+    /// <summary>
+    /// Returns the index of the last value that is NOT any of the given ones.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static int LastIndexOfAnyExcept<T>(
+        this T[] source, ReadOnlySpan<T> values, IEqualityComparer<T> comparer)
+    {
+        ArgumentNullException.ThrowIfNull(comparer);
+
+        for (int i = source.Length - 1; i >= 0; i--)
+        {
+            var item = source[i];
+            var found = false;
+
+            foreach (var value in values)
+            {
+                var except = comparer.Equals(item, value);
+                if (except) { found = true; break; }
+            }
+            if (!found) return i;
+        }
+        return -1;
+    }
+#endif
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Returns the indexes of all values that are NOT any of the given ones.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static List<int> IndexesOfAnyExcept<T>(
+        this T[] source, ReadOnlySpan<T> values) where T : IEquatable<T>
+    {
+        var comparer = EqualityComparerEx.New<T>();
+        return source.IndexesOfAnyExcept(values, comparer);
+    }
+
+    /// <summary>
+    /// Returns the indexes of all values that are NOT any of the given ones.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static List<int> IndexesOfAnyExcept<T>(
+        this T[] source, ReadOnlySpan<T> values, IEqualityComparer<T> comparer)
+    {
+        ArgumentNullException.ThrowIfNull(comparer);
+
+        List<int> nums = [];
+        for (int i = 0; i < source.Length; i++)
+        {
+            var item = source[i];
+            var found = false;
+
+            foreach (var value in values)
+            {
+                var except = comparer.Equals(item, value);
+                if (except) { found = true; break; }
+            }
+            if (!found) nums.Add(i);
+        }
+        return nums;
+    }
+
+    // ----------------------------------------------------
+
+#if NETSTANDARD2_0
+    /// <summary>
+    /// Determines if the array contains any value EXCEPT the given ones.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <returns></returns>
+    public static bool ContainsAnyExcept<T>(
+        this T[] source, ReadOnlySpan<T> values) where T : IEquatable<T>
+        => source.IndexOfAnyExcept(values) >= 0;
+#endif
+
+#if NETSTANDARD2_0
+    /// <summary>
+    /// Determines if the array contains any value EXCEPT the given ones.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static bool ContainsAnyExcept<T>(
+        this T[] source, ReadOnlySpan<T> values, IEqualityComparer<T> comparer)
+        => source.IndexOfAnyExcept(values, comparer) >= 0;
+#endif
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Determines if the array starts with any value EXCEPT the given ones.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <returns></returns>
+    public static bool StartsWithAnyExcept<T>(
+        this T[] source, ReadOnlySpan<T> values) where T : IEquatable<T>
+        => source.IndexOfAnyExcept(values) == 0;
+
+    /// <summary>
+    /// Determines if the array starts with any value EXCEPT the given ones.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static bool StartsWithAnyExcept<T>(
+        this T[] source, ReadOnlySpan<T> values, IEqualityComparer<T> comparer)
+        => source.IndexOfAnyExcept(values, comparer) == 0;
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Determines if the array ends with any value EXCEPT the given ones.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <returns></returns>
+    public static bool EndsWithAnyExcept<T>(
+        this T[] source, ReadOnlySpan<T> values) where T : IEquatable<T>
+        => source.Length > 0
+        && source.IndexOfAnyExcept(values) == source.Length - 1;
+
+    /// <summary>
+    /// Determines if the array ends with any value EXCEPT the given ones.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static bool EndsWithAnyExcept<T>(
+        this T[] source, ReadOnlySpan<T> values, IEqualityComparer<T> comparer)
+        => source.Length > 0
+        && source.IndexOfAnyExcept(values, comparer) == source.Length - 1;
 }

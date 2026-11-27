@@ -263,6 +263,12 @@ public static partial class Test_ArrayExtensions
 
     // ----------------------------------------------------
 
+    // TODO ArrayEx: TrimStart value
+    // TODO ArrayEx: TrimEnd value
+    // TODO ArrayEx: Trim value
+
+    // ----------------------------------------------------
+
     // TODO ArrayEx: Add value
     // TODO ArrayEx: Insert value
     // TODO ArrayEx: RemoveAt

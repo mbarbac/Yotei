@@ -50,12 +50,193 @@ public static partial class Test_ArrayExtensions
 
     // ----------------------------------------------------
 
-    // TODO ArrayEx: IndexOf_Range span
-    // TODO ArrayEx: LastIndexOf_Range span
-    // TODO ArrayEx: Contains_Range span
-    // TODO ArrayEx: Contains_Range span
-    // TODO ArrayEx: StartsWith_Range span
-    // TODO ArrayEx: EndsWith_Range span
+    [Fact]
+    public static void Test_IndexOf_Span_Ints()
+    {
+        int result;
+        var source = IntArray();
+        var values = IntSpan();
+        result = source.IndexOf(values); Assert.Equal(0, result);
+        result = source.IndexOf(values, IntEquality()); Assert.Equal(0, result);
+
+        source = [1, 2, 3, 4];
+        values = [4, 5];
+        result = source.IndexOf(values); Assert.Equal(-1, result);
+        result = source.IndexOf(values, IntEquality()); Assert.Equal(-1, result);
+
+        values = [2, 3];
+        result = source.IndexOf(values); Assert.Equal(1, result);
+        result = source.IndexOf(values, IntEquality()); Assert.Equal(1, result);
+    }
+
+    [Fact]
+    public static void Test_IndexOf_Span_Items()
+    {
+        int result;
+        var source = ItemArray();
+        var values = ItemSpan();
+        // result = source.IndexOf(values); // Item<> not IEquatable
+        result = source.IndexOf(values, ItemEquality()); Assert.Equal(0, result);
+
+        source = ItemArray([1, 2, 3, 4]);
+        values = ItemSpan([4, 5]);
+        result = source.IndexOf(values, ItemEquality()); Assert.Equal(-1, result);
+
+        values = ItemSpan([2, 3]);
+        result = source.IndexOf(values, ItemEquality()); Assert.Equal(1, result);
+    }
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_LastIndexOf_Span_Ints()
+    {
+        int result;
+        var source = IntArray();
+        var values = IntSpan();
+        result = source.LastIndexOf(values); Assert.Equal(0, result);
+        result = source.LastIndexOf(values, IntEquality()); Assert.Equal(0, result);
+
+        source = [1, 2, 3, 4];
+        values = [4, 5];
+        result = source.LastIndexOf(values); Assert.Equal(-1, result);
+        result = source.LastIndexOf(values, IntEquality()); Assert.Equal(-1, result);
+
+        values = [2, 3];
+        result = source.LastIndexOf(values); Assert.Equal(1, result);
+        result = source.LastIndexOf(values, IntEquality()); Assert.Equal(1, result);
+    }
+
+    [Fact]
+    public static void Test_LastIndexOf_Span_Items()
+    {
+        int result;
+        var source = ItemArray();
+        var values = ItemSpan();
+        // result = source.LastIndexOf(values); // Item<> not IEquatable
+        result = source.LastIndexOf(values, ItemEquality()); Assert.Equal(0, result);
+
+        source = ItemArray([1, 2, 3, 4]);
+        values = ItemSpan([4, 5]);
+        result = source.LastIndexOf(values, ItemEquality()); Assert.Equal(-1, result);
+
+        values = ItemSpan([2, 3]);
+        result = source.LastIndexOf(values, ItemEquality()); Assert.Equal(1, result);
+    }
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_Contains_Span_Ints()
+    {
+        bool result;
+        var source = IntArray();
+        var values = IntSpan();
+        result = source.Contains(values); Assert.True(result); // Standard behavior
+        result = source.Contains(values, IntEquality()); Assert.True(result);
+
+        source = [1, 2, 3, 4];
+        values = [4, 5];
+        result = source.Contains(values); Assert.False(result);
+        result = source.Contains(values, IntEquality()); Assert.False(result);
+
+        values = [2, 3];
+        result = source.Contains(values); Assert.True(result);
+        result = source.Contains(values, IntEquality()); Assert.True(result);
+    }
+
+    [Fact]
+    public static void Test_Contains_Span_Items()
+    {
+        bool result;
+        var source = ItemArray();
+        var values = ItemSpan();
+        // result = source.Contains(values); // Item<> not IEquatable
+        result = source.Contains(values, ItemEquality()); Assert.True(result);
+
+        source = ItemArray([1, 2, 3, 4]);
+        values = ItemSpan([4, 5]);
+        result = source.Contains(values, ItemEquality()); Assert.False(result);
+
+        values = ItemSpan([2, 3]);
+        result = source.Contains(values, ItemEquality()); Assert.True(result);
+    }
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_StartsWith_Span_Ints()
+    {
+        bool result;
+        var source = IntArray();
+        var values = IntSpan();
+        result = source.StartsWith(values); Assert.True(result); // Standard behavior
+        result = source.StartsWith(values, IntEquality()); Assert.True(result);
+
+        source = [1, 2, 3, 4];
+        values = [4, 5];
+        result = source.StartsWith(values); Assert.False(result);
+        result = source.StartsWith(values, IntEquality()); Assert.False(result);
+
+        values = [1, 2];
+        result = source.StartsWith(values); Assert.True(result);
+        result = source.StartsWith(values, IntEquality()); Assert.True(result);
+    }
+
+    [Fact]
+    public static void Test_StartsWith_Span_Items()
+    {
+        bool result;
+        var source = ItemArray();
+        var values = ItemSpan();
+        // result = source.StartsWith(values); // Item<> not IEquatable
+        result = source.StartsWith(values, ItemEquality()); Assert.True(result);
+
+        source = ItemArray([1, 2, 3, 4]);
+        values = ItemSpan([4, 5]);
+        result = source.StartsWith(values, ItemEquality()); Assert.False(result);
+
+        values = ItemSpan([1, 2]);
+        result = source.StartsWith(values, ItemEquality()); Assert.True(result);
+    }
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_EndsWith_Span_Ints()
+    {
+        bool result;
+        var source = IntArray();
+        var values = IntSpan();
+        result = source.EndsWith(values); Assert.True(result); // Standard behavior
+        result = source.EndsWith(values, IntEquality()); Assert.False(result);
+
+        source = [1, 2, 3, 4];
+        values = [4, 5];
+        result = source.EndsWith(values); Assert.False(result);
+        result = source.EndsWith(values, IntEquality()); Assert.False(result);
+
+        values = [3, 4];
+        result = source.EndsWith(values); Assert.True(result);
+        result = source.EndsWith(values, IntEquality()); Assert.True(result);
+    }
+
+    [Fact]
+    public static void Test_EndsWith_Span_Items()
+    {
+        bool result;
+        var source = ItemArray();
+        var values = ItemSpan();
+        // result = source.EndsWith(values); // Item<> not IEquatable
+        result = source.EndsWith(values, ItemEquality()); Assert.False(result);
+
+        source = ItemArray([1, 2, 3, 4]);
+        values = ItemSpan([4, 5]);
+        result = source.EndsWith(values, ItemEquality()); Assert.False(result);
+
+        values = ItemSpan([3, 4]);
+        result = source.EndsWith(values, ItemEquality()); Assert.True(result);
+    }
 
     // ----------------------------------------------------
 
@@ -100,7 +281,7 @@ public static partial class Test_ArrayExtensions
     // ----------------------------------------------------
 
     [Fact]
-    public static void Test_LastIndexOf_Span_Ints()
+    public static void Test_LastIndexOfAny_Span_Ints()
     {
         int result;
         var source = IntArray();
@@ -120,7 +301,7 @@ public static partial class Test_ArrayExtensions
     }
 
     [Fact]
-    public static void Test_LastIndexOf_Span_Items()
+    public static void Test_LastIndexOfAny_Span_Items()
     {
         int result;
         var source = ItemArray();
@@ -299,12 +480,234 @@ public static partial class Test_ArrayExtensions
 
     // ----------------------------------------------------
 
-    // TODO ArrayEx: IndexOfAnyExcept span
-    // TODO ArrayEx: LastIndexOfAnyExcept span
-    // TODO ArrayEx: IndexesOfAnyExcept span
-    // TODO ArrayEx: ContainsAnyExcept span
-    // TODO ArrayEx: StartsWithAnyExcept span
-    // TODO ArrayEx: EndsWithAnyExcept span
+    [Fact]
+    public static void Test_IndexOfAnyExcept_Span_Ints()
+    {
+        int result;
+        var source = IntArray();
+        var values = IntSpan();
+        result = source.IndexOfAnyExcept(values); Assert.Equal(-1, result);
+        result = source.IndexOfAnyExcept(values, IntEquality()); Assert.Equal(-1, result);
+
+        source = [1, 2, 3, 4];
+        values = IntSpan([8, 9]);
+        result = source.IndexOfAnyExcept(values); Assert.Equal(0, result);
+        result = source.IndexOfAnyExcept(values, IntEquality()); Assert.Equal(0, result);
+
+        source = [1, 2, 3, 4];
+        values = IntSpan([8, 1, 2]);
+        result = source.IndexOfAnyExcept(values); Assert.Equal(2, result);
+        result = source.IndexOfAnyExcept(values, IntEquality()); Assert.Equal(2, result);
+    }
+
+    [Fact]
+    public static void Test_IndexOfAnyExcept_Span_Items()
+    {
+        int result;
+        var source = ItemArray();
+        var values = ItemSpan();
+        // result = source.IndexOfAnyExcept(values); // Item<> not IEquatable
+        result = source.IndexOfAnyExcept(values, ItemEquality()); Assert.Equal(-1, result);
+
+        source = ItemArray([1, 2, 3, 4]);
+        values = ItemSpan([8, 9]);
+        result = source.IndexOfAnyExcept(values, ItemEquality()); Assert.Equal(0, result);
+
+        source = ItemArray([1, 2, 3, 4]);
+        values = ItemSpan([8, 1, 2]);
+        result = source.IndexOfAnyExcept(values, ItemEquality()); Assert.Equal(2, result);
+    }
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_LastIndexOfAnyExcept_Span_Ints()
+    {
+        int result;
+        var source = IntArray();
+        var values = IntSpan();
+        result = source.LastIndexOfAnyExcept(values); Assert.Equal(-1, result);
+        result = source.LastIndexOfAnyExcept(values, IntEquality()); Assert.Equal(-1, result);
+
+        source = [1, 2, 3, 4];
+        values = IntSpan([8, 9]);
+        result = source.LastIndexOfAnyExcept(values); Assert.Equal(3, result);
+        result = source.LastIndexOfAnyExcept(values, IntEquality()); Assert.Equal(3, result);
+
+        source = [1, 2, 3, 4];
+        values = IntSpan([8, 3, 4]);
+        result = source.LastIndexOfAnyExcept(values); Assert.Equal(1, result);
+        result = source.LastIndexOfAnyExcept(values, IntEquality()); Assert.Equal(1, result);
+    }
+
+    [Fact]
+    public static void Test_LastIndexOfAnyExcept_Span_Items()
+    {
+        int result;
+        var source = ItemArray();
+        var values = ItemSpan();
+        // result = source.LastIndexOfAnyExcept(values); // Item<> not IEquatable
+        result = source.LastIndexOfAnyExcept(values, ItemEquality()); Assert.Equal(-1, result);
+
+        source = ItemArray([1, 2, 3, 4]);
+        values = ItemSpan([8, 9]);
+        result = source.LastIndexOfAnyExcept(values, ItemEquality()); Assert.Equal(3, result);
+
+        source = ItemArray([1, 2, 3, 4]);
+        values = ItemSpan([8, 3, 4]);
+        result = source.LastIndexOfAnyExcept(values, ItemEquality()); Assert.Equal(1, result);
+    }
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_IndexesOfAnyExcept_Span_Ints()
+    {
+        List<int> result;
+        var source = IntArray();
+        var values = IntSpan();
+        result = source.IndexesOfAnyExcept(values); Assert.Empty(result);
+        result = source.IndexesOfAnyExcept(values, IntEquality()); Assert.Empty(result);
+
+        source = [1, 2, 3, 4];
+        values = IntSpan([1, 4]);
+        result = source.IndexesOfAnyExcept(values); Assert.True(result is [1, 2]);
+        result = source.IndexesOfAnyExcept(values, IntEquality()); Assert.True(result is [1, 2]);
+    }
+
+    [Fact]
+    public static void Test_IndexesOfAnyExcept_Span_Items()
+    {
+        List<int> result;
+        var source = ItemArray();
+        var values = ItemSpan();
+        // result = source.IndexesOfAnyExcept(values); // Item<> not IEquatable
+        result = source.IndexesOfAnyExcept(values, ItemEquality()); Assert.Empty(result);
+
+        source = ItemArray([1, 2, 3, 4]);
+        values = ItemSpan([1, 4]);
+        result = source.IndexesOfAnyExcept(values, ItemEquality()); Assert.True(result is [1, 2]);
+    }
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_ContainsAnyExcept_Span_Ints()
+    {
+        bool result;
+        var source = IntArray();
+        var values = IntSpan();
+        result = source.ContainsAnyExcept(values); Assert.False(result);
+        result = source.ContainsAnyExcept(values, IntEquality()); Assert.False(result);
+
+        source = [1, 2, 3];
+        values = IntSpan([1, 2, 3]);
+        result = source.ContainsAnyExcept(values); Assert.False(result);
+        result = source.ContainsAnyExcept(values, IntEquality()); Assert.False(result);
+
+        source = [1, 2, 3];
+        values = IntSpan([1, 2]);
+        result = source.ContainsAnyExcept(values); Assert.True(result);
+        result = source.ContainsAnyExcept(values, IntEquality()); Assert.True(result);
+    }
+
+    [Fact]
+    public static void Test_ContainsAnyExcept_Span_Items()
+    {
+        bool result;
+        var source = ItemArray();
+        var values = ItemSpan();
+        // result = source.ContainsAnyExcept(values); // Item<> not IEquatable
+        result = source.ContainsAnyExcept(values, ItemEquality()); Assert.False(result);
+
+        source = ItemArray([1, 2, 3]);
+        values = ItemSpan([1, 2, 3]);
+        result = source.ContainsAnyExcept(values, ItemEquality()); Assert.False(result);
+
+        source = ItemArray([1, 2, 3]);
+        values = ItemSpan([1, 2]);
+        result = source.ContainsAnyExcept(values, ItemEquality()); Assert.True(result);
+    }
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_StartsWithAnyExcept_Span_Ints()
+    {
+        bool result;
+        var source = IntArray();
+        var values = IntSpan();
+        result = source.StartsWithAnyExcept(values); Assert.False(result);
+        result = source.StartsWithAnyExcept(values, IntEquality()); Assert.False(result);
+
+        source = [1, 2, 3];
+        values = IntSpan([1, 2, 3]);
+        result = source.StartsWithAnyExcept(values); Assert.False(result);
+        result = source.StartsWithAnyExcept(values, IntEquality()); Assert.False(result);
+
+        source = [1, 2, 3];
+        values = IntSpan([8, 2, 3]);
+        result = source.StartsWithAnyExcept(values); Assert.True(result);
+        result = source.StartsWithAnyExcept(values, IntEquality()); Assert.True(result);
+    }
+
+    [Fact]
+    public static void Test_StartsWithAnyExcept_Span_Items()
+    {
+        bool result;
+        var source = ItemArray();
+        var values = ItemSpan();
+        // result = source.StartsWithAnyExcept(values); // Item<> not IEquatable
+        result = source.StartsWithAnyExcept(values, ItemEquality()); Assert.False(result);
+
+        source = ItemArray([1, 2, 3]);
+        values = ItemSpan([1, 2, 3]);
+        result = source.StartsWithAnyExcept(values, ItemEquality()); Assert.False(result);
+
+        source = ItemArray([1, 2, 3]);
+        values = ItemSpan([8, 2, 3]);
+        result = source.StartsWithAnyExcept(values, ItemEquality()); Assert.True(result);
+    }
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_EndsWithAnyExcept_Span_Ints()
+    {
+        bool result;
+        var source = IntArray();
+        var values = IntSpan();
+        result = source.EndsWithAnyExcept(values); Assert.False(result);
+        result = source.EndsWithAnyExcept(values, IntEquality()); Assert.False(result);
+
+        source = [1, 2, 3];
+        values = IntSpan([1, 2, 3]);
+        result = source.EndsWithAnyExcept(values); Assert.False(result);
+        result = source.EndsWithAnyExcept(values, IntEquality()); Assert.False(result);
+
+        source = [1, 2, 3];
+        values = IntSpan([1, 2]);
+        result = source.EndsWithAnyExcept(values); Assert.True(result);
+        result = source.EndsWithAnyExcept(values, IntEquality()); Assert.True(result);
+    }
+
+    [Fact]
+    public static void Test_EndsWithAnyExcept_Span_Items()
+    {
+        bool result;
+        var source = ItemArray();
+        var values = ItemSpan();
+        // result = source.EndsWithAnyExcept(values); // Item<> not IEquatable
+        result = source.EndsWithAnyExcept(values, ItemEquality()); Assert.False(result);
+
+        source = ItemArray([1, 2, 3]);
+        values = ItemSpan([1, 2, 3]);
+        result = source.EndsWithAnyExcept(values, ItemEquality()); Assert.False(result);
+
+        source = ItemArray([1, 2, 3]);
+        values = ItemSpan([1, 2]);
+        result = source.EndsWithAnyExcept(values, ItemEquality()); Assert.True(result);
+    }
 
     // ----------------------------------------------------
 

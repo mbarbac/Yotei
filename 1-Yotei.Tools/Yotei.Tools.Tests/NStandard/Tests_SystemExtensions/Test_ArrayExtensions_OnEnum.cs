@@ -50,12 +50,193 @@ public static partial class Test_ArrayExtensions
 
     // ----------------------------------------------------
 
-    // TODO ArrayEx: IndexOf_Range enum
-    // TODO ArrayEx: LastIndexOf_Range enum
-    // TODO ArrayEx: IndexesOf_Range enum
-    // TODO ArrayEx: Contains_Range enum
-    // TODO ArrayEx: StartsWith_Range enum
-    // TODO ArrayEx: EndsWith_Range enum
+    [Fact]
+    public static void Test_IndexOf_Enum_Ints()
+    {
+        int result;
+        var source = IntArray();
+        var values = IntEnumerable();
+        result = source.IndexOf(values); Assert.Equal(0, result);
+        result = source.IndexOf(values, IntEquality()); Assert.Equal(0, result);
+
+        source = [1, 2, 3, 4];
+        values = [4, 5];
+        result = source.IndexOf(values); Assert.Equal(-1, result);
+        result = source.IndexOf(values, IntEquality()); Assert.Equal(-1, result);
+
+        values = [2, 3];
+        result = source.IndexOf(values); Assert.Equal(1, result);
+        result = source.IndexOf(values, IntEquality()); Assert.Equal(1, result);
+    }
+
+    [Fact]
+    public static void Test_IndexOf_Enum_Items()
+    {
+        int result;
+        var source = ItemArray();
+        var values = ItemEnumerable();
+        // result = source.IndexOf(values); // Item<> not IEquatable
+        result = source.IndexOf(values, ItemEquality()); Assert.Equal(0, result);
+
+        source = ItemArray([1, 2, 3, 4]);
+        values = ItemEnumerable([4, 5]);
+        result = source.IndexOf(values, ItemEquality()); Assert.Equal(-1, result);
+
+        values = ItemEnumerable([2, 3]);
+        result = source.IndexOf(values, ItemEquality()); Assert.Equal(1, result);
+    }
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_LastIndexOf_Enum_Ints()
+    {
+        int result;
+        var source = IntArray();
+        var values = IntEnumerable();
+        result = source.LastIndexOf(values); Assert.Equal(0, result);
+        result = source.LastIndexOf(values, IntEquality()); Assert.Equal(0, result);
+
+        source = [1, 2, 3, 4];
+        values = [4, 5];
+        result = source.LastIndexOf(values); Assert.Equal(-1, result);
+        result = source.LastIndexOf(values, IntEquality()); Assert.Equal(-1, result);
+
+        values = [2, 3];
+        result = source.LastIndexOf(values); Assert.Equal(1, result);
+        result = source.LastIndexOf(values, IntEquality()); Assert.Equal(1, result);
+    }
+
+    [Fact]
+    public static void Test_LastIndexOf_Enum_Items()
+    {
+        int result;
+        var source = ItemArray();
+        var values = ItemEnumerable();
+        // result = source.LastIndexOf(values); // Item<> not IEquatable
+        result = source.LastIndexOf(values, ItemEquality()); Assert.Equal(0, result);
+
+        source = ItemArray([1, 2, 3, 4]);
+        values = ItemEnumerable([4, 5]);
+        result = source.LastIndexOf(values, ItemEquality()); Assert.Equal(-1, result);
+
+        values = ItemEnumerable([2, 3]);
+        result = source.LastIndexOf(values, ItemEquality()); Assert.Equal(1, result);
+    }
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_Contains_Enum_Ints()
+    {
+        bool result;
+        var source = IntArray();
+        var values = IntEnumerable();
+        result = source.Contains(values); Assert.True(result); // Standard behavior
+        result = source.Contains(values, IntEquality()); Assert.True(result);
+
+        source = [1, 2, 3, 4];
+        values = [4, 5];
+        result = source.Contains(values); Assert.False(result);
+        result = source.Contains(values, IntEquality()); Assert.False(result);
+
+        values = [2, 3];
+        result = source.Contains(values); Assert.True(result);
+        result = source.Contains(values, IntEquality()); Assert.True(result);
+    }
+
+    [Fact]
+    public static void Test_Contains_Enum_Items()
+    {
+        bool result;
+        var source = ItemArray();
+        var values = ItemEnumerable();
+        // result = source.Contains(values); // Item<> not IEquatable
+        result = source.Contains(values, ItemEquality()); Assert.True(result);
+
+        source = ItemArray([1, 2, 3, 4]);
+        values = ItemEnumerable([4, 5]);
+        result = source.Contains(values, ItemEquality()); Assert.False(result);
+
+        values = ItemEnumerable([2, 3]);
+        result = source.Contains(values, ItemEquality()); Assert.True(result);
+    }
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_StartsWith_Enum_Ints()
+    {
+        bool result;
+        var source = IntArray();
+        var values = IntEnumerable();
+        result = source.StartsWith(values); Assert.True(result); // Standard behavior
+        result = source.StartsWith(values, IntEquality()); Assert.True(result);
+
+        source = [1, 2, 3, 4];
+        values = [4, 5];
+        result = source.StartsWith(values); Assert.False(result);
+        result = source.StartsWith(values, IntEquality()); Assert.False(result);
+
+        values = [1, 2];
+        result = source.StartsWith(values); Assert.True(result);
+        result = source.StartsWith(values, IntEquality()); Assert.True(result);
+    }
+
+    [Fact]
+    public static void Test_StartsWith_Enum_Items()
+    {
+        bool result;
+        var source = ItemArray();
+        var values = ItemEnumerable();
+        // result = source.StartsWith(values); // Item<> not IEquatable
+        result = source.StartsWith(values, ItemEquality()); Assert.True(result);
+
+        source = ItemArray([1, 2, 3, 4]);
+        values = ItemEnumerable([4, 5]);
+        result = source.StartsWith(values, ItemEquality()); Assert.False(result);
+
+        values = ItemEnumerable([1, 2]);
+        result = source.StartsWith(values, ItemEquality()); Assert.True(result);
+    }
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_EndsWith_Enum_Ints()
+    {
+        bool result;
+        var source = IntArray();
+        var values = IntEnumerable();
+        result = source.EndsWith(values); Assert.False(result);
+        result = source.EndsWith(values, IntEquality()); Assert.False(result);
+
+        source = [1, 2, 3, 4];
+        values = [4, 5];
+        result = source.EndsWith(values); Assert.False(result);
+        result = source.EndsWith(values, IntEquality()); Assert.False(result);
+
+        values = [3, 4];
+        result = source.EndsWith(values); Assert.True(result);
+        result = source.EndsWith(values, IntEquality()); Assert.True(result);
+    }
+
+    [Fact]
+    public static void Test_EndsWith_Enum_Items()
+    {
+        bool result;
+        var source = ItemArray();
+        var values = ItemEnumerable();
+        // result = source.EndsWith(values); // Item<> not IEquatable
+        result = source.EndsWith(values, ItemEquality()); Assert.False(result);
+
+        source = ItemArray([1, 2, 3, 4]);
+        values = ItemEnumerable([4, 5]);
+        result = source.EndsWith(values, ItemEquality()); Assert.False(result);
+
+        values = ItemEnumerable([3, 4]);
+        result = source.EndsWith(values, ItemEquality()); Assert.True(result);
+    }
 
     // ----------------------------------------------------
 
@@ -299,12 +480,234 @@ public static partial class Test_ArrayExtensions
 
     // ----------------------------------------------------
 
-    // TODO ArrayEx: IndexOfAnyExcept enum
-    // TODO ArrayEx: LastIndexOfAnyExcept enum
-    // TODO ArrayEx: IndexesOfAnyExcept enum
-    // TODO ArrayEx: ContainsAnyExcept enum
-    // TODO ArrayEx: StartsWithAnyExcept enum
-    // TODO ArrayEx: EndsWithAnyExcept enum
+    [Fact]
+    public static void Test_IndexOfAnyExcept_Enum_Ints()
+    {
+        int result;
+        var source = IntArray();
+        var values = IntEnumerable();
+        result = source.IndexOfAnyExcept(values); Assert.Equal(-1, result);
+        result = source.IndexOfAnyExcept(values, IntEquality()); Assert.Equal(-1, result);
+
+        source = [1, 2, 3, 4];
+        values = IntEnumerable([8, 9]);
+        result = source.IndexOfAnyExcept(values); Assert.Equal(0, result);
+        result = source.IndexOfAnyExcept(values, IntEquality()); Assert.Equal(0, result);
+
+        source = [1, 2, 3, 4];
+        values = IntEnumerable([8, 1, 2]);
+        result = source.IndexOfAnyExcept(values); Assert.Equal(2, result);
+        result = source.IndexOfAnyExcept(values, IntEquality()); Assert.Equal(2, result);
+    }
+
+    [Fact]
+    public static void Test_IndexOfAnyExcept_Enum_Items()
+    {
+        int result;
+        var source = ItemArray();
+        var values = ItemEnumerable();
+        // result = source.IndexOfAnyExcept(values); // Item<> not IEquatable
+        result = source.IndexOfAnyExcept(values, ItemEquality()); Assert.Equal(-1, result);
+
+        source = ItemArray([1, 2, 3, 4]);
+        values = ItemEnumerable([8, 9]);
+        result = source.IndexOfAnyExcept(values, ItemEquality()); Assert.Equal(0, result);
+
+        source = ItemArray([1, 2, 3, 4]);
+        values = ItemEnumerable([8, 1, 2]);
+        result = source.IndexOfAnyExcept(values, ItemEquality()); Assert.Equal(2, result);
+    }
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_LastIndexOfAnyExcept_Enum_Ints()
+    {
+        int result;
+        var source = IntArray();
+        var values = IntEnumerable();
+        result = source.LastIndexOfAnyExcept(values); Assert.Equal(-1, result);
+        result = source.LastIndexOfAnyExcept(values, IntEquality()); Assert.Equal(-1, result);
+
+        source = [1, 2, 3, 4];
+        values = IntEnumerable([8, 9]);
+        result = source.LastIndexOfAnyExcept(values); Assert.Equal(3, result);
+        result = source.LastIndexOfAnyExcept(values, IntEquality()); Assert.Equal(3, result);
+
+        source = [1, 2, 3, 4];
+        values = IntEnumerable([8, 3, 4]);
+        result = source.LastIndexOfAnyExcept(values); Assert.Equal(1, result);
+        result = source.LastIndexOfAnyExcept(values, IntEquality()); Assert.Equal(1, result);
+    }
+
+    [Fact]
+    public static void Test_LastIndexOfAnyExcept_Enum_Items()
+    {
+        int result;
+        var source = ItemArray();
+        var values = ItemEnumerable();
+        // result = source.LastIndexOfAnyExcept(values); // Item<> not IEquatable
+        result = source.LastIndexOfAnyExcept(values, ItemEquality()); Assert.Equal(-1, result);
+
+        source = ItemArray([1, 2, 3, 4]);
+        values = ItemEnumerable([8, 9]);
+        result = source.LastIndexOfAnyExcept(values, ItemEquality()); Assert.Equal(3, result);
+
+        source = ItemArray([1, 2, 3, 4]);
+        values = ItemEnumerable([8, 3, 4]);
+        result = source.LastIndexOfAnyExcept(values, ItemEquality()); Assert.Equal(1, result);
+    }
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_IndexesOfAnyExcept_Enum_Ints()
+    {
+        List<int> result;
+        var source = IntArray();
+        var values = IntEnumerable();
+        result = source.IndexesOfAnyExcept(values); Assert.Empty(result);
+        result = source.IndexesOfAnyExcept(values, IntEquality()); Assert.Empty(result);
+
+        source = [1, 2, 3, 4];
+        values = IntEnumerable([1, 4]);
+        result = source.IndexesOfAnyExcept(values); Assert.True(result is [1, 2]);
+        result = source.IndexesOfAnyExcept(values, IntEquality()); Assert.True(result is [1, 2]);
+    }
+
+    [Fact]
+    public static void Test_IndexesOfAnyExcept_Enum_Items()
+    {
+        List<int> result;
+        var source = ItemArray();
+        var values = ItemEnumerable();
+        // result = source.IndexesOfAnyExcept(values); // Item<> not IEquatable
+        result = source.IndexesOfAnyExcept(values, ItemEquality()); Assert.Empty(result);
+
+        source = ItemArray([1, 2, 3, 4]);
+        values = ItemEnumerable([1, 4]);
+        result = source.IndexesOfAnyExcept(values, ItemEquality()); Assert.True(result is [1, 2]);
+    }
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_ContainsAnyExcept_Enum_Ints()
+    {
+        bool result;
+        var source = IntArray();
+        var values = IntEnumerable();
+        result = source.ContainsAnyExcept(values); Assert.False(result);
+        result = source.ContainsAnyExcept(values, IntEquality()); Assert.False(result);
+
+        source = [1, 2, 3];
+        values = IntEnumerable([1, 2, 3]);
+        result = source.ContainsAnyExcept(values); Assert.False(result);
+        result = source.ContainsAnyExcept(values, IntEquality()); Assert.False(result);
+
+        source = [1, 2, 3];
+        values = IntEnumerable([1, 2]);
+        result = source.ContainsAnyExcept(values); Assert.True(result);
+        result = source.ContainsAnyExcept(values, IntEquality()); Assert.True(result);
+    }
+
+    [Fact]
+    public static void Test_ContainsAnyExcept_Enum_Items()
+    {
+        bool result;
+        var source = ItemArray();
+        var values = ItemEnumerable();
+        // result = source.ContainsAnyExcept(values); // Item<> not IEquatable
+        result = source.ContainsAnyExcept(values, ItemEquality()); Assert.False(result);
+
+        source = ItemArray([1, 2, 3]);
+        values = ItemEnumerable([1, 2, 3]);
+        result = source.ContainsAnyExcept(values, ItemEquality()); Assert.False(result);
+
+        source = ItemArray([1, 2, 3]);
+        values = ItemEnumerable([1, 2]);
+        result = source.ContainsAnyExcept(values, ItemEquality()); Assert.True(result);
+    }
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_StartsWithAnyExcept_Enum_Ints()
+    {
+        bool result;
+        var source = IntArray();
+        var values = IntEnumerable();
+        result = source.StartsWithAnyExcept(values); Assert.False(result);
+        result = source.StartsWithAnyExcept(values, IntEquality()); Assert.False(result);
+
+        source = [1, 2, 3];
+        values = IntEnumerable([1, 2, 3]);
+        result = source.StartsWithAnyExcept(values); Assert.False(result);
+        result = source.StartsWithAnyExcept(values, IntEquality()); Assert.False(result);
+
+        source = [1, 2, 3];
+        values = IntEnumerable([8, 2, 3]);
+        result = source.StartsWithAnyExcept(values); Assert.True(result);
+        result = source.StartsWithAnyExcept(values, IntEquality()); Assert.True(result);
+    }
+
+    [Fact]
+    public static void Test_StartsWithAnyExcept_Enum_Items()
+    {
+        bool result;
+        var source = ItemArray();
+        var values = ItemEnumerable();
+        // result = source.StartsWithAnyExcept(values); // Item<> not IEquatable
+        result = source.StartsWithAnyExcept(values, ItemEquality()); Assert.False(result);
+
+        source = ItemArray([1, 2, 3]);
+        values = ItemEnumerable([1, 2, 3]);
+        result = source.StartsWithAnyExcept(values, ItemEquality()); Assert.False(result);
+
+        source = ItemArray([1, 2, 3]);
+        values = ItemEnumerable([8, 2, 3]);
+        result = source.StartsWithAnyExcept(values, ItemEquality()); Assert.True(result);
+    }
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_EndsWithAnyExcept_Enum_Ints()
+    {
+        bool result;
+        var source = IntArray();
+        var values = IntEnumerable();
+        result = source.EndsWithAnyExcept(values); Assert.False(result);
+        result = source.EndsWithAnyExcept(values, IntEquality()); Assert.False(result);
+
+        source = [1, 2, 3];
+        values = IntEnumerable([1, 2, 3]);
+        result = source.EndsWithAnyExcept(values); Assert.False(result);
+        result = source.EndsWithAnyExcept(values, IntEquality()); Assert.False(result);
+
+        source = [1, 2, 3];
+        values = IntEnumerable([1, 2]);
+        result = source.EndsWithAnyExcept(values); Assert.True(result);
+        result = source.EndsWithAnyExcept(values, IntEquality()); Assert.True(result);
+    }
+
+    [Fact]
+    public static void Test_EndsWithAnyExcept_Enum_Items()
+    {
+        bool result;
+        var source = ItemArray();
+        var values = ItemEnumerable();
+        // result = source.EndsWithAnyExcept(values); // Item<> not IEquatable
+        result = source.EndsWithAnyExcept(values, ItemEquality()); Assert.False(result);
+
+        source = ItemArray([1, 2, 3]);
+        values = ItemEnumerable([1, 2, 3]);
+        result = source.EndsWithAnyExcept(values, ItemEquality()); Assert.False(result);
+
+        source = ItemArray([1, 2, 3]);
+        values = ItemEnumerable([1, 2]);
+        result = source.EndsWithAnyExcept(values, ItemEquality()); Assert.True(result);
+    }
 
     // ----------------------------------------------------
 
