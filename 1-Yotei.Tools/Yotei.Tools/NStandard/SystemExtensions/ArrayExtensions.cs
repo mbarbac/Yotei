@@ -255,4 +255,132 @@ public static partial class ArrayExtension
     public static bool EndsWith<T>(
         this T[] source, Predicate<T> predicate)
         => source.Length > 0 && source.IndexOf(predicate) == source.Length - 1;
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Returns a new instance where all leading ocurrences of the default value have been removed.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    public static T[] TrimStart<T>(this T[] source)
+    {
+        var comparer = EqualityComparerEx.New<T>();
+        return source.TrimStart(default!, comparer);
+    }
+
+    /// <summary>
+    /// Returns a new instance where all leading ocurrences of the given value have been removed.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public static T[] TrimStart<T>(this T[] source, T value) where T : IEquatable<T>
+    {
+        var comparer = EqualityComparerEx.New<T>();
+        return source.TrimStart(value, comparer);
+    }
+
+    /// <summary>
+    /// Returns a new instance where all leading ocurrences of the given value have been removed.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static T[] TrimStart<T>(this T[] source, T value, IEqualityComparer<T> comparer)
+    {
+        ArgumentNullException.ThrowIfNull(comparer);
+
+        var span = source.AsSpan(); while (span.Length > 0)
+        {
+            if (comparer.Equals(span[0], value)) span = span[1..];
+            else break;
+        }
+        return span.ToArray();
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Returns a new instance where all trailing ocurrences of the default value have been removed.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    public static T[] TrimEnd<T>(this T[] source)
+    {
+        var comparer = EqualityComparerEx.New<T>();
+        return source.TrimEnd(default!, comparer);
+    }
+
+    /// <summary>
+    /// Returns a new instance where all trailing ocurrences of the given value have been removed.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public static T[] TrimEnd<T>(this T[] source, T value) where T : IEquatable<T>
+    {
+        var comparer = EqualityComparerEx.New<T>();
+        return source.TrimEnd(value, comparer);
+    }
+
+    /// <summary>
+    /// Returns a new instance where all trailing ocurrences of the given value have been removed.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static T[] TrimEnd<T>(this T[] source, T value, IEqualityComparer<T> comparer)
+    {
+        ArgumentNullException.ThrowIfNull(comparer);
+
+        var span = source.AsSpan(); while (span.Length > 0)
+        {
+            if (comparer.Equals(span[^1], value)) span = span[..^1];
+            else break;
+        }
+        return span.ToArray();
+    }
+
+    // ----------------------------------------------------
+
+    /// <summary>
+    /// Returns a new instance where all leading and trailing ocurrences of the default value
+    /// have been removed.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    public static T[] Trim<T>(this T[] source) => source.TrimStart().TrimEnd();
+
+    /// <summary>
+    /// Returns a new instance where all leading and trailing ocurrences of the given value have
+    /// been removed.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    public static T[] Trim<T>(this T[] source, T value) where T : IEquatable<T>
+        => source.TrimStart(value).TrimEnd(value);
+
+    /// <summary>
+    /// Returns a new instance where all leading and trailing ocurrences of the given value have
+    /// been removed.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="value"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static T[] Trim<T>(this T[] source, T value, IEqualityComparer<T> comparer)
+        => source.TrimStart(value, comparer).TrimEnd(value, comparer);
 }

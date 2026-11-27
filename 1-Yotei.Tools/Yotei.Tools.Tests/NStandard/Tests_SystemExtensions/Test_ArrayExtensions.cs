@@ -263,6 +263,14 @@ public static partial class Test_ArrayExtensions
 
     // ----------------------------------------------------
 
+    [Fact]
+    public static void Test_TrimStart_Value_Int()
+    {
+        var source = IntArray();
+    }
+
+    // ----------------------------------------------------
+
     // TODO ArrayEx: TrimStart value
     // TODO ArrayEx: TrimEnd value
     // TODO ArrayEx: Trim value
