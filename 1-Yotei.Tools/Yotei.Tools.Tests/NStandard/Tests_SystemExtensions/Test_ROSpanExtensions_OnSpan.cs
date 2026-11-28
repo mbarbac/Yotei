@@ -294,8 +294,6 @@ public static partial class Test_ROSpanExtensions
         result = source.EndsWith(values, ItemEquality()); Assert.True(result);
     }
 
-    /*
-
     // ----------------------------------------------------
 
     [Fact]
@@ -766,7 +764,6 @@ public static partial class Test_ROSpanExtensions
         values = ItemSpan([1, 2]);
         result = source.EndsWithAnyExcept(values, ItemEquality()); Assert.True(result);
     }
-     */
 
     // ----------------------------------------------------
 

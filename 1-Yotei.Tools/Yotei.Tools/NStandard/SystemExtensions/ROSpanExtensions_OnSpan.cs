@@ -225,10 +225,9 @@ public static partial class ReadOnlySpanExtensions
         && source.IndexOf(values, comparer) == source.Length - values.Length);
 #endif
 
-    /*
-
     // ----------------------------------------------------
 
+#if NETSTANDARD2_0
     /// <summary>
     /// Returns the index of the first ocurrence of any of the given values, or -1 if none.
     /// </summary>
@@ -249,9 +248,11 @@ public static partial class ReadOnlySpanExtensions
         }
         return -1;
     }
+#endif
 
     // ----------------------------------------------------
 
+#if NETSTANDARD2_0
     /// <summary>
     /// Returns the index of the last ocurrence of any of the given values, or -1 if none.
     /// </summary>
@@ -272,6 +273,7 @@ public static partial class ReadOnlySpanExtensions
         }
         return -1;
     }
+#endif
 
     // ----------------------------------------------------
 
@@ -618,5 +620,4 @@ public static partial class ReadOnlySpanExtensions
         this ReadOnlySpan<T> source, ReadOnlySpan<T> values, IEqualityComparer<T> comparer)
         => source.Length > 0
         && source.IndexOfAnyExcept(values, comparer) == source.Length - 1;
-     */
 }

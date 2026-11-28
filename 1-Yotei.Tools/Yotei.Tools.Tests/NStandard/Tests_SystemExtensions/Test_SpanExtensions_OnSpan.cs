@@ -294,8 +294,6 @@ public static partial class Test_SpanExtensions
         result = source.EndsWith(values, ItemEquality()); Assert.True(result);
     }
 
-    /*
-
     // ----------------------------------------------------
 
     [Fact]
@@ -307,12 +305,12 @@ public static partial class Test_SpanExtensions
         result = source.IndexOfAny(values); Assert.Equal(-1, result);
         result = source.IndexOfAny(values, IntEquality()); Assert.Equal(-1, result);
 
-        source = IntSpan([1, 2];
+        source = IntSpan([1, 2]);
         values = IntSpan([8, 9]);
         result = source.IndexOfAny(values); Assert.Equal(-1, result);
         result = source.IndexOfAny(values, IntEquality()); Assert.Equal(-1, result);
 
-        source = IntSpan([1, 9, 2];
+        source = IntSpan([1, 9, 2]);
         values = IntSpan([8, 9]);
         result = source.IndexOfAny(values); Assert.Equal(1, result);
         result = source.IndexOfAny(values, IntEquality()); Assert.Equal(1, result);
@@ -347,12 +345,12 @@ public static partial class Test_SpanExtensions
         result = source.LastIndexOfAny(values); Assert.Equal(-1, result);
         result = source.LastIndexOfAny(values, IntEquality()); Assert.Equal(-1, result);
 
-        source = IntSpan([1, 2];
+        source = IntSpan([1, 2]);
         values = IntSpan([8, 9]);
         result = source.LastIndexOfAny(values); Assert.Equal(-1, result);
         result = source.LastIndexOfAny(values, IntEquality()); Assert.Equal(-1, result);
 
-        source = IntSpan([1, 9, 2];
+        source = IntSpan([1, 9, 2]);
         values = IntSpan([8, 9]);
         result = source.LastIndexOfAny(values); Assert.Equal(1, result);
         result = source.LastIndexOfAny(values, IntEquality()); Assert.Equal(1, result);
@@ -387,12 +385,12 @@ public static partial class Test_SpanExtensions
         result = source.IndexesOfAny(values); Assert.Empty(result);
         result = source.IndexesOfAny(values, IntEquality()); Assert.Empty(result);
 
-        source = IntSpan([1, 2];
+        source = IntSpan([1, 2]);
         values = IntSpan([8, 9]);
         result = source.IndexesOfAny(values); Assert.Empty(result);
         result = source.IndexesOfAny(values, IntEquality()); Assert.Empty(result);
 
-        source = IntSpan([1, 9, 8, 2];
+        source = IntSpan([1, 9, 8, 2]);
         values = IntSpan([8, 9]);
         result = source.IndexesOfAny(values); Assert.True(result is [1, 2]);
         result = source.IndexesOfAny(values, IntEquality()); Assert.True(result is [1, 2]);
@@ -427,12 +425,12 @@ public static partial class Test_SpanExtensions
         result = source.ContainsAny(values); Assert.False(result);
         result = source.ContainsAny(values, IntEquality()); Assert.False(result);
 
-        source = IntSpan([1, 2];
+        source = IntSpan([1, 2]);
         values = IntSpan([8, 9]);
         result = source.ContainsAny(values); Assert.False(result);
         result = source.ContainsAny(values, IntEquality()); Assert.False(result);
 
-        source = IntSpan([1, 9, 2];
+        source = IntSpan([1, 9, 2]);
         values = IntSpan([8, 9]);
         result = source.ContainsAny(values); Assert.True(result);
         result = source.ContainsAny(values, IntEquality()); Assert.True(result);
@@ -467,12 +465,12 @@ public static partial class Test_SpanExtensions
         result = source.StartsWithAny(values); Assert.False(result);
         result = source.StartsWithAny(values, IntEquality()); Assert.False(result);
 
-        source = IntSpan([1, 2];
+        source = IntSpan([1, 2]);
         values = IntSpan([8, 9]);
         result = source.StartsWithAny(values); Assert.False(result);
         result = source.StartsWithAny(values, IntEquality()); Assert.False(result);
 
-        source = IntSpan([9, 2];
+        source = IntSpan([9, 2]);
         values = IntSpan([8, 9]);
         result = source.StartsWithAny(values); Assert.True(result);
         result = source.StartsWithAny(values, IntEquality()); Assert.True(result);
@@ -507,12 +505,12 @@ public static partial class Test_SpanExtensions
         result = source.EndsWithAny(values); Assert.False(result);
         result = source.EndsWithAny(values, IntEquality()); Assert.False(result);
 
-        source = IntSpan([1, 2];
+        source = IntSpan([1, 2]);
         values = IntSpan([8, 9]);
         result = source.EndsWithAny(values); Assert.False(result);
         result = source.EndsWithAny(values, IntEquality()); Assert.False(result);
 
-        source = IntSpan([1, 9];
+        source = IntSpan([1, 9]);
         values = IntSpan([8, 9]);
         result = source.EndsWithAny(values); Assert.True(result);
         result = source.EndsWithAny(values, IntEquality()); Assert.True(result);
@@ -547,12 +545,12 @@ public static partial class Test_SpanExtensions
         result = source.IndexOfAnyExcept(values); Assert.Equal(-1, result);
         result = source.IndexOfAnyExcept(values, IntEquality()); Assert.Equal(-1, result);
 
-        source = IntSpan([1, 2, 3, 4];
+        source = IntSpan([1, 2, 3, 4]);
         values = IntSpan([8, 9]);
         result = source.IndexOfAnyExcept(values); Assert.Equal(0, result);
         result = source.IndexOfAnyExcept(values, IntEquality()); Assert.Equal(0, result);
 
-        source = IntSpan([1, 2, 3, 4];
+        source = IntSpan([1, 2, 3, 4]);
         values = IntSpan([8, 1, 2]);
         result = source.IndexOfAnyExcept(values); Assert.Equal(2, result);
         result = source.IndexOfAnyExcept(values, IntEquality()); Assert.Equal(2, result);
@@ -587,12 +585,12 @@ public static partial class Test_SpanExtensions
         result = source.LastIndexOfAnyExcept(values); Assert.Equal(-1, result);
         result = source.LastIndexOfAnyExcept(values, IntEquality()); Assert.Equal(-1, result);
 
-        source = IntSpan([1, 2, 3, 4];
+        source = IntSpan([1, 2, 3, 4]);
         values = IntSpan([8, 9]);
         result = source.LastIndexOfAnyExcept(values); Assert.Equal(3, result);
         result = source.LastIndexOfAnyExcept(values, IntEquality()); Assert.Equal(3, result);
 
-        source = IntSpan([1, 2, 3, 4];
+        source = IntSpan([1, 2, 3, 4]);
         values = IntSpan([8, 3, 4]);
         result = source.LastIndexOfAnyExcept(values); Assert.Equal(1, result);
         result = source.LastIndexOfAnyExcept(values, IntEquality()); Assert.Equal(1, result);
@@ -627,7 +625,7 @@ public static partial class Test_SpanExtensions
         result = source.IndexesOfAnyExcept(values); Assert.Empty(result);
         result = source.IndexesOfAnyExcept(values, IntEquality()); Assert.Empty(result);
 
-        source = IntSpan([1, 2, 3, 4];
+        source = IntSpan([1, 2, 3, 4]);
         values = IntSpan([1, 4]);
         result = source.IndexesOfAnyExcept(values); Assert.True(result is [1, 2]);
         result = source.IndexesOfAnyExcept(values, IntEquality()); Assert.True(result is [1, 2]);
@@ -658,12 +656,12 @@ public static partial class Test_SpanExtensions
         result = source.ContainsAnyExcept(values); Assert.False(result);
         result = source.ContainsAnyExcept(values, IntEquality()); Assert.False(result);
 
-        source = IntSpan([1, 2, 3];
+        source = IntSpan([1, 2, 3]);
         values = IntSpan([1, 2, 3]);
         result = source.ContainsAnyExcept(values); Assert.False(result);
         result = source.ContainsAnyExcept(values, IntEquality()); Assert.False(result);
 
-        source = IntSpan([1, 2, 3];
+        source = IntSpan([1, 2, 3]);
         values = IntSpan([1, 2]);
         result = source.ContainsAnyExcept(values); Assert.True(result);
         result = source.ContainsAnyExcept(values, IntEquality()); Assert.True(result);
@@ -698,12 +696,12 @@ public static partial class Test_SpanExtensions
         result = source.StartsWithAnyExcept(values); Assert.False(result);
         result = source.StartsWithAnyExcept(values, IntEquality()); Assert.False(result);
 
-        source = IntSpan([1, 2, 3];
+        source = IntSpan([1, 2, 3]);
         values = IntSpan([1, 2, 3]);
         result = source.StartsWithAnyExcept(values); Assert.False(result);
         result = source.StartsWithAnyExcept(values, IntEquality()); Assert.False(result);
 
-        source = IntSpan([1, 2, 3];
+        source = IntSpan([1, 2, 3]);
         values = IntSpan([8, 2, 3]);
         result = source.StartsWithAnyExcept(values); Assert.True(result);
         result = source.StartsWithAnyExcept(values, IntEquality()); Assert.True(result);
@@ -738,12 +736,12 @@ public static partial class Test_SpanExtensions
         result = source.EndsWithAnyExcept(values); Assert.False(result);
         result = source.EndsWithAnyExcept(values, IntEquality()); Assert.False(result);
 
-        source = IntSpan([1, 2, 3];
+        source = IntSpan([1, 2, 3]);
         values = IntSpan([1, 2, 3]);
         result = source.EndsWithAnyExcept(values); Assert.False(result);
         result = source.EndsWithAnyExcept(values, IntEquality()); Assert.False(result);
 
-        source = IntSpan([1, 2, 3];
+        source = IntSpan([1, 2, 3]);
         values = IntSpan([1, 2]);
         result = source.EndsWithAnyExcept(values); Assert.True(result);
         result = source.EndsWithAnyExcept(values, IntEquality()); Assert.True(result);
@@ -766,9 +764,9 @@ public static partial class Test_SpanExtensions
         values = ItemSpan([1, 2]);
         result = source.EndsWithAnyExcept(values, ItemEquality()); Assert.True(result);
     }
-     */
 
     // ----------------------------------------------------
+
     // TODO SpanEx: Test_TrimStart_Span
     // TODO SpanEx: Test_TrimEnd_Span
     // TODO SpanEx: Test_Trim_Span
