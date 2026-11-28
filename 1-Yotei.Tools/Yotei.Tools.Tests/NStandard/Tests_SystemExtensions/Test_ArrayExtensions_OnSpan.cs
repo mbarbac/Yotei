@@ -717,6 +717,12 @@ public static partial class Test_ArrayExtensions
 
     // ----------------------------------------------------
 
+    // TODO ArrayEx: TrimStartAny span
+    // TODO ArrayEx: TrimEndAny span
+    // TODO ArrayEx: TrimAny span
+
+    // ----------------------------------------------------
+
     // TODO ArrayEx: AddRange span
     // TODO ArrayEx: InsertRange span
     // TODO ArrayEx: Remove span

@@ -17,7 +17,7 @@ public static partial class Test_ArrayExtensions
     {
         bool result;
         var source = Array.Empty<int>();
-        var target = IntArray();
+        var target = IntEnumerable();
         result = source.SequenceEqual(target); Assert.True(result);
         result = source.SequenceEqual(target, IntEquality()); Assert.True(result);
 
@@ -35,7 +35,7 @@ public static partial class Test_ArrayExtensions
     {
         bool result;
         var source = Array.Empty<Item<int>>();
-        var target = ItemArray();
+        var target = ItemEnumerable();
         result = source.SequenceEqual(target); Assert.True(result);
         result = source.SequenceEqual(target, ItemEquality()); Assert.True(result);
 
@@ -43,7 +43,7 @@ public static partial class Test_ArrayExtensions
         result = source.SequenceEqual(target); Assert.False(result);
         result = source.SequenceEqual(target, ItemEquality()); Assert.False(result);
 
-        target = ItemArray([1, 2]);
+        target = ItemEnumerable([1, 2]);
         result = source.SequenceEqual(target); Assert.False(result); // elements are references
         result = source.SequenceEqual(target, ItemEquality()); Assert.True(result);
     }
@@ -714,6 +714,12 @@ public static partial class Test_ArrayExtensions
     // TODO ArrayEx: TrimStart enum
     // TODO ArrayEx: TrimEnd enum
     // TODO ArrayEx: Trim enum
+
+    // ----------------------------------------------------
+
+    // TODO ArrayEx: TrimStartAny enum
+    // TODO ArrayEx: TrimEndAny enum
+    // TODO ArrayEx: TrimAny enum
 
     // ----------------------------------------------------
 
