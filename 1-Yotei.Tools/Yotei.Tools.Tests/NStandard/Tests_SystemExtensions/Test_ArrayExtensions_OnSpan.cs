@@ -51,6 +51,69 @@ public static partial class Test_ArrayExtensions
     // ----------------------------------------------------
 
     [Fact]
+    public static void Test_SequenceCompareTo_Span_Ints()
+    {
+        int result;
+        var source = IntArray();
+        var values = IntSpan();
+        result = source.SequenceCompareTo(values); Assert.Equal(0, result);
+        result = source.SequenceCompareTo(values, IntComparer()); Assert.Equal(0, result);
+
+        source = [1, 2, 3];
+        values = [1, 2, 3];
+        result = source.SequenceCompareTo(values); Assert.Equal(0, result);
+        result = source.SequenceCompareTo(values, IntComparer()); Assert.Equal(0, result);
+
+        values = [1, 2];
+        result = source.SequenceCompareTo(values); Assert.Equal(+1, result);
+        result = source.SequenceCompareTo(values, IntComparer()); Assert.Equal(+1, result);
+
+        values = [1, 2, 3, 4];
+        result = source.SequenceCompareTo(values); Assert.Equal(-1, result);
+        result = source.SequenceCompareTo(values, IntComparer()); Assert.Equal(-1, result);
+
+        source = [1, 2, 4];
+        values = [1, 2, 3];
+        result = source.SequenceCompareTo(values); Assert.Equal(+1, result);
+        result = source.SequenceCompareTo(values, IntComparer()); Assert.Equal(+1, result);
+
+        source = [1, 2, 2];
+        values = [1, 2, 3];
+        result = source.SequenceCompareTo(values); Assert.Equal(-1, result);
+        result = source.SequenceCompareTo(values, IntComparer()); Assert.Equal(-1, result);
+    }
+
+    [Fact]
+    public static void Test_SequenceCompareTo_Span_Items()
+    {
+        int result;
+        var source = ItemArray();
+        var values = ItemSpan();
+        // result = source.SequenceCompareTo(values); // Item<> not IEquatable
+        result = source.SequenceCompareTo(values, ItemComparer()); Assert.Equal(0, result);
+
+        source = ItemArray([1, 2, 3]);
+        values = ItemSpan([1, 2, 3]);
+        result = source.SequenceCompareTo(values, ItemComparer()); Assert.Equal(0, result);
+
+        values = ItemSpan([1, 2]);
+        result = source.SequenceCompareTo(values, ItemComparer()); Assert.Equal(+1, result);
+
+        values = ItemSpan([1, 2, 3, 4]);
+        result = source.SequenceCompareTo(values, ItemComparer()); Assert.Equal(-1, result);
+
+        source = ItemArray([1, 2, 4]);
+        values = ItemSpan([1, 2, 3]);
+        result = source.SequenceCompareTo(values, ItemComparer()); Assert.Equal(+1, result);
+
+        source = ItemArray([1, 2, 2]);
+        values = ItemSpan([1, 2, 3]);
+        result = source.SequenceCompareTo(values, ItemComparer()); Assert.Equal(-1, result);
+    }
+
+    // ----------------------------------------------------
+
+    [Fact]
     public static void Test_IndexOf_Span_Ints()
     {
         int result;
@@ -711,21 +774,15 @@ public static partial class Test_ArrayExtensions
 
     // ----------------------------------------------------
 
-    // TODO ArrayEx: TrimStart span
-    // TODO ArrayEx: TrimEnd span
-    // TODO ArrayEx: Trim span
-
-    // ----------------------------------------------------
-
-    // TODO ArrayEx: TrimStartAny span
-    // TODO ArrayEx: TrimEndAny span
-    // TODO ArrayEx: TrimAny span
-
-    // ----------------------------------------------------
-
-    // TODO ArrayEx: AddRange span
-    // TODO ArrayEx: InsertRange span
-    // TODO ArrayEx: Remove span
-    // TODO ArrayEx: RemoveLast span
-    // TODO ArrayEx: RemoveAll span
+    // TODO ArrayEx: Test_TrimStart span
+    // TODO ArrayEx: Test_TrimEnd span
+    // TODO ArrayEx: Test_Trim span
+    // TODO ArrayEx: Test_TrimStartAny span
+    // TODO ArrayEx: Test_TrimEndAny span
+    // TODO ArrayEx: Test_TrimAny span
+    // TODO ArrayEx: Test_AddRange span
+    // TODO ArrayEx: Test_InsertRange span
+    // TODO ArrayEx: Test_Remove span
+    // TODO ArrayEx: Test_RemoveLast span
+    // TODO ArrayEx: Test_RemoveAll span
 }

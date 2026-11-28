@@ -2,8 +2,6 @@
 #pragma warning disable CA1859
 
 #if NETSTANDARD2_0
-using System.Net.Sockets;
-
 namespace Yotei.Tools.NStd20.Tests;
 #else
 namespace Yotei.Tools.Tests;
@@ -46,6 +44,69 @@ public static partial class Test_ArrayExtensions
         target = ItemEnumerable([1, 2]);
         result = source.SequenceEqual(target); Assert.False(result); // elements are references
         result = source.SequenceEqual(target, ItemEquality()); Assert.True(result);
+    }
+
+    // ----------------------------------------------------
+
+    [Fact]
+    public static void Test_SequenceCompareTo_Enum_Ints()
+    {
+        int result;
+        var source = IntArray();
+        var values = IntEnumerable();
+        result = source.SequenceCompareTo(values); Assert.Equal(0, result);
+        result = source.SequenceCompareTo(values, IntComparer()); Assert.Equal(0, result);
+
+        source = [1, 2, 3];
+        values = [1, 2, 3];
+        result = source.SequenceCompareTo(values); Assert.Equal(0, result);
+        result = source.SequenceCompareTo(values, IntComparer()); Assert.Equal(0, result);
+
+        values = [1, 2];
+        result = source.SequenceCompareTo(values); Assert.Equal(+1, result);
+        result = source.SequenceCompareTo(values, IntComparer()); Assert.Equal(+1, result);
+
+        values = [1, 2, 3, 4];
+        result = source.SequenceCompareTo(values); Assert.Equal(-1, result);
+        result = source.SequenceCompareTo(values, IntComparer()); Assert.Equal(-1, result);
+
+        source = [1, 2, 4];
+        values = [1, 2, 3];
+        result = source.SequenceCompareTo(values); Assert.Equal(+1, result);
+        result = source.SequenceCompareTo(values, IntComparer()); Assert.Equal(+1, result);
+
+        source = [1, 2, 2];
+        values = [1, 2, 3];
+        result = source.SequenceCompareTo(values); Assert.Equal(-1, result);
+        result = source.SequenceCompareTo(values, IntComparer()); Assert.Equal(-1, result);
+    }
+
+    [Fact]
+    public static void Test_SequenceCompareTo_Enum_Items()
+    {
+        int result;
+        var source = ItemArray();
+        var values = ItemEnumerable();
+        // result = source.SequenceCompareTo(values); // Item<> not IEquatable
+        result = source.SequenceCompareTo(values, ItemComparer()); Assert.Equal(0, result);
+
+        source = ItemArray([1, 2, 3]);
+        values = ItemEnumerable([1, 2, 3]);
+        result = source.SequenceCompareTo(values, ItemComparer()); Assert.Equal(0, result);
+
+        values = ItemEnumerable([1, 2]);
+        result = source.SequenceCompareTo(values, ItemComparer()); Assert.Equal(+1, result);
+
+        values = ItemEnumerable([1, 2, 3, 4]);
+        result = source.SequenceCompareTo(values, ItemComparer()); Assert.Equal(-1, result);
+
+        source = ItemArray([1, 2, 4]);
+        values = ItemEnumerable([1, 2, 3]);
+        result = source.SequenceCompareTo(values, ItemComparer()); Assert.Equal(+1, result);
+
+        source = ItemArray([1, 2, 2]);
+        values = ItemEnumerable([1, 2, 3]);
+        result = source.SequenceCompareTo(values, ItemComparer()); Assert.Equal(-1, result);
     }
 
     // ----------------------------------------------------
@@ -711,21 +772,15 @@ public static partial class Test_ArrayExtensions
 
     // ----------------------------------------------------
 
-    // TODO ArrayEx: TrimStart enum
-    // TODO ArrayEx: TrimEnd enum
-    // TODO ArrayEx: Trim enum
-
-    // ----------------------------------------------------
-
-    // TODO ArrayEx: TrimStartAny enum
-    // TODO ArrayEx: TrimEndAny enum
-    // TODO ArrayEx: TrimAny enum
-
-    // ----------------------------------------------------
-
-    // TODO ArrayEx: AddRange enum
-    // TODO ArrayEx: InsertRange enum
-    // TODO ArrayEx: Remove enum
-    // TODO ArrayEx: RemoveLast enum
-    // TODO ArrayEx: RemoveAll enum
+    // TODO ArrayEx: Test_TrimStart_Enum
+    // TODO ArrayEx: Test_TrimEnd_Enum
+    // TODO ArrayEx: Test_Trim_Enum
+    // TODO ArrayEx: Test_TrimStartAny_Enum
+    // TODO ArrayEx: Test_TrimEndAny_Enum
+    // TODO ArrayEx: Test_TrimAny_Enum
+    // TODO ArrayEx: Test_AddRange_Enum
+    // TODO ArrayEx: Test_InsertRange_Enum
+    // TODO ArrayEx: Test_Remove_Enum
+    // TODO ArrayEx: Test_RemoveLast_Enum
+    // TODO ArrayEx: Test_RemoveAll_Enum
 }

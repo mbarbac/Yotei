@@ -449,12 +449,15 @@ public static partial class Test_ArrayExtensions
 
     // ----------------------------------------------------
 
-    // TODO ArrayEx: Add value
-    // TODO ArrayEx: Insert value
-    // TODO ArrayEx: RemoveAt
-    // TODO ArrayEx: RemoveRange index count
-    // TODO ArrayEx: Remove value
-    // TODO ArrayEx: RemoveLast value
-    // TODO ArrayEx: RemoveAll value
-    // TODO ArrayEx: Clear
+    // TODO ArrayEx: Test_Add value
+    // TODO ArrayEx: Test_Insert value
+    // TODO ArrayEx: Test_RemoveAt
+    // TODO ArrayEx: Test_RemoveRange index count
+    // TODO ArrayEx: Test_Remove value
+    // TODO ArrayEx: Test_RemoveLast value
+    // TODO ArrayEx: Test_RemoveAll value
+    // TODO ArrayEx: Test_Remove_Predicate
+    // TODO ArrayEx: Test_RemoveLast_Predicate
+    // TODO ArrayEx: Test_RemoveAll_Predicate
+    // TODO ArrayEx: Test_Clear
 }

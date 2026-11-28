@@ -60,6 +60,40 @@ public static partial class ArrayExtension
 
     // ----------------------------------------------------
 
+    /// <summary>
+    /// Determines the order of this span relative to the given sequence of values:
+    /// <br/>- Less than 0: span precedes the values' sequence.
+    /// <br/>- Equal to 0: span equals the values' sequence.
+    /// <br/>- Greater than 0: span follows the values' sequence.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static int SequenceCompareTo<T>(
+        this T[] source, ReadOnlySpan<T> values, IComparer<T> comparer)
+    {
+        ArgumentNullException.ThrowIfNull(comparer);
+
+        var xlen = source.Length;
+        var ylen = values.Length;
+
+        if (xlen < ylen) return -1;
+        if (xlen > ylen) return +1;
+
+        for (int i = 0; i < xlen; i++)
+        {
+            var xvalue = source[i];
+            var yvalue = values[i];
+            var result = comparer.Compare(xvalue, yvalue);
+            if (result != 0) return result < 0 ? -1 : +1;
+        }
+        return 0;
+    }
+
+    // ----------------------------------------------------
+
 #if NETSTANDARD2_0
     /// <summary>
     /// Returns the index of the first ocurrence of the given sequence, or -1 if any.

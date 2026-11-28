@@ -1,14 +1,65 @@
 ﻿#if NETSTANDARD2_0
+using System.Buffers;
 namespace Yotei.Tools.NStd20;
 #else
 namespace Yotei.Tools;
 #endif
 
-using System.Buffers;
-
 // ========================================================
 public static partial class ArrayExtension
 {
+    /// <summary>
+    /// Determines the order of this span relative to the given sequence of values:
+    /// <br/>- Less than 0: span precedes the values' sequence.
+    /// <br/>- Equal to 0: span equals the values' sequence.
+    /// <br/>- Greater than 0: span follows the values' sequence.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <returns></returns>
+    public static int SequenceCompareTo<T>(
+        this T[] source, IEnumerable<T> values) where T : IComparable<T>
+    {
+        var comparer = ComparerEx.New<T>();
+        return source.SequenceCompareTo(values, comparer);
+    }
+
+    /// <summary>
+    /// Determines the order of this span relative to the given sequence of values:
+    /// <br/>- Less than 0: span precedes the values' sequence.
+    /// <br/>- Equal to 0: span equals the values' sequence.
+    /// <br/>- Greater than 0: span follows the values' sequence.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="source"></param>
+    /// <param name="values"></param>
+    /// <param name="comparer"></param>
+    /// <returns></returns>
+    public static int SequenceCompareTo<T>(
+        this T[] source, IEnumerable<T> values, IComparer<T> comparer)
+    {
+        ArgumentNullException.ThrowIfNull(values);
+        ArgumentNullException.ThrowIfNull(comparer);
+
+        var len = source.Length;
+        var iter = values.GetEnumerator();
+
+        for (int i = 0; i < len; i++)
+        {
+            if (!iter.MoveNext()) return +1;
+
+            var xvalue = source[i];
+            var yvalue = iter.Current;
+            var result = comparer.Compare(xvalue, yvalue);
+            if (result != 0) return result < 0 ? -1 : +1;
+        }
+        if (iter.MoveNext()) return -1;
+        return 0;
+    }
+
+    // ----------------------------------------------------
+
     /// Returns the index of the first ocurrence of the given sequence, or -1 if any.
     /// </summary>
     /// <typeparam name="T"></typeparam>
