@@ -2,8 +2,6 @@
 #pragma warning disable CA1859
 
 #if NETSTANDARD2_0
-using System.Net.Sockets;
-
 namespace Yotei.Tools.NStd20.Tests;
 #else
 namespace Yotei.Tools.Tests;

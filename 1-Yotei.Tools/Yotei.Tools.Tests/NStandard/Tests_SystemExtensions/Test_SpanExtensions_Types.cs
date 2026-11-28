@@ -15,8 +15,8 @@ public static partial class Test_SpanExtensions
     static int[] IntArray() => [];
     static int[] IntArray(IEnumerable<int> values) => [.. values];
 
-    static ReadOnlySpan<int> IntSpan() => [];
-    static ReadOnlySpan<int> IntSpan(IEnumerable<int> values) => values.ToArray();
+    static Span<int> IntSpan() => [];
+    static Span<int> IntSpan(IEnumerable<int> values) => values.ToArray();
 
     static IEnumerable<int> IntEnumerable() => [];
     static IEnumerable<int> IntEnumerable(IEnumerable<int> values) => values;
@@ -31,8 +31,8 @@ public static partial class Test_SpanExtensions
     static Item<int>[] ItemArray() => [];
     static Item<int>[] ItemArray(IEnumerable<int> values) => [.. values.Select(x => Item(x))];
 
-    static ReadOnlySpan<Item<int>> ItemSpan() => [];
-    static ReadOnlySpan<Item<int>> ItemSpan(IEnumerable<int> values) => values.Select(x => Item(x)).ToArray();
+    static Span<Item<int>> ItemSpan() => [];
+    static Span<Item<int>> ItemSpan(IEnumerable<int> values) => values.Select(x => Item(x)).ToArray();
 
     static IEnumerable<Item<int>> ItemEnumerable() => [];
     static IEnumerable<Item<int>> ItemEnumerable(IEnumerable<int> values) => values.Select(x => Item(x));
