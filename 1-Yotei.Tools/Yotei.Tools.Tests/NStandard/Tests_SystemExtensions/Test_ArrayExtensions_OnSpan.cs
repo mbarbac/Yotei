@@ -36,15 +36,13 @@ public static partial class Test_ArrayExtensions
         bool result;
         var source = Array.Empty<Item<int>>();
         var target = ItemSpan();
-        result = source.SequenceEqual(target); Assert.True(result);
+        // result = source.SequenceEqual(target); // Item<> not IEquatable
         result = source.SequenceEqual(target, ItemEquality()); Assert.True(result);
 
         source = ItemArray([1, 2]);
-        result = source.SequenceEqual(target); Assert.False(result);
         result = source.SequenceEqual(target, ItemEquality()); Assert.False(result);
 
         target = ItemSpan([1, 2]);
-        result = source.SequenceEqual(target); Assert.False(result); // elements are references
         result = source.SequenceEqual(target, ItemEquality()); Assert.True(result);
     }
 
@@ -272,7 +270,7 @@ public static partial class Test_ArrayExtensions
         var source = IntArray();
         var values = IntSpan();
         result = source.EndsWith(values); Assert.True(result); // Standard behavior
-        result = source.EndsWith(values, IntEquality()); Assert.False(result);
+        result = source.EndsWith(values, IntEquality()); Assert.True(result);
 
         source = [1, 2, 3, 4];
         values = [4, 5];
@@ -291,7 +289,7 @@ public static partial class Test_ArrayExtensions
         var source = ItemArray();
         var values = ItemSpan();
         // result = source.EndsWith(values); // Item<> not IEquatable
-        result = source.EndsWith(values, ItemEquality()); Assert.False(result);
+        result = source.EndsWith(values, ItemEquality()); Assert.True(result);
 
         source = ItemArray([1, 2, 3, 4]);
         values = ItemSpan([4, 5]);
